@@ -1,0 +1,172 @@
+{
+   "tag_color":"green",
+   "rules":[
+      {
+         "name":"Linux_to_Katello_RHEL_Repos",
+         "source_zone":"any",
+         "source":"any",
+         "dest_zone":"any",
+         "dest":"10.200.10.35",
+         "service":"TCP_443",
+         "description":"All Linux servers to external katello-scl-rhel repository for RHEL packages"
+      },
+      {
+         "name":"Admin_SSH_Gateways_to_SECINFRA",
+         "dest":"10.100.1.128/26",
+         "source":"10.50.88.4,10.50.88.5",
+         "service":"TCP_22",
+         "description":"SSH access from admin network gateways to SECINFRA subnet"
+      },
+      {
+         "name":"Windows_KMS_Activation",
+         "source_zone":"prod_zone",
+         "source":"10.100.1.128/26",
+         "dest_zone":"any",
+         "dest":"10.200.194.54",
+         "service":"TCP_1688",
+         "description":"All SECINFRA Windows servers to KMS activation server SLS19002"
+      },
+      {
+         "name":"WSUS_Internet_Updates",
+         "source_zone":"prod_zone",
+         "source":"10.100.1.141",
+         "dest_zone":"any",
+         "dest":"any",
+         "service":"TCP_80,TCP_443",
+         "description":"WSUS server (svc-win-02d) downloads Microsoft Updates from Internet"
+      },
+      {
+         "name":"NTLite_Vendor_Download",
+         "source_zone":"prod_zone",
+         "source":"10.100.1.145",
+         "dest_zone":"any",
+         "dest":"93.184.216.34",
+         "service":"TCP_80,TCP_443",
+         "description":"NTLite server (svc-win-01d) downloads from vendor website"
+      },
+      {
+         "name":"External_to_DCs_LDAPS",
+         "source":"10.26.63.150",
+         "dest":"10.100.1.134,10.100.1.135,10.100.1.137,10.100.1.138,10.100.1.139,10.100.1.150",
+         "service":"TCP_636",
+         "description":"External system to SECINFRA Domain Controllers LDAPS (AD CORP, AD ADMIN, LDAP Linux servers)"
+      },
+      {
+         "name":"ADMIN_to_Gateway_Linux_SSH",
+         "source":"10.120.72.0/24,10.120.73.0/24",
+         "dest":"10.100.1.132",
+         "service":"TCP_22",
+         "description":"Admin SSH access to Linux Gateway (gw-lin-01d)"
+      },
+      {
+         "name":"ADMIN_to_Gateway_Windows_RDP_SMB",
+         "source":"10.120.72.0/24,10.120.73.0/24",
+         "dest":"10.100.1.133",
+         "service":"TCP_3389,TCP_445",
+         "description":"Admin RDP and SMB access to Windows Gateway (gw-win-01d)"
+      },
+      {
+         "name":"ADMIN_to_AD_CORP_Services",
+         "source":"10.120.72.0/24,10.120.73.0/24",
+         "dest":"10.100.1.137,10.100.1.138",
+         "service":"TCP_88,TCP_135,TCP_139,TCP_389,TCP_445,TCP_464,TCP_636,TCP_1024-1028,TCP_3268-3269,TCP_5985-5986,TCP_9389,TCP_25000-25010,TCP_49152-65535,UDP_53,UDP_88,UDP_123,UDP_137-138,UDP_389,UDP_445,UDP_464,UDP_636,UDP_1024-1028,UDP_49152-65535",
+         "description":"Admin to AD CORP Domain Controllers full AD services (dc-win-01d, dc-win-02d)"
+      },
+      {
+         "name":"ADMIN_to_KeePass_SMB",
+         "source":"10.120.72.0/24,10.120.73.0/24",
+         "dest":"10.100.1.146",
+         "service":"TCP_445",
+         "description":"Admin to KeePass File Server SMB access (file-win-01d)"
+      },
+      {
+         "name":"ADMIN_to_CRL_HTTP",
+         "source":"10.120.72.0/24,10.120.73.0/24",
+         "dest":"10.100.1.144",
+         "service":"TCP_80",
+         "description":"Admin to CRL Server HTTP for certificate validation (svc-win-04d)"
+      },
+      {
+         "name":"ADMIN_to_WSUS_Client",
+         "source":"10.120.72.0/24,10.120.73.0/24",
+         "dest":"10.100.1.141",
+         "service":"TCP_8530,TCP_8531",
+         "description":"Admin to WSUS Server for Windows Updates client port (svc-win-02d)"
+      },
+      {
+         "name":"AD_Replication_DC2_to_DC1",
+         "source_zone":"prod_zone",
+         "source":"10.100.1.128/26",
+         "dest_zone":"prod_zone",
+         "dest":"10.100.2.128/26",
+         "service":"TCP_53,TCP_88,TCP_135,TCP_389,TCP_445,TCP_464,TCP_636,TCP_3268,TCP_3269,TCP_9389,TCP_25000-25010,TCP_49152-65535,UDP_53,UDP_88,UDP_123,UDP_389,UDP_464",
+         "description":"INTER-SITE: AD Replication from Datacenter 2 to Datacenter 1 - Full AD services"
+      },
+      {
+         "name":"AD_Failover_DC2_to_DC1",
+         "source_zone":"prod_zone",
+         "source":"10.100.1.128/26",
+         "dest_zone":"prod_zone",
+         "dest":"10.100.2.128/26",
+         "service":"TCP_53,TCP_88,TCP_389,TCP_636,TCP_3268,UDP_53,UDP_88,UDP_123",
+         "description":"INTER-SITE: AD Failover from Datacenter 2 to Datacenter 1 - Essential AD services"
+      },
+      {
+         "name":"KeePass_Sync_DC2_to_DC1",
+         "source_zone":"prod_zone",
+         "source":"10.100.1.146",
+         "dest_zone":"prod_zone",
+         "dest":"10.100.2.128/26",
+         "service":"TCP_445",
+         "description":"INTER-SITE: KeePass synchronization from Datacenter 2 (file-win-01d) to Datacenter 1"
+      },
+      {
+         "name":"Admin_SSH_DC2_to_DC1",
+         "source_zone":"prod_zone",
+         "source":"10.100.1.132",
+         "dest_zone":"prod_zone",
+         "dest":"10.100.2.128/26",
+         "service":"TCP_22",
+         "description":"INTER-SITE: Admin SSH access from Datacenter 2 Gateway to Datacenter 1 servers"
+      },
+      {
+         "name":"Admin_RDP_DC2_to_DC1",
+         "source_zone":"prod_zone",
+         "source":"10.100.1.133",
+         "dest_zone":"prod_zone",
+         "dest":"10.100.2.128/26",
+         "service":"TCP_3389,TCP_5985-5986",
+         "description":"INTER-SITE: Admin RDP/WinRM access from Datacenter 2 Gateway to Datacenter 1 servers"
+      },
+      {
+         "name":"Concentrator_to_SOC_6514",
+         "source":"10.100.1.136",
+         "dest":"10.98.14.20",
+         "service":"TCP_6514",
+         "description":"Send the log from the concentrator to SOC with TLS"
+      },
+      {
+         "name":"Concentrator_to_SOC_1545",
+         "source":"10.100.1.136",
+         "dest":"10.98.14.20",
+         "service":"TCP_1545",
+         "description":"TCP opening to SOC machine"
+      },
+      {
+         "name":"LDAP_Sync_DC2_to_DC1",
+         "source":"10.100.1.150",
+         "dest":"10.100.2.136",
+         "service":"TCP_389,TCP_636",
+         "description":"TCP opening to ensure LDAP sync between DC2 and DC1"
+      },
+      {
+         "name":"Windows_to_Chocolatey",
+         "source_zone":"prod_zone",
+         "source":"any",
+         "dest_zone":"any",
+         "dest":"10.100.122.34",
+         "service":"TCP_80",
+         "description":"Access for SECINFRA Windows servers to internal Chocolatey package server"
+      }
+   ]
+}

@@ -1,0 +1,182 @@
+{
+  "formatName": "PaloAlto",
+  "filePatterns": ["*FW_Rules*.json", "*NAT_Rules*.json", "*fw_rules*.json"],
+  "rules": [
+    {
+      "key": "firewall.tag_color",
+      "valuePattern": "green",
+      "severity": "GoodPractice",
+      "humanDescription": "Firewall rules tagged with green color indicating approved/reviewed status.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.tag_color",
+      "valuePattern": "red",
+      "severity": "Warning",
+      "humanDescription": "Firewall rules tagged with red color. These may require review or represent temporary rules.",
+      "suggestedFix": "",
+      "fixReason": "Review red-tagged rules and update to approved status after verification."
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Palo Alto firewall rule definition. Each rule defines allowed traffic between source and destination.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.source_any",
+      "valuePattern": "any",
+      "severity": "Warning",
+      "humanDescription": "Firewall rule allows traffic from ANY source. This is overly permissive and should be restricted.",
+      "suggestedFix": "Specify source IP addresses or networks",
+      "fixReason": "Any-source rules increase attack surface. Define specific source networks."
+    },
+    {
+      "key": "fw_rule.dest_any",
+      "valuePattern": "any",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Firewall rule allows traffic to ANY destination. This is highly permissive and creates security risk.",
+      "suggestedFix": "Specify destination IP addresses or networks",
+      "fixReason": "Any-destination rules allow unrestricted outbound access. Define specific destinations."
+    },
+    {
+      "key": "fw_rule.source",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Firewall rule source definition. Specifies which networks/hosts can initiate connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.dest",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Firewall rule destination definition. Specifies target networks/hosts for allowed traffic.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.service",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Service/port definition for the firewall rule.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.source_zone",
+      "valuePattern": "any",
+      "severity": "Warning",
+      "humanDescription": "Rule applies to any source zone. Consider restricting to specific security zones.",
+      "suggestedFix": "",
+      "fixReason": "Zone-based policies provide better segmentation control."
+    },
+    {
+      "key": "fw_rule.dest_zone",
+      "valuePattern": "any",
+      "severity": "Warning",
+      "humanDescription": "Rule applies to any destination zone. Consider restricting to specific security zones.",
+      "suggestedFix": "",
+      "fixReason": "Zone-based policies provide better segmentation control."
+    },
+    {
+      "key": "fw_rule.port.TCP_22",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "SSH access (TCP/22) allowed. Ensure SSH is only accessible from admin networks or jump hosts.",
+      "suggestedFix": "",
+      "fixReason": "SSH should be restricted to authorized admin networks."
+    },
+    {
+      "key": "fw_rule.port.TCP_23",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Telnet (TCP/23) access allowed. Telnet transmits credentials in plaintext and is insecure.",
+      "suggestedFix": "Replace Telnet with SSH (TCP/22)",
+      "fixReason": "Telnet is unencrypted and should never be used in production environments."
+    },
+    {
+      "key": "fw_rule.port.TCP_3389",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "RDP access (TCP/3389) allowed. RDP is frequently targeted by attackers and should be protected.",
+      "suggestedFix": "",
+      "fixReason": "Use RDP Gateway, enable NLA, and restrict source IPs for RDP access."
+    },
+    {
+      "key": "fw_rule.port.TCP_445",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "SMB file sharing (TCP/445) allowed. SMB is commonly exploited in ransomware attacks.",
+      "suggestedFix": "",
+      "fixReason": "Ensure SMBv1 is disabled and SMB signing is enabled. Restrict to necessary networks."
+    },
+    {
+      "key": "fw_rule.port.TCP_1433",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "SQL Server (TCP/1433) allowed. Database ports should be restricted to application servers only.",
+      "suggestedFix": "",
+      "fixReason": "Never expose database ports directly. Use application tier segmentation."
+    },
+    {
+      "key": "fw_rule.port.TCP_3306",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "MySQL (TCP/3306) allowed. Database ports should be restricted to application servers only.",
+      "suggestedFix": "",
+      "fixReason": "Never expose database ports directly. Use application tier segmentation."
+    },
+    {
+      "key": "fw_rule.port.TCP_5432",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "PostgreSQL (TCP/5432) allowed. Database ports should be restricted to application servers only.",
+      "suggestedFix": "",
+      "fixReason": "Never expose database ports directly. Use application tier segmentation."
+    },
+    {
+      "key": "fw_rule.port.TCP_27017",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "MongoDB (TCP/27017) allowed. Ensure MongoDB authentication is enabled and access is restricted.",
+      "suggestedFix": "",
+      "fixReason": "MongoDB default installations lack authentication. Always enable auth and restrict access."
+    },
+    {
+      "key": "fw_rule.port.TCP_6379",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Redis (TCP/6379) allowed. Redis should be password-protected and not exposed directly.",
+      "suggestedFix": "",
+      "fixReason": "Redis without authentication can lead to data theft and remote code execution."
+    },
+    {
+      "key": "fw_rule.port.TCP_21",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "FTP (TCP/21) allowed. FTP transmits credentials in plaintext and is insecure.",
+      "suggestedFix": "Replace FTP with SFTP (TCP/22) or FTPS",
+      "fixReason": "FTP is unencrypted. Use SFTP or FTPS for secure file transfers."
+    },
+    {
+      "key": "fw_rule.port.TCP_80",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "HTTP (TCP/80) allowed. Consider whether HTTPS (TCP/443) should be required instead.",
+      "suggestedFix": "",
+      "fixReason": "HTTP traffic is unencrypted. Use HTTPS where possible."
+    },
+    {
+      "key": "fw_rule.port.wide_range",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Wide ephemeral port range (49152-65535) allowed. Common for AD/RPC but increases attack surface.",
+      "suggestedFix": "",
+      "fixReason": "Wide port ranges are sometimes necessary but should be carefully documented."
+    }
+  ]
+}

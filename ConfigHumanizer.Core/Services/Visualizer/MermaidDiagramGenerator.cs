@@ -46,6 +46,8 @@ public class MermaidDiagramGenerator : IDiagramGenerator
             "fail2ban" => GenerateFail2banDiagram(sb, rules),
             "iptables" => GenerateFirewallDiagram(sb, rules),
             "postfix" => GeneratePostfixDiagram(sb, rules),
+            "terraform" => GenerateTerraformDiagram(sb, rules),
+            "paloalto" => GeneratePaloAltoDiagram(sb, rules),
             _ => GenerateGenericDiagram(sb, rules, formatName)
         };
     }
@@ -837,6 +839,186 @@ public class MermaidDiagramGenerator : IDiagramGenerator
         // Outgoing mail
         sb.AppendLine("    Postfix -->|Deliver| Recipient((Recipient))");
         sb.AppendLine("    Postfix -->|Queue| Queue[(Mail Queue)]");
+
+        return sb.ToString();
+    }
+
+    private static string GenerateTerraformDiagram(StringBuilder sb, List<HumanizedRule> rules)
+    {
+        sb.AppendLine("    TF{{Terraform}}");
+
+        // Extract modules
+        var modules = rules.Where(r => r.Key.Contains("module.definition"))
+            .Select(r => r.Value)
+            .Distinct()
+            .ToList();
+
+        // Extract EPGs/security groups
+        var epgs = rules.Where(r => r.Key.Contains("vm.securityGroup") || r.Key.Contains("contract.epg"))
+            .Select(r => r.Value)
+            .Distinct()
+            .ToList();
+
+        // Extract VMs by OS type
+        var windowsVms = rules.Count(r => r.Key.Contains("vm.os") && r.Value.ToLowerInvariant().Contains("windows"));
+        var linuxVms = rules.Count(r => r.Key.Contains("vm.os") &&
+            (r.Value.ToLowerInvariant().Contains("rhel") || r.Value.ToLowerInvariant().Contains("centos")));
+
+        // Draw modules
+        foreach (var module in modules.Take(6))
+        {
+            var moduleId = SanitizeMermaidId(module);
+            sb.AppendLine($"    TF --> {moduleId}[Module: {module}]");
+            sb.AppendLine($"    style {moduleId} fill:#74c0fc,stroke:#339af0");
+        }
+
+        // Draw ACI tenant structure if present
+        var hasTenant = rules.Any(r => r.Key.Contains("aci.fabric"));
+        if (hasTenant)
+        {
+            sb.AppendLine("    TF --> ACI{{Cisco ACI Fabric}}");
+            sb.AppendLine("    style ACI fill:#00bceb,stroke:#005073");
+        }
+
+        // Draw EPG groups
+        var epgIndex = 0;
+        foreach (var epg in epgs.Distinct().Take(6))
+        {
+            epgIndex++;
+            var epgId = $"EPG{epgIndex}";
+            var shortName = epg.Length > 20 ? epg[..17] + "..." : epg;
+
+            if (hasTenant)
+            {
+                sb.AppendLine($"    ACI --> {epgId}[/{shortName}/]");
+            }
+            else
+            {
+                sb.AppendLine($"    TF --> {epgId}[/{shortName}/]");
+            }
+
+            // Color based on EPG type
+            if (epg.Contains("_GW"))
+            {
+                sb.AppendLine($"    style {epgId} fill:#ffd43b,stroke:#fab005");
+            }
+            else if (epg.Contains("_SECU"))
+            {
+                sb.AppendLine($"    style {epgId} fill:#69db7c,stroke:#37b24d");
+            }
+            else if (epg.Contains("_AD") || epg.Contains("_LDAP"))
+            {
+                sb.AppendLine($"    style {epgId} fill:#da77f2,stroke:#ae3ec9");
+            }
+        }
+
+        // Draw VM counts
+        if (windowsVms > 0)
+        {
+            sb.AppendLine($"    WinVMs[Windows VMs: {windowsVms}] --> TF");
+            sb.AppendLine("    style WinVMs fill:#00adef,stroke:#0078d4");
+        }
+
+        if (linuxVms > 0)
+        {
+            sb.AppendLine($"    LinuxVMs[Linux VMs: {linuxVms}] --> TF");
+            sb.AppendLine("    style LinuxVMs fill:#e95420,stroke:#c34113");
+        }
+
+        // Check for Palo Alto firewall rules
+        var hasPaloAlto = rules.Any(r => r.Key.Contains("firewall.json_file") || r.Key.Contains("firewall.ports"));
+        if (hasPaloAlto)
+        {
+            sb.AppendLine("    TF --> PaloAlto{{Palo Alto Firewall}}");
+            sb.AppendLine("    style PaloAlto fill:#ff6b6b,stroke:#c92a2a");
+        }
+
+        // Check for cross-tenant contracts
+        var hasCrossTenant = rules.Any(r => r.Key.Contains("contract.tenant"));
+        if (hasCrossTenant)
+        {
+            sb.AppendLine("    TF -.->|Cross-Tenant| External((External Tenants))");
+        }
+
+        return sb.ToString();
+    }
+
+    private static string GeneratePaloAltoDiagram(StringBuilder sb, List<HumanizedRule> rules)
+    {
+        sb.AppendLine("    External((External)) --> Firewall{{Palo Alto Firewall}}");
+        sb.AppendLine("    Firewall --> Internal((Internal Network))");
+
+        // Check for any-source rules (risky)
+        var anySourceRules = rules.Count(r => r.Key.Contains("fw_rule.source_any"));
+        if (anySourceRules > 0)
+        {
+            sb.AppendLine($"    Warning[Any Source: {anySourceRules} rules] -.-> Firewall");
+            sb.AppendLine("    style Warning fill:#ffd43b,stroke:#fab005");
+        }
+
+        // Check for any-dest rules (very risky)
+        var anyDestRules = rules.Count(r => r.Key.Contains("fw_rule.dest_any"));
+        if (anyDestRules > 0)
+        {
+            sb.AppendLine($"    Critical[Any Dest: {anyDestRules} rules] -.-> Firewall");
+            sb.AppendLine("    style Critical fill:#ff6b6b,stroke:#c92a2a");
+        }
+
+        // Extract zones
+        var zones = rules.Where(r => r.Key.Contains("fw_rule.source_zone") || r.Key.Contains("fw_rule.dest_zone"))
+            .Select(r => r.Value)
+            .Where(v => !string.IsNullOrEmpty(v) && v != "any")
+            .Distinct()
+            .ToList();
+
+        var zoneIndex = 0;
+        foreach (var zone in zones.Take(4))
+        {
+            zoneIndex++;
+            var zoneId = $"Zone{zoneIndex}";
+            sb.AppendLine($"    Firewall --> {zoneId}[/{zone}/]");
+            sb.AppendLine($"    style {zoneId} fill:#74c0fc,stroke:#339af0");
+        }
+
+        // Count open ports
+        var sshRules = rules.Count(r => r.Key.Contains("fw_rule.port.TCP_22"));
+        var rdpRules = rules.Count(r => r.Key.Contains("fw_rule.port.TCP_3389"));
+        var smbRules = rules.Count(r => r.Key.Contains("fw_rule.port.TCP_445"));
+        var httpRules = rules.Count(r => r.Key.Contains("fw_rule.port.TCP_80"));
+
+        if (sshRules > 0)
+        {
+            sb.AppendLine($"    SSH[SSH: {sshRules}] --> Firewall");
+        }
+        if (rdpRules > 0)
+        {
+            sb.AppendLine($"    RDP[RDP: {rdpRules}] --> Firewall");
+            sb.AppendLine("    style RDP fill:#ffd43b,stroke:#fab005");
+        }
+        if (smbRules > 0)
+        {
+            sb.AppendLine($"    SMB[SMB: {smbRules}] --> Firewall");
+            sb.AppendLine("    style SMB fill:#ffd43b,stroke:#fab005");
+        }
+        if (httpRules > 0)
+        {
+            sb.AppendLine($"    HTTP[HTTP: {httpRules}] --> Firewall");
+        }
+
+        // Count total rules
+        var totalRules = rules.Count(r => r.Key.Contains("fw_rule.name"));
+        sb.AppendLine($"    Rules{{Total Rules: {totalRules}}} -.-> Firewall");
+
+        // Check tag color
+        var tagColor = rules.FirstOrDefault(r => r.Key.Contains("firewall.tag_color"))?.Value;
+        if (tagColor == "green")
+        {
+            sb.AppendLine("    style Firewall fill:#69db7c,stroke:#37b24d");
+        }
+        else if (tagColor == "red")
+        {
+            sb.AppendLine("    style Firewall fill:#ff6b6b,stroke:#c92a2a");
+        }
 
         return sb.ToString();
     }

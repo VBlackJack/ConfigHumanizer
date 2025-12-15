@@ -1,0 +1,198 @@
+{
+  "formatName": "Terraform",
+  "filePatterns": ["*.tf", "*.tfvars"],
+  "rules": [
+    {
+      "key": "module.source",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Terraform module source reference. Verify the module source is from a trusted registry or internal repository.",
+      "suggestedFix": "",
+      "fixReason": "Module sources should be versioned and from trusted registries."
+    },
+    {
+      "key": "module.source",
+      "valuePattern": ".*:latest.*",
+      "severity": "Warning",
+      "humanDescription": "Module reference uses 'latest' tag. This can lead to unpredictable infrastructure changes.",
+      "suggestedFix": "Pin module to specific version (e.g., ?ref=1.0.0)",
+      "fixReason": "Always pin module versions to ensure reproducible deployments."
+    },
+    {
+      "key": "module.source",
+      "valuePattern": "^git::https://.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Module source uses HTTPS for Git repository access. This is secure and recommended.",
+      "suggestedFix": "",
+      "fixReason": "HTTPS ensures encrypted communication with the Git repository."
+    },
+    {
+      "key": "module.source",
+      "valuePattern": "^git::http://.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Module source uses unencrypted HTTP. Credentials and code can be intercepted.",
+      "suggestedFix": "Change http:// to https://",
+      "fixReason": "Always use HTTPS for secure module downloads."
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Terraform module definition. Modules encapsulate reusable infrastructure components.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "locals.definition",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Local values block for reusable expressions within the configuration.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.securityGroup",
+      "valuePattern": ".*_GW$",
+      "severity": "Info",
+      "humanDescription": "VM assigned to Gateway security group. Gateway VMs typically handle inbound/outbound traffic and require careful network rule configuration.",
+      "suggestedFix": "",
+      "fixReason": "Gateway VMs are entry points and should have minimal required ports open."
+    },
+    {
+      "key": "vm.securityGroup",
+      "valuePattern": ".*_AD_LDAP$",
+      "severity": "Info",
+      "humanDescription": "VM assigned to AD/LDAP security group. Contains Active Directory and LDAP services requiring specific port access.",
+      "suggestedFix": "",
+      "fixReason": "AD/LDAP servers should be protected with strict network policies."
+    },
+    {
+      "key": "vm.securityGroup",
+      "valuePattern": ".*_SERVICES$",
+      "severity": "Info",
+      "humanDescription": "VM assigned to Services security group. Contains shared infrastructure services.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.securityGroup",
+      "valuePattern": ".*_SECU_REPO$",
+      "severity": "Info",
+      "humanDescription": "VM assigned to Security Repository group. Likely contains security tools like Wazuh, SIEM, or log collectors.",
+      "suggestedFix": "",
+      "fixReason": "Security infrastructure should be isolated and protected."
+    },
+    {
+      "key": "vm.os",
+      "valuePattern": "(?i)windows.*",
+      "severity": "Info",
+      "humanDescription": "Windows-based VM. Ensure Windows Update (WSUS) and security patches are configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.os",
+      "valuePattern": "(?i)rhel.*|centos.*|rocky.*|alma.*",
+      "severity": "Info",
+      "humanDescription": "Enterprise Linux-based VM (RHEL/CentOS/Rocky/Alma). Ensure package management (Katello/Satellite) is configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.netClass",
+      "valuePattern": "GOLD.*",
+      "severity": "GoodPractice",
+      "humanDescription": "VM uses GOLD network tier with guaranteed bandwidth and low latency.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.storClass",
+      "valuePattern": "GOLD.*",
+      "severity": "GoodPractice",
+      "humanDescription": "VM uses GOLD storage tier with high IOPS and reliable performance.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "aci.fabric",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Cisco ACI fabric assignment. Defines which ACI fabric controller manages this tenant.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "contract.epg",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Endpoint Group (EPG) reference in firewall contract. EPGs define network segmentation in Cisco ACI.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "contract.tenant",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Cross-tenant contract reference. Enables communication between different ACI tenants.",
+      "suggestedFix": "",
+      "fixReason": "Cross-tenant contracts should be reviewed for least-privilege access."
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_22.*",
+      "severity": "Info",
+      "humanDescription": "SSH (TCP/22) port allowed in firewall rule. SSH access should be restricted to administrative networks.",
+      "suggestedFix": "",
+      "fixReason": "Limit SSH access to jump hosts or VPN connections only."
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_3389.*",
+      "severity": "Info",
+      "humanDescription": "RDP (TCP/3389) port allowed in firewall rule. RDP access should be restricted to administrative networks.",
+      "suggestedFix": "",
+      "fixReason": "Limit RDP access to jump hosts or VPN connections. Consider using RDP Gateway."
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_445.*",
+      "severity": "Warning",
+      "humanDescription": "SMB (TCP/445) port allowed. SMB should be carefully controlled to prevent lateral movement attacks.",
+      "suggestedFix": "",
+      "fixReason": "SMB is commonly targeted in ransomware attacks. Ensure SMBv1 is disabled."
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_49152-65535.*",
+      "severity": "Warning",
+      "humanDescription": "Wide ephemeral port range allowed (49152-65535). This is common for AD but expands attack surface.",
+      "suggestedFix": "",
+      "fixReason": "Wide port ranges are sometimes necessary for AD RPC but should be monitored."
+    },
+    {
+      "key": "firewall.json_file",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "JSON file reference for North-South firewall rules (Palo Alto). Review the referenced file for security rules.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "workspace.PROD.*",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Production workspace configuration. Production environments require additional security scrutiny.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "workspace.DEV.*",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Development workspace configuration.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

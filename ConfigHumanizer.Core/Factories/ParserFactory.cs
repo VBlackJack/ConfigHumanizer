@@ -231,7 +231,7 @@ public static class ParserFactory
         // Check for Terraform files
         if (extension == ".tf" || extension == ".tfvars")
         {
-            return ruleEngine != null ? new SshdConfigParser(ruleEngine, "Terraform") : new SshdConfigParser();
+            return ruleEngine != null ? new HclConfigParser(ruleEngine, "Terraform") : new HclConfigParser();
         }
 
         // ==================== YAML Files ====================
@@ -309,6 +309,13 @@ public static class ParserFactory
             if (fileName.Contains("appsettings"))
             {
                 return ruleEngine != null ? new JsonConfigParser(ruleEngine, "AppSettings") : new JsonConfigParser();
+            }
+
+            // Palo Alto / Firewall rules JSON files
+            if (fileName.Contains("fw_rules") || fileName.Contains("nat_rules") ||
+                (fileContent.Contains("\"rules\"") && (fileContent.Contains("\"source\"") || fileContent.Contains("\"dest\""))))
+            {
+                return ruleEngine != null ? new PaloAltoJsonParser(ruleEngine, "PaloAlto") : new PaloAltoJsonParser();
             }
 
             return ruleEngine != null ? new JsonConfigParser(ruleEngine, "JSON") : new JsonConfigParser();
