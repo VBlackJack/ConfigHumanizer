@@ -1,0 +1,110 @@
+{
+  "formatName": "Network",
+  "filePatterns": ["hosts", "resolv.conf", "*resolv*"],
+  "rules": [
+    {
+      "key": "nameserver",
+      "valuePattern": "^8\\.8\\.8\\.8$|^8\\.8\\.4\\.4$",
+      "severity": "Info",
+      "humanDescription": "Using Google Public DNS resolvers.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "nameserver",
+      "valuePattern": "^1\\.1\\.1\\.1$|^1\\.0\\.0\\.1$",
+      "severity": "Info",
+      "humanDescription": "Using Cloudflare Public DNS resolvers (privacy-focused).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "nameserver",
+      "valuePattern": "^9\\.9\\.9\\.9$",
+      "severity": "GoodPractice",
+      "humanDescription": "Using Quad9 DNS (security-focused, blocks malicious domains).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "nameserver",
+      "valuePattern": "^127\\.0\\.0\\.1$|^::1$",
+      "severity": "Info",
+      "humanDescription": "Using local DNS resolver (localhost).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "nameserver",
+      "valuePattern": "^192\\.168\\..*|^10\\..*|^172\\.(1[6-9]|2[0-9]|3[0-1])\\..*",
+      "severity": "Info",
+      "humanDescription": "Using private network DNS server.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "search",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "DNS search domain configured for short hostname resolution.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "domain",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Local domain name configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "options",
+      "valuePattern": ".*rotate.*",
+      "severity": "GoodPractice",
+      "humanDescription": "DNS rotation enabled. Queries are distributed across nameservers.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "options",
+      "valuePattern": ".*timeout:.*",
+      "severity": "Info",
+      "humanDescription": "Custom DNS timeout configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "localhost.*",
+      "valuePattern": "^127\\.0\\.0\\.1$",
+      "severity": "GoodPractice",
+      "humanDescription": "Standard localhost definition pointing to loopback address.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*",
+      "valuePattern": "^127\\.0\\.0\\.1$",
+      "severity": "Info",
+      "humanDescription": "Hostname resolves to localhost. Often used to block domains.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*",
+      "valuePattern": "^0\\.0\\.0\\.0$",
+      "severity": "Info",
+      "humanDescription": "Hostname blocked (resolves to null route). Ad-blocking technique.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\.local$",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Local network hostname (mDNS/Bonjour domain).",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

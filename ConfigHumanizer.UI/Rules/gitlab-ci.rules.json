@@ -1,0 +1,134 @@
+{
+  "formatName": "GitLabCI",
+  "filePatterns": [".gitlab-ci.yml", ".gitlab-ci.yaml"],
+  "rules": [
+    {
+      "key": ".*image:",
+      "valuePattern": ".*:latest$",
+      "severity": "Warning",
+      "humanDescription": "Using :latest tag. Builds may not be reproducible.",
+      "suggestedFix": "",
+      "fixReason": "Pin images to specific versions."
+    },
+    {
+      "key": ".*image:",
+      "valuePattern": ".*:\\d+\\.\\d+.*$",
+      "severity": "GoodPractice",
+      "humanDescription": "Image pinned to specific version.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*variables\\..*PASSWORD|.*variables\\..*SECRET|.*variables\\..*TOKEN",
+      "valuePattern": "^(?!\\$).*$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Potential hardcoded secret in variables.",
+      "suggestedFix": "",
+      "fixReason": "Use GitLab CI/CD masked variables."
+    },
+    {
+      "key": ".*only:.*main|.*only:.*master",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Job runs only on main/master branch.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*when:.*manual",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Manual job trigger required.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*allow_failure:",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "Job failure allowed. Pipeline continues on failure.",
+      "suggestedFix": "",
+      "fixReason": "Consider if failure should block pipeline."
+    },
+    {
+      "key": ".*cache:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Caching configured. Improves build speed.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*artifacts:",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Artifacts configured for job output.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*artifacts\\.expire_in:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Artifact expiration configured. Saves storage.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*services:",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Service containers configured for job.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*before_script:",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Before script configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*script:.*curl.*\\|.*sh|.*script:.*wget.*\\|.*sh",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Piping remote script to shell. Security risk.",
+      "suggestedFix": "",
+      "fixReason": "Download and verify scripts before execution."
+    },
+    {
+      "key": ".*needs:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Job dependencies configured with needs.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*rules:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Rules-based job execution configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*environment:",
+      "valuePattern": ".*production.*",
+      "severity": "Info",
+      "humanDescription": "Production environment deployment configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*retry:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Automatic retry configured for flaky jobs.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

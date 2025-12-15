@@ -1,0 +1,142 @@
+{
+  "formatName": "PostgreSQL",
+  "filePatterns": ["postgresql.conf", "pg_hba.conf", "*/postgresql/*"],
+  "rules": [
+    {
+      "key": "listen_addresses",
+      "valuePattern": "^\\*$",
+      "severity": "Warning",
+      "humanDescription": "PostgreSQL listening on all interfaces.",
+      "suggestedFix": "listen_addresses = 'localhost'",
+      "fixReason": "Bind to localhost unless remote access is required."
+    },
+    {
+      "key": "listen_addresses",
+      "valuePattern": "^localhost$|^127\\.0\\.0\\.1$",
+      "severity": "GoodPractice",
+      "humanDescription": "PostgreSQL bound to localhost only.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "port",
+      "valuePattern": "^5432$",
+      "severity": "Info",
+      "humanDescription": "Using default PostgreSQL port 5432.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ssl",
+      "valuePattern": "(?i)^on$",
+      "severity": "GoodPractice",
+      "humanDescription": "SSL enabled for encrypted connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ssl",
+      "valuePattern": "(?i)^off$",
+      "severity": "Warning",
+      "humanDescription": "SSL disabled. Connections are unencrypted.",
+      "suggestedFix": "ssl = on",
+      "fixReason": "Enable SSL for encrypted connections."
+    },
+    {
+      "key": "password_encryption",
+      "valuePattern": "(?i)^md5$",
+      "severity": "Warning",
+      "humanDescription": "Using MD5 password hashing. Consider scram-sha-256.",
+      "suggestedFix": "password_encryption = 'scram-sha-256'",
+      "fixReason": "SCRAM-SHA-256 is more secure than MD5."
+    },
+    {
+      "key": "password_encryption",
+      "valuePattern": "(?i)^scram-sha-256$",
+      "severity": "GoodPractice",
+      "humanDescription": "Using SCRAM-SHA-256 password encryption. Secure.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "log_connections",
+      "valuePattern": "(?i)^on$",
+      "severity": "GoodPractice",
+      "humanDescription": "Connection logging enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "log_disconnections",
+      "valuePattern": "(?i)^on$",
+      "severity": "GoodPractice",
+      "humanDescription": "Disconnection logging enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "log_statement",
+      "valuePattern": "(?i)^all$",
+      "severity": "Warning",
+      "humanDescription": "All statements logged. Performance impact and disk usage.",
+      "suggestedFix": "",
+      "fixReason": "Consider 'ddl' or 'mod' for production."
+    },
+    {
+      "key": "log_statement",
+      "valuePattern": "(?i)^ddl$|^mod$",
+      "severity": "GoodPractice",
+      "humanDescription": "DDL/modification statements logged. Good for auditing.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "shared_buffers",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Shared buffers size configured. Key performance setting.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "max_connections",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Maximum connections limit configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*trust$",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Trust authentication! No password required for this rule.",
+      "suggestedFix": "",
+      "fixReason": "Use md5 or scram-sha-256 authentication."
+    },
+    {
+      "key": ".*md5$|.*scram-sha-256$",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Password authentication required.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*0\\.0\\.0\\.0/0.*|.*::/0.*",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "pg_hba.conf allows connections from any IP.",
+      "suggestedFix": "",
+      "fixReason": "Restrict to specific IP ranges."
+    },
+    {
+      "key": "row_security",
+      "valuePattern": "(?i)^on$",
+      "severity": "GoodPractice",
+      "humanDescription": "Row-level security enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

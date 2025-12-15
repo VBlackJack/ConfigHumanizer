@@ -1,0 +1,166 @@
+{
+  "formatName": "HAProxy",
+  "filePatterns": ["haproxy.cfg", "haproxy.conf", "*/haproxy/*"],
+  "rules": [
+    {
+      "key": ".*stats.*enable",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "HAProxy stats page enabled. Ensure it's protected.",
+      "suggestedFix": "",
+      "fixReason": "Stats page can expose sensitive information about backends."
+    },
+    {
+      "key": ".*stats.*auth",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Stats page authentication configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*stats.*uri",
+      "valuePattern": ".*/haproxy.*|.*/stats.*",
+      "severity": "Warning",
+      "humanDescription": "Stats page using predictable URL. Consider a random path.",
+      "suggestedFix": "",
+      "fixReason": "Use unpredictable URL to prevent discovery."
+    },
+    {
+      "key": ".*bind.*:80\\b",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Listening on HTTP port 80.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*bind.*:443.*ssl",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "HTTPS configured on port 443 with SSL.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*ssl-default-bind-ciphers",
+      "valuePattern": ".*DES.*|.*RC4.*|.*NULL.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Weak SSL ciphers configured. These are cryptographically broken.",
+      "suggestedFix": "",
+      "fixReason": "Use only strong, modern cipher suites."
+    },
+    {
+      "key": ".*ssl-default-bind-options",
+      "valuePattern": ".*no-sslv3.*|.*no-tlsv10.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Legacy SSL/TLS protocols disabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*mode.*http",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "HTTP mode enabled. Layer 7 load balancing.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*mode.*tcp",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "TCP mode enabled. Layer 4 load balancing.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*balance.*roundrobin",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Round-robin load balancing algorithm.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*balance.*leastconn",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Least-connections algorithm. Better for long-running requests.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*option.*httpchk",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "HTTP health checks configured for backends.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*option.*forwardfor",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "X-Forwarded-For header added. Client IP preserved.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*option.*http-server-close",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "HTTP server-side connection closing enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*server.*check",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Backend server health checking enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*server.*(?!.*check)",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Backend server without health check. Failed servers won't be detected.",
+      "suggestedFix": "",
+      "fixReason": "Add 'check' option to enable health monitoring."
+    },
+    {
+      "key": ".*maxconn",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Maximum connections limit configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*timeout.*connect|.*timeout.*server|.*timeout.*client",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Connection timeout configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*log.*global",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Logging enabled using global settings.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*acl.*",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Access Control List defined for traffic routing.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

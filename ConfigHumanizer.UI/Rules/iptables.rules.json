@@ -1,0 +1,126 @@
+{
+  "formatName": "Iptables",
+  "filePatterns": ["iptables.rules", "*.iptables", "iptables-save", "ip6tables.rules", "nftables.conf"],
+  "rules": [
+    {
+      "key": ".*INPUT.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "INPUT chain default policy is ACCEPT. All incoming traffic allowed by default.",
+      "suggestedFix": "-P INPUT DROP",
+      "fixReason": "Default policy should be DROP with explicit allow rules."
+    },
+    {
+      "key": ".*INPUT.*DROP|.*INPUT.*REJECT",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "INPUT chain default policy is DROP/REJECT. Deny by default.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*FORWARD.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "FORWARD chain allows traffic. This machine routes packets.",
+      "suggestedFix": "",
+      "fixReason": "Ensure forwarding is intentional (router/gateway)."
+    },
+    {
+      "key": ".*-p tcp.*--dport 22.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "SSH (port 22) is allowed through firewall.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*-p tcp.*--dport 22.*-s 0\\.0\\.0\\.0/0.*ACCEPT|.*-p tcp.*--dport 22(?!.*-s).*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "SSH open to all IPs. Consider restricting to specific sources.",
+      "suggestedFix": "",
+      "fixReason": "Limit SSH access to trusted IP ranges."
+    },
+    {
+      "key": ".*--dport 3306.*ACCEPT|.*--dport 5432.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Database port exposed (MySQL 3306 or PostgreSQL 5432).",
+      "suggestedFix": "",
+      "fixReason": "Database ports should not be publicly accessible."
+    },
+    {
+      "key": ".*-p tcp.*--dport 80.*ACCEPT|.*-p tcp.*--dport 443.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "HTTP/HTTPS ports allowed. Web server accessible.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*RELATED,ESTABLISHED.*ACCEPT|.*ESTABLISHED,RELATED.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Stateful firewall configured. Existing connections allowed.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*-i lo.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Loopback interface allowed. Required for local services.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*LOG.*",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Firewall logging configured. Dropped packets are logged.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*-j ACCEPT$",
+      "valuePattern": ".*0\\.0\\.0\\.0/0.*",
+      "severity": "Warning",
+      "humanDescription": "Rule accepts traffic from any source (0.0.0.0/0).",
+      "suggestedFix": "",
+      "fixReason": "Consider restricting to specific IP ranges."
+    },
+    {
+      "key": ".*icmp.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "ICMP (ping) allowed through firewall.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*--dport 23.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Telnet port 23 open! Telnet transmits in plaintext.",
+      "suggestedFix": "",
+      "fixReason": "Use SSH instead of Telnet."
+    },
+    {
+      "key": ".*--dport 21.*ACCEPT",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "FTP port 21 open. Consider using SFTP instead.",
+      "suggestedFix": "",
+      "fixReason": "FTP transmits credentials in plaintext."
+    },
+    {
+      "key": ".*nat.*MASQUERADE|.*nat.*SNAT",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "NAT/Masquerading configured. This machine is a gateway.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

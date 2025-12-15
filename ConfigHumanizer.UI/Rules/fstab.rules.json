@@ -1,0 +1,110 @@
+{
+  "formatName": "Fstab",
+  "filePatterns": ["fstab", "*fstab*"],
+  "rules": [
+    {
+      "key": "/tmp",
+      "valuePattern": "^((?!noexec).)*$",
+      "severity": "Warning",
+      "humanDescription": "/tmp should be mounted with 'noexec' to prevent malware execution from temporary files.",
+      "suggestedFix": "defaults,noexec,nosuid,nodev",
+      "fixReason": "Adding noexec prevents execution of binaries from /tmp, a common attack vector."
+    },
+    {
+      "key": "/tmp",
+      "valuePattern": ".*noexec.*",
+      "severity": "GoodPractice",
+      "humanDescription": "/tmp is mounted with noexec flag. Execution of binaries from /tmp is prevented.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "/var/tmp",
+      "valuePattern": "^((?!noexec).)*$",
+      "severity": "Warning",
+      "humanDescription": "/var/tmp should be mounted with 'noexec' like /tmp.",
+      "suggestedFix": "defaults,noexec,nosuid,nodev",
+      "fixReason": "Prevent execution of malicious binaries from /var/tmp."
+    },
+    {
+      "key": "/home",
+      "valuePattern": "^((?!nosuid).)*$",
+      "severity": "GoodPractice",
+      "humanDescription": "/home partition could use 'nosuid' to prevent setuid binaries in user directories.",
+      "suggestedFix": "defaults,nosuid",
+      "fixReason": "Prevents privilege escalation via setuid binaries in home directories."
+    },
+    {
+      "key": "/home",
+      "valuePattern": ".*nosuid.*",
+      "severity": "GoodPractice",
+      "humanDescription": "/home is mounted with nosuid. Setuid binaries are disabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "/boot",
+      "valuePattern": "^((?!noexec).)*$",
+      "severity": "Info",
+      "humanDescription": "/boot partition is writable. Consider mounting read-only after kernel updates.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "/dev/shm",
+      "valuePattern": "^((?!noexec).)*$",
+      "severity": "Warning",
+      "humanDescription": "Shared memory (/dev/shm) should have noexec to prevent in-memory attacks.",
+      "suggestedFix": "defaults,noexec,nosuid,nodev",
+      "fixReason": "Attackers often use /dev/shm for fileless malware execution."
+    },
+    {
+      "key": "swap",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Swap partition configured for virtual memory.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "none",
+      "valuePattern": ".*swap.*",
+      "severity": "Info",
+      "humanDescription": "Swap space configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "/",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Root filesystem mount point.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*",
+      "valuePattern": ".*nofail.*",
+      "severity": "Info",
+      "humanDescription": "Mount will not fail boot if device is missing. Good for removable media.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*",
+      "valuePattern": ".*noauto.*",
+      "severity": "Info",
+      "humanDescription": "Filesystem is not mounted automatically at boot.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*nfs.*|.*cifs.*|.*smbfs.*",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Network filesystem mount. Ensure network is available before mounting.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

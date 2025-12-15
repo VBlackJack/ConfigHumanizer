@@ -1,0 +1,126 @@
+{
+  "formatName": "PAM",
+  "filePatterns": ["*/pam.d/*", "pam.conf", "system-auth", "password-auth", "common-auth"],
+  "rules": [
+    {
+      "key": ".*pam_unix\\.so",
+      "valuePattern": ".*nullok.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Null passwords allowed! Users can authenticate with empty passwords.",
+      "suggestedFix": "",
+      "fixReason": "Remove 'nullok' to require passwords for all users."
+    },
+    {
+      "key": ".*pam_permit\\.so",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "pam_permit always succeeds. Check if this is intentional.",
+      "suggestedFix": "",
+      "fixReason": "pam_permit grants access unconditionally."
+    },
+    {
+      "key": ".*pam_deny\\.so",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "pam_deny configured. This rule always denies access.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_wheel\\.so",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Wheel group restriction enabled. Only wheel members can su to root.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_tally2?\\.so|.*pam_faillock\\.so",
+      "valuePattern": ".*deny.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Account lockout configured. Protects against brute-force.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_pwquality\\.so|.*pam_cracklib\\.so",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Password quality enforcement enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_pwquality\\.so",
+      "valuePattern": ".*minlen.*=.*([0-9]|1[0-3])\\b.*",
+      "severity": "Warning",
+      "humanDescription": "Minimum password length is less than 14 characters.",
+      "suggestedFix": "minlen=14",
+      "fixReason": "Use at least 14 characters for strong passwords."
+    },
+    {
+      "key": ".*pam_google_authenticator\\.so|.*pam_oath\\.so|.*pam_yubico\\.so",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Two-factor authentication (2FA) configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_securetty\\.so",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "TTY restrictions for root login enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_limits\\.so",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Resource limits (ulimits) enforcement enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_access\\.so",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Access control by user/host/tty enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_selinux\\.so",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "SELinux context management enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*pam_ldap\\.so|.*pam_sss\\.so",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Centralized authentication (LDAP/SSSD) configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "auth.*required",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Required authentication module. Must succeed for access.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "auth.*sufficient",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Sufficient authentication module. Success grants immediate access.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

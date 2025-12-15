@@ -1,0 +1,134 @@
+{
+  "formatName": "Redis",
+  "filePatterns": ["redis.conf", "*/redis/*"],
+  "rules": [
+    {
+      "key": "bind",
+      "valuePattern": "^$|.*0\\.0\\.0\\.0.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Redis bound to all interfaces or no binding. Accessible from network.",
+      "suggestedFix": "bind 127.0.0.1",
+      "fixReason": "Bind to localhost unless remote access is required."
+    },
+    {
+      "key": "bind",
+      "valuePattern": ".*127\\.0\\.0\\.1.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Redis bound to localhost.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "protected-mode",
+      "valuePattern": "(?i)^yes$",
+      "severity": "GoodPractice",
+      "humanDescription": "Protected mode enabled. Restricts access without password.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "protected-mode",
+      "valuePattern": "(?i)^no$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Protected mode disabled. Redis accessible without authentication.",
+      "suggestedFix": "protected-mode yes",
+      "fixReason": "Enable protected mode for security."
+    },
+    {
+      "key": "requirepass",
+      "valuePattern": ".+",
+      "severity": "GoodPractice",
+      "humanDescription": "Password authentication configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "requirepass",
+      "valuePattern": "^$",
+      "severity": "Warning",
+      "humanDescription": "No password configured. Anyone can access Redis.",
+      "suggestedFix": "requirepass <strong-password>",
+      "fixReason": "Set a strong password."
+    },
+    {
+      "key": "rename-command.*CONFIG",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "CONFIG command renamed/disabled. Prevents remote reconfiguration.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "rename-command.*FLUSHALL|rename-command.*FLUSHDB",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Dangerous FLUSH commands renamed/disabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "rename-command.*DEBUG",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "DEBUG command disabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "maxmemory",
+      "valuePattern": ".+",
+      "severity": "GoodPractice",
+      "humanDescription": "Memory limit configured. Prevents OOM.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "maxmemory-policy",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Memory eviction policy configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "appendonly",
+      "valuePattern": "(?i)^yes$",
+      "severity": "GoodPractice",
+      "humanDescription": "AOF persistence enabled. Data durability improved.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "save",
+      "valuePattern": ".+",
+      "severity": "Info",
+      "humanDescription": "RDB snapshot persistence configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "tls-port",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "TLS port configured. Encrypted connections available.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "aclfile",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "ACL file configured. Fine-grained access control.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "port",
+      "valuePattern": "^0$",
+      "severity": "Info",
+      "humanDescription": "TCP disabled. Only Unix socket or TLS connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

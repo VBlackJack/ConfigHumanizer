@@ -1,0 +1,134 @@
+{
+  "formatName": "Ansible",
+  "filePatterns": ["playbook.yml", "playbook.yaml", "*/playbooks/*", "site.yml", "main.yml", "*/tasks/*", "*/handlers/*"],
+  "rules": [
+    {
+      "key": ".*hosts",
+      "valuePattern": "^all$",
+      "severity": "Warning",
+      "humanDescription": "Playbook targets all hosts. Ensure this is intentional.",
+      "suggestedFix": "",
+      "fixReason": "Consider targeting specific host groups."
+    },
+    {
+      "key": ".*become",
+      "valuePattern": "(?i)^true$|^yes$",
+      "severity": "Info",
+      "humanDescription": "Privilege escalation (sudo) enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*become_user",
+      "valuePattern": "^root$",
+      "severity": "Warning",
+      "humanDescription": "Running tasks as root user.",
+      "suggestedFix": "",
+      "fixReason": "Use least privilege when possible."
+    },
+    {
+      "key": ".*password.*:",
+      "valuePattern": "^(?!\\{\\{).*$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Potential plaintext password in playbook.",
+      "suggestedFix": "",
+      "fixReason": "Use Ansible Vault for secrets."
+    },
+    {
+      "key": ".*vault_password_file|.*vault_id",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Ansible Vault configured for secrets.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*no_log",
+      "valuePattern": "(?i)^true$|^yes$",
+      "severity": "GoodPractice",
+      "humanDescription": "Logging disabled for sensitive task.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*ignore_errors",
+      "valuePattern": "(?i)^true$|^yes$",
+      "severity": "Warning",
+      "humanDescription": "Errors ignored for this task. May hide failures.",
+      "suggestedFix": "",
+      "fixReason": "Use failed_when for specific error handling."
+    },
+    {
+      "key": ".*shell:|.*command:|.*raw:",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Shell/command module used. Consider using specific modules.",
+      "suggestedFix": "",
+      "fixReason": "Ansible modules are more idempotent and safer."
+    },
+    {
+      "key": ".*shell:|.*command:",
+      "valuePattern": ".*rm -rf.*|.*\\|.*sh.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Dangerous command detected in shell module.",
+      "suggestedFix": "",
+      "fixReason": "Review command for safety."
+    },
+    {
+      "key": ".*mode:",
+      "valuePattern": "^0777$|^777$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "World-writable permissions (777) set on file.",
+      "suggestedFix": "mode: '0755'",
+      "fixReason": "Use restrictive permissions."
+    },
+    {
+      "key": ".*check_mode",
+      "valuePattern": "(?i)^true$|^yes$",
+      "severity": "Info",
+      "humanDescription": "Dry-run mode enabled. No changes will be made.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*tags:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Tags configured for selective execution.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*handlers:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Handlers defined for service management.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*when:",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Conditional execution configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*delegate_to:",
+      "valuePattern": ".*localhost.*",
+      "severity": "Info",
+      "humanDescription": "Task delegated to localhost.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*async:|.*poll:",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Asynchronous task execution configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

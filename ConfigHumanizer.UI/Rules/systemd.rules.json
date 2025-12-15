@@ -1,0 +1,158 @@
+{
+  "formatName": "Systemd",
+  "filePatterns": ["*.service", "*.socket", "*.timer", "*.mount"],
+  "rules": [
+    {
+      "key": "User",
+      "valuePattern": "^root$",
+      "severity": "Warning",
+      "humanDescription": "Service is running as root user. This is a security risk for network-facing services.",
+      "suggestedFix": "User = nobody",
+      "fixReason": "Use a dedicated unprivileged user to limit potential damage from exploits."
+    },
+    {
+      "key": "User",
+      "valuePattern": "^(?!root$).+",
+      "severity": "GoodPractice",
+      "humanDescription": "Service runs as a dedicated non-root user, following the principle of least privilege.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Restart",
+      "valuePattern": "^no$",
+      "severity": "Info",
+      "humanDescription": "Service will NOT automatically restart if it crashes or exits.",
+      "suggestedFix": "Restart = always",
+      "fixReason": "Enable automatic restart to improve service availability."
+    },
+    {
+      "key": "Restart",
+      "valuePattern": "^always$",
+      "severity": "GoodPractice",
+      "humanDescription": "Service will automatically restart regardless of exit status.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Restart",
+      "valuePattern": "^on-failure$",
+      "severity": "GoodPractice",
+      "humanDescription": "Service will restart only on non-zero exit codes or signals.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ExecStart",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Command executed when the service starts.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ExecStop",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Command executed when the service stops.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "PrivateTmp",
+      "valuePattern": "(?i)^(false|no)$",
+      "severity": "Warning",
+      "humanDescription": "Private /tmp isolation is disabled. Service shares /tmp with other processes.",
+      "suggestedFix": "PrivateTmp = true",
+      "fixReason": "Enable PrivateTmp to isolate temporary files and prevent information leakage."
+    },
+    {
+      "key": "PrivateTmp",
+      "valuePattern": "(?i)^(true|yes)$",
+      "severity": "GoodPractice",
+      "humanDescription": "Private /tmp isolation is enabled. Service has its own isolated temporary directory.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ProtectSystem",
+      "valuePattern": "(?i)^(false|no)$",
+      "severity": "Warning",
+      "humanDescription": "System directory protection is disabled. Service can modify /usr and /boot.",
+      "suggestedFix": "ProtectSystem = strict",
+      "fixReason": "Enable ProtectSystem to mount system directories read-only."
+    },
+    {
+      "key": "ProtectSystem",
+      "valuePattern": "(?i)^(true|yes|full|strict)$",
+      "severity": "GoodPractice",
+      "humanDescription": "System directories are protected from modification by this service.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ProtectHome",
+      "valuePattern": "(?i)^(false|no)$",
+      "severity": "Info",
+      "humanDescription": "Home directory protection is disabled. Service can access user home directories.",
+      "suggestedFix": "ProtectHome = true",
+      "fixReason": "Enable ProtectHome to prevent access to user home directories."
+    },
+    {
+      "key": "NoNewPrivileges",
+      "valuePattern": "(?i)^(true|yes)$",
+      "severity": "GoodPractice",
+      "humanDescription": "Process cannot gain new privileges via setuid/setgid binaries.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "NoNewPrivileges",
+      "valuePattern": "(?i)^(false|no)$",
+      "severity": "Warning",
+      "humanDescription": "Process CAN gain new privileges. This increases attack surface.",
+      "suggestedFix": "NoNewPrivileges = true",
+      "fixReason": "Prevent privilege escalation by disabling setuid/setgid execution."
+    },
+    {
+      "key": "After",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Service starts after the specified target/service.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Requires",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Service has a hard dependency on the specified target/service.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Wants",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Service has a soft dependency (will start even if dependency fails).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Type",
+      "valuePattern": "simple",
+      "severity": "Info",
+      "humanDescription": "Service type is 'simple'. Systemd considers the service started immediately.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Type",
+      "valuePattern": "forking",
+      "severity": "Info",
+      "humanDescription": "Service forks a child process. Parent exits, child continues.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

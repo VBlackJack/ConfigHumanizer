@@ -1,0 +1,134 @@
+{
+  "formatName": "Logrotate",
+  "filePatterns": ["logrotate.conf", "*/logrotate.d/*"],
+  "rules": [
+    {
+      "key": "rotate",
+      "valuePattern": "^[0-3]$",
+      "severity": "Warning",
+      "humanDescription": "Low rotation count. Limited log retention.",
+      "suggestedFix": "rotate 7",
+      "fixReason": "Consider keeping at least 7 rotations."
+    },
+    {
+      "key": "rotate",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Log rotation count configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "daily|weekly|monthly|yearly",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Rotation frequency configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "compress",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Log compression enabled. Saves disk space.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "delaycompress",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Delayed compression. Recent log stays uncompressed.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "missingok",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Missing files ignored without error.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "notifempty",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Empty files not rotated. Saves resources.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "create",
+      "valuePattern": ".*0600.*|.*600.*",
+      "severity": "GoodPractice",
+      "humanDescription": "New log files created with restricted permissions (600).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "create",
+      "valuePattern": ".*0644.*|.*644.*|.*0666.*|.*666.*",
+      "severity": "Warning",
+      "humanDescription": "New log files may be world-readable.",
+      "suggestedFix": "create 0640 root adm",
+      "fixReason": "Restrict log file permissions."
+    },
+    {
+      "key": "sharedscripts",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Scripts run once for all matching files.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "postrotate",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Post-rotation script configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "prerotate",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Pre-rotation script configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "maxsize",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Maximum size before rotation configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "minsize",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Minimum size for rotation configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "copytruncate",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Copy and truncate mode. For apps that don't reopen logs.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "dateext",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Date extension for rotated files. Easier to identify.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

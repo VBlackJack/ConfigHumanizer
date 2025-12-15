@@ -1,0 +1,102 @@
+{
+  "formatName": "Crontab",
+  "filePatterns": ["crontab", "cron.d/*", "*cron*"],
+  "rules": [
+    {
+      "key": ".*curl.*|.*wget.*",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Downloading and executing scripts from the web in Cron is extremely dangerous. Attackers can modify the remote content.",
+      "suggestedFix": "",
+      "fixReason": "Download scripts to local storage and verify integrity before execution."
+    },
+    {
+      "key": ".*curl.*\\|.*sh.*|.*wget.*\\|.*sh.*",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "CRITICAL: Piping downloaded content directly to shell. This is a major security vulnerability.",
+      "suggestedFix": "",
+      "fixReason": "Never pipe untrusted remote content to a shell interpreter."
+    },
+    {
+      "key": ".*rm -rf /.*|.*rm -rf ~.*",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Destructive command targeting root or home directory. High risk of data loss.",
+      "suggestedFix": "",
+      "fixReason": "Use absolute paths and add safety checks before destructive operations."
+    },
+    {
+      "key": ".*rm -rf.*",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Destructive 'rm -rf' command in cron. Ensure paths are absolute and correct.",
+      "suggestedFix": "",
+      "fixReason": "Always use absolute paths and consider adding safeguards."
+    },
+    {
+      "key": ".*",
+      "valuePattern": "^\\* \\* \\* \\* \\*$",
+      "severity": "Warning",
+      "humanDescription": "This task runs every single minute (60 times per hour). May cause high system load.",
+      "suggestedFix": "",
+      "fixReason": "Consider if such frequent execution is truly necessary."
+    },
+    {
+      "key": ".*backup.*",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Automated backup task scheduled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*",
+      "valuePattern": "^@reboot$",
+      "severity": "Info",
+      "humanDescription": "Task runs once at system startup.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*",
+      "valuePattern": "^@daily$|^0 0 \\* \\* \\*$",
+      "severity": "Info",
+      "humanDescription": "Task runs once daily at midnight.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*",
+      "valuePattern": "^@hourly$|^0 \\* \\* \\* \\*$",
+      "severity": "Info",
+      "humanDescription": "Task runs once every hour.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*",
+      "valuePattern": "^@weekly$|^0 0 \\* \\* 0$",
+      "severity": "Info",
+      "humanDescription": "Task runs once weekly.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*> /dev/null.*",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Output is silenced (redirected to /dev/null). Errors may go unnoticed.",
+      "suggestedFix": "",
+      "fixReason": "Consider logging output for debugging purposes."
+    },
+    {
+      "key": ".*2>&1.*",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Standard error is redirected to standard output. Good for logging.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "formatName": "INI Configuration",
+  "filePatterns": ["*.ini", "*.cfg", "*.conf"],
+  "rules": [
+    {
+      "key": "DebugLevel",
+      "valuePattern": "0",
+      "severity": "GoodPractice",
+      "humanDescription": "Debug level is set to 0 (disabled). This is recommended for production environments.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "DebugLevel",
+      "valuePattern": "^[1-9]\\d*$",
+      "severity": "Info",
+      "humanDescription": "Debug level is enabled. Higher values produce more verbose logging which may impact performance.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "AutoUpdate",
+      "valuePattern": "^(false|0|no|off)$",
+      "severity": "Warning",
+      "humanDescription": "Automatic updates are disabled. This may leave the system vulnerable to security issues.",
+      "suggestedFix": "AutoUpdate=true",
+      "fixReason": "Enabling automatic updates ensures you receive critical security patches promptly."
+    },
+    {
+      "key": "AutoUpdate",
+      "valuePattern": "^(true|1|yes|on)$",
+      "severity": "GoodPractice",
+      "humanDescription": "Automatic updates are enabled. The system will receive security patches automatically.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "LogLevel",
+      "valuePattern": "^(debug|trace)$",
+      "severity": "Warning",
+      "humanDescription": "Log level is set to debug/trace. This may impact performance and disk space in production.",
+      "suggestedFix": "LogLevel=Info",
+      "fixReason": "Consider using 'Info' or 'Warning' level in production to reduce log volume."
+    },
+    {
+      "key": "LogLevel",
+      "valuePattern": "^(info|warn|warning|error|fatal)$",
+      "severity": "Info",
+      "humanDescription": "Log level is set appropriately for production use.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "EnableTelemetry",
+      "valuePattern": "^(true|1|yes|on)$",
+      "severity": "Info",
+      "humanDescription": "Telemetry is enabled. Usage data may be sent to external servers.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "EnableTelemetry",
+      "valuePattern": "^(false|0|no|off)$",
+      "severity": "GoodPractice",
+      "humanDescription": "Telemetry is disabled. No usage data will be collected.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Password",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "A password is stored in the configuration file. This is a security risk.",
+      "suggestedFix": "",
+      "fixReason": "Consider using environment variables or a secrets manager for sensitive credentials."
+    },
+    {
+      "key": "ApiKey",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "An API key is stored in the configuration file. Consider using secure storage.",
+      "suggestedFix": "",
+      "fixReason": "API keys in config files may be accidentally committed to version control."
+    },
+    {
+      "key": "ConnectionString",
+      "valuePattern": ".*password.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Connection string contains embedded credentials. This is a security risk.",
+      "suggestedFix": "",
+      "fixReason": "Use integrated security or store credentials in a secure vault."
+    }
+  ]
+}

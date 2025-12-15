@@ -1,0 +1,150 @@
+{
+  "formatName": "Sysctl",
+  "filePatterns": ["sysctl.conf", "*sysctl*"],
+  "rules": [
+    {
+      "key": "net.ipv4.ip_forward",
+      "valuePattern": "^1$",
+      "severity": "Warning",
+      "humanDescription": "IPv4 forwarding is ENABLED. This machine can route packets between networks (acts as a router).",
+      "suggestedFix": "net.ipv4.ip_forward = 0",
+      "fixReason": "Disable IP forwarding unless this machine is explicitly meant to be a router."
+    },
+    {
+      "key": "net.ipv4.ip_forward",
+      "valuePattern": "^0$",
+      "severity": "GoodPractice",
+      "humanDescription": "IPv4 forwarding is disabled. Machine will not route packets.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "net.ipv6.conf.all.forwarding",
+      "valuePattern": "^1$",
+      "severity": "Warning",
+      "humanDescription": "IPv6 forwarding is ENABLED. This machine can route IPv6 packets.",
+      "suggestedFix": "net.ipv6.conf.all.forwarding = 0",
+      "fixReason": "Disable IPv6 forwarding unless acting as an IPv6 router."
+    },
+    {
+      "key": "net.ipv4.icmp_echo_ignore_all",
+      "valuePattern": "^1$",
+      "severity": "Info",
+      "humanDescription": "Machine ignores all ICMP echo requests (ping). Stealth mode enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "net.ipv4.icmp_echo_ignore_all",
+      "valuePattern": "^0$",
+      "severity": "Info",
+      "humanDescription": "Machine responds to ICMP echo requests (ping).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "kernel.sysrq",
+      "valuePattern": "^1$",
+      "severity": "Warning",
+      "humanDescription": "Magic SysRq key is FULLY ENABLED. Physical access allows forced reboot, memory dump, and more.",
+      "suggestedFix": "kernel.sysrq = 0",
+      "fixReason": "Disable or restrict SysRq key to prevent unauthorized system manipulation via keyboard."
+    },
+    {
+      "key": "kernel.sysrq",
+      "valuePattern": "^0$",
+      "severity": "GoodPractice",
+      "humanDescription": "Magic SysRq key is disabled. Physical console attacks mitigated.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "net.ipv4.conf.all.accept_redirects",
+      "valuePattern": "^1$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "ICMP redirects are accepted. Attackers can manipulate routing tables.",
+      "suggestedFix": "net.ipv4.conf.all.accept_redirects = 0",
+      "fixReason": "Disable ICMP redirect acceptance to prevent man-in-the-middle routing attacks."
+    },
+    {
+      "key": "net.ipv4.conf.all.accept_redirects",
+      "valuePattern": "^0$",
+      "severity": "GoodPractice",
+      "humanDescription": "ICMP redirects are ignored. Routing table is protected from external manipulation.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "net.ipv4.conf.all.send_redirects",
+      "valuePattern": "^1$",
+      "severity": "Warning",
+      "humanDescription": "System sends ICMP redirects. Only routers should do this.",
+      "suggestedFix": "net.ipv4.conf.all.send_redirects = 0",
+      "fixReason": "Disable sending ICMP redirects unless this is a router."
+    },
+    {
+      "key": "net.ipv4.conf.all.rp_filter",
+      "valuePattern": "^0$",
+      "severity": "Warning",
+      "humanDescription": "Reverse path filtering is DISABLED. IP spoofing attacks are possible.",
+      "suggestedFix": "net.ipv4.conf.all.rp_filter = 1",
+      "fixReason": "Enable reverse path filtering to drop packets with spoofed source addresses."
+    },
+    {
+      "key": "net.ipv4.conf.all.rp_filter",
+      "valuePattern": "^1$",
+      "severity": "GoodPractice",
+      "humanDescription": "Reverse path filtering enabled. IP spoofing is mitigated.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "net.ipv4.tcp_syncookies",
+      "valuePattern": "^1$",
+      "severity": "GoodPractice",
+      "humanDescription": "SYN cookies are enabled. Protection against SYN flood DDoS attacks.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "net.ipv4.tcp_syncookies",
+      "valuePattern": "^0$",
+      "severity": "Warning",
+      "humanDescription": "SYN cookies are DISABLED. System vulnerable to SYN flood attacks.",
+      "suggestedFix": "net.ipv4.tcp_syncookies = 1",
+      "fixReason": "Enable SYN cookies to protect against SYN flood denial-of-service attacks."
+    },
+    {
+      "key": "fs.suid_dumpable",
+      "valuePattern": "^[12]$",
+      "severity": "Warning",
+      "humanDescription": "Core dumps of setuid programs are enabled. May leak sensitive data.",
+      "suggestedFix": "fs.suid_dumpable = 0",
+      "fixReason": "Disable core dumps for setuid programs to prevent credential leakage."
+    },
+    {
+      "key": "fs.suid_dumpable",
+      "valuePattern": "^0$",
+      "severity": "GoodPractice",
+      "humanDescription": "Core dumps of setuid programs are disabled. Sensitive data protected.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "kernel.randomize_va_space",
+      "valuePattern": "^2$",
+      "severity": "GoodPractice",
+      "humanDescription": "Full ASLR enabled. Memory addresses randomized for security.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "kernel.randomize_va_space",
+      "valuePattern": "^[01]$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "ASLR is disabled or partial. Exploitation of memory corruption bugs is easier.",
+      "suggestedFix": "kernel.randomize_va_space = 2",
+      "fixReason": "Enable full ASLR to make memory exploitation significantly harder."
+    }
+  ]
+}

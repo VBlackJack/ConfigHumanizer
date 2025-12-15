@@ -1,0 +1,134 @@
+{
+  "formatName": "Rsyslog",
+  "filePatterns": ["rsyslog.conf", "*/rsyslog.d/*"],
+  "rules": [
+    {
+      "key": ".*\\$ModLoad.*imudp",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "UDP syslog receiver enabled. UDP is unreliable.",
+      "suggestedFix": "",
+      "fixReason": "Consider TCP (imtcp) for reliable log delivery."
+    },
+    {
+      "key": ".*\\$ModLoad.*imtcp",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "TCP syslog receiver enabled. Reliable delivery.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\$ModLoad.*imrelp",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "RELP receiver enabled. Reliable Event Logging Protocol.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\$UDPServerRun",
+      "valuePattern": ".*514.*",
+      "severity": "Warning",
+      "humanDescription": "UDP syslog listening on port 514.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\$InputTCPServerRun",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "TCP syslog listening configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*@@.*",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Remote logging via TCP configured (@@).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*@[^@].*",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Remote logging via UDP configured (@). Consider TCP.",
+      "suggestedFix": "",
+      "fixReason": "Use @@ for TCP to ensure reliable delivery."
+    },
+    {
+      "key": ".*\\$ActionQueueType.*LinkedList|.*\\$ActionQueueType.*FixedArray",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Async queue configured. Improves performance.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\$ActionQueueSaveOnShutdown",
+      "valuePattern": "(?i)^on$",
+      "severity": "GoodPractice",
+      "humanDescription": "Queue saved on shutdown. Prevents log loss.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\$FileOwner|.*\\$FileGroup",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Log file ownership configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\$FileCreateMode",
+      "valuePattern": ".*0600.*|.*0640.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Restrictive file permissions for logs.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\$FileCreateMode",
+      "valuePattern": ".*0644.*|.*0666.*",
+      "severity": "Warning",
+      "humanDescription": "Log files may be world-readable.",
+      "suggestedFix": "$FileCreateMode 0640",
+      "fixReason": "Restrict log file permissions."
+    },
+    {
+      "key": ".*auth.*|.*authpriv.*",
+      "valuePattern": ".*/var/log/.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Authentication logs being captured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\*\\.\\*",
+      "valuePattern": ".*@.*",
+      "severity": "Info",
+      "humanDescription": "All logs forwarded to remote server.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*\\$IncludeConfig",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Additional config files included.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*StreamDriver.*gtls|.*DefaultNetstreamDriverCAFile",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "TLS encryption configured for remote logging.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "formatName": "DockerCompose",
+  "filePatterns": ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"],
+  "rules": [
+    {
+      "key": ".*privileged",
+      "valuePattern": "(?i)^true$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Container running in privileged mode. Has FULL access to host system.",
+      "suggestedFix": "privileged: false",
+      "fixReason": "Privileged containers can access host devices and bypass security isolation."
+    },
+    {
+      "key": ".*privileged",
+      "valuePattern": "(?i)^false$",
+      "severity": "GoodPractice",
+      "humanDescription": "Container not running in privileged mode. Security isolation maintained.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*image",
+      "valuePattern": ".*:latest$",
+      "severity": "Warning",
+      "humanDescription": "Using 'latest' tag. This can cause unexpected updates and break production.",
+      "suggestedFix": "",
+      "fixReason": "Pin images to specific versions for production stability."
+    },
+    {
+      "key": ".*image",
+      "valuePattern": ".*:\\d+\\.\\d+.*$",
+      "severity": "GoodPractice",
+      "humanDescription": "Image pinned to specific version. Good for reproducibility.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*network_mode",
+      "valuePattern": "(?i)^host$",
+      "severity": "Warning",
+      "humanDescription": "Container using host network. Network isolation is disabled.",
+      "suggestedFix": "",
+      "fixReason": "Host network mode exposes all container ports directly on the host."
+    },
+    {
+      "key": ".*cap_add.*",
+      "valuePattern": ".*SYS_ADMIN.*|.*ALL.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Dangerous Linux capabilities added. SYS_ADMIN or ALL grants extensive host access.",
+      "suggestedFix": "",
+      "fixReason": "Only add specific capabilities that are absolutely required."
+    },
+    {
+      "key": ".*volumes.*",
+      "valuePattern": ".*/var/run/docker\\.sock.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Docker socket mounted in container. Container can control Docker daemon.",
+      "suggestedFix": "",
+      "fixReason": "Mounting Docker socket allows container to spawn other containers and access host."
+    },
+    {
+      "key": ".*volumes.*",
+      "valuePattern": ".*:/.*:rw.*|^/.*:.*[^:]+$",
+      "severity": "Warning",
+      "humanDescription": "Host path mounted read-write in container.",
+      "suggestedFix": "",
+      "fixReason": "Consider using read-only mounts (:ro) when write access is not needed."
+    },
+    {
+      "key": ".*restart",
+      "valuePattern": "(?i)^always$|^unless-stopped$",
+      "severity": "GoodPractice",
+      "humanDescription": "Container configured to restart automatically.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*restart",
+      "valuePattern": "(?i)^no$",
+      "severity": "Info",
+      "humanDescription": "Container will not restart automatically if it stops.",
+      "suggestedFix": "restart: unless-stopped",
+      "fixReason": "Consider enabling restart policy for production services."
+    },
+    {
+      "key": ".*environment.*PASSWORD.*|.*environment.*SECRET.*",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Sensitive data (password/secret) in environment variables.",
+      "suggestedFix": "",
+      "fixReason": "Use Docker secrets or external secret management for sensitive data."
+    },
+    {
+      "key": ".*ports.*",
+      "valuePattern": "^0\\.0\\.0\\.0:.*|^\\d+:\\d+$",
+      "severity": "Warning",
+      "humanDescription": "Port exposed on all interfaces (0.0.0.0). Accessible from external networks.",
+      "suggestedFix": "",
+      "fixReason": "Consider binding to specific IP or localhost for internal services."
+    },
+    {
+      "key": ".*ports.*",
+      "valuePattern": "^127\\.0\\.0\\.1:.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Port bound to localhost only. Not accessible from external networks.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*depends_on.*",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Service dependency defined. Startup order will be coordinated.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*healthcheck.*",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Health check configured for service monitoring.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*user",
+      "valuePattern": "(?i)^root$|^0$",
+      "severity": "Warning",
+      "humanDescription": "Container running as root user.",
+      "suggestedFix": "",
+      "fixReason": "Run containers as non-root user when possible."
+    }
+  ]
+}

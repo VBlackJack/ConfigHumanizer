@@ -1,0 +1,78 @@
+{
+  "formatName": "SSSD",
+  "filePatterns": ["sssd.conf", "*sssd*"],
+  "rules": [
+    {
+      "key": "enumerate",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "User/group enumeration is enabled. This severely impacts performance on large LDAP/Active Directory environments.",
+      "suggestedFix": "enumerate = false",
+      "fixReason": "Disable enumeration to prevent performance degradation. Users can still authenticate; they just won't appear in 'getent passwd' listings."
+    },
+    {
+      "key": "cache_credentials",
+      "valuePattern": "(?i)^false$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Credential caching is disabled. Users will NOT be able to log in when the LDAP/AD server is unreachable.",
+      "suggestedFix": "cache_credentials = true",
+      "fixReason": "Enable credential caching to allow offline authentication when the identity provider is unavailable."
+    },
+    {
+      "key": "id_provider",
+      "valuePattern": "^ldap$",
+      "severity": "Info",
+      "humanDescription": "Using generic LDAP identity provider. Ensure LDAP connection uses TLS/SSL for security.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "id_provider",
+      "valuePattern": "^ad$",
+      "severity": "GoodPractice",
+      "humanDescription": "Using Active Directory provider with native AD integration.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ldap_tls_reqcert",
+      "valuePattern": "(?i)^never$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "TLS certificate verification is disabled. This exposes the system to man-in-the-middle attacks.",
+      "suggestedFix": "ldap_tls_reqcert = demand",
+      "fixReason": "Enable certificate verification to ensure secure communication with the LDAP server."
+    },
+    {
+      "key": "ldap_tls_reqcert",
+      "valuePattern": "(?i)^allow$",
+      "severity": "Warning",
+      "humanDescription": "TLS certificate verification is optional. Connection will proceed even with invalid certificates.",
+      "suggestedFix": "ldap_tls_reqcert = demand",
+      "fixReason": "Require valid certificates to ensure secure communication."
+    },
+    {
+      "key": "debug_level",
+      "valuePattern": "^[5-9]$|^[1-9][0-9]+$",
+      "severity": "Warning",
+      "humanDescription": "High debug level is enabled. This generates excessive logs and may impact performance.",
+      "suggestedFix": "debug_level = 0",
+      "fixReason": "Reduce debug level in production to minimize log volume and improve performance."
+    },
+    {
+      "key": "offline_credentials_expiration",
+      "valuePattern": "^0$",
+      "severity": "Warning",
+      "humanDescription": "Offline credentials never expire. This may be a security concern for cached passwords.",
+      "suggestedFix": "offline_credentials_expiration = 5",
+      "fixReason": "Set an expiration period (in days) for cached credentials to balance security and usability."
+    },
+    {
+      "key": "ldap_id_use_start_tls",
+      "valuePattern": "(?i)^false$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "LDAP connection is not using StartTLS. Credentials may be transmitted in plaintext.",
+      "suggestedFix": "ldap_id_use_start_tls = true",
+      "fixReason": "Enable StartTLS to encrypt LDAP communications and protect credentials."
+    }
+  ]
+}

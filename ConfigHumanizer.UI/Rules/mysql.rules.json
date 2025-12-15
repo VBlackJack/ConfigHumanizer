@@ -1,0 +1,142 @@
+{
+  "formatName": "MySQL",
+  "filePatterns": ["my.cnf", "my.ini", "mysql.cnf", "*/mysql/*.cnf", "mariadb.cnf"],
+  "rules": [
+    {
+      "key": "bind-address|bind_address",
+      "valuePattern": "^0\\.0\\.0\\.0$|^\\*$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "MySQL listening on all interfaces. Accessible from any network.",
+      "suggestedFix": "bind-address = 127.0.0.1",
+      "fixReason": "Bind to localhost unless remote access is required."
+    },
+    {
+      "key": "bind-address|bind_address",
+      "valuePattern": "^127\\.0\\.0\\.1$|^localhost$",
+      "severity": "GoodPractice",
+      "humanDescription": "MySQL bound to localhost only. Not accessible remotely.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "skip-networking|skip_networking",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "TCP/IP networking disabled. Only local socket connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "local-infile|local_infile",
+      "valuePattern": "(?i)^1$|^ON$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "LOAD DATA LOCAL enabled. Can read arbitrary files from client.",
+      "suggestedFix": "local-infile = 0",
+      "fixReason": "Disable to prevent file exfiltration attacks."
+    },
+    {
+      "key": "local-infile|local_infile",
+      "valuePattern": "(?i)^0$|^OFF$",
+      "severity": "GoodPractice",
+      "humanDescription": "LOAD DATA LOCAL disabled. Protected against file read attacks.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "symbolic-links|symbolic_links",
+      "valuePattern": "(?i)^1$|^ON$",
+      "severity": "Warning",
+      "humanDescription": "Symbolic links enabled. Can potentially access files outside data dir.",
+      "suggestedFix": "symbolic-links = 0",
+      "fixReason": "Disable symbolic links for security."
+    },
+    {
+      "key": "secure-file-priv|secure_file_priv",
+      "valuePattern": "^$",
+      "severity": "Warning",
+      "humanDescription": "secure-file-priv is empty. SELECT INTO OUTFILE can write anywhere.",
+      "suggestedFix": "secure-file-priv = /var/lib/mysql-files",
+      "fixReason": "Restrict file operations to a specific directory."
+    },
+    {
+      "key": "secure-file-priv|secure_file_priv",
+      "valuePattern": ".*NULL.*",
+      "severity": "GoodPractice",
+      "humanDescription": "File import/export disabled. Maximum security.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "log-error|log_error",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Error logging configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "general-log|general_log",
+      "valuePattern": "(?i)^1$|^ON$",
+      "severity": "Warning",
+      "humanDescription": "General query log enabled. Performance impact and disk usage.",
+      "suggestedFix": "",
+      "fixReason": "Disable in production unless debugging."
+    },
+    {
+      "key": "slow-query-log|slow_query_log",
+      "valuePattern": "(?i)^1$|^ON$",
+      "severity": "GoodPractice",
+      "humanDescription": "Slow query logging enabled. Good for performance analysis.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "max_connections",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Maximum concurrent connections configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "innodb_buffer_pool_size",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "InnoDB buffer pool size configured. Key performance setting.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "require_secure_transport",
+      "valuePattern": "(?i)^ON$|^1$",
+      "severity": "GoodPractice",
+      "humanDescription": "SSL/TLS required for all connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ssl-ca|ssl_ca",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "SSL CA certificate configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "skip-grant-tables|skip_grant_tables",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Grant tables skipped! Anyone can connect without password.",
+      "suggestedFix": "",
+      "fixReason": "Never run with skip-grant-tables in production."
+    },
+    {
+      "key": "old_passwords|old-passwords",
+      "valuePattern": "(?i)^1$|^ON$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Using old, insecure password hashing.",
+      "suggestedFix": "old_passwords = 0",
+      "fixReason": "Use modern password hashing."
+    }
+  ]
+}

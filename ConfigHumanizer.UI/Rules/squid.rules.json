@@ -1,0 +1,70 @@
+{
+  "formatName": "Squid",
+  "filePatterns": ["squid.conf", "*squid*"],
+  "rules": [
+    {
+      "key": "http_access",
+      "valuePattern": "^allow all",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Allowing all HTTP access is a major security risk. Anyone can use this proxy without restrictions.",
+      "suggestedFix": "http_access deny all",
+      "fixReason": "Restrict access using ACLs (Access Control Lists) to only allow authorized users or networks."
+    },
+    {
+      "key": "http_port",
+      "valuePattern": "^3128$",
+      "severity": "Info",
+      "humanDescription": "Using the default Squid proxy port (3128).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "visible_hostname",
+      "valuePattern": "^$",
+      "severity": "Warning",
+      "humanDescription": "No visible hostname defined. This can cause DNS lookup issues and error pages may display incorrect information.",
+      "suggestedFix": "visible_hostname proxy.example.com",
+      "fixReason": "Define a hostname to avoid DNS resolution problems and improve error page clarity."
+    },
+    {
+      "key": "cache_dir",
+      "valuePattern": "null",
+      "severity": "Warning",
+      "humanDescription": "Disk caching is disabled. All content will be fetched from origin servers, reducing performance.",
+      "suggestedFix": "cache_dir ufs /var/spool/squid 100 16 256",
+      "fixReason": "Enable disk caching to improve response times and reduce bandwidth usage."
+    },
+    {
+      "key": "cache_mem",
+      "valuePattern": "^[0-9]+ MB$",
+      "severity": "Info",
+      "humanDescription": "Memory cache size is configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "acl",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Access Control List definition.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "forwarded_for",
+      "valuePattern": "(?i)^on$",
+      "severity": "Warning",
+      "humanDescription": "Client IP addresses are forwarded to upstream servers. This may expose internal network information.",
+      "suggestedFix": "forwarded_for off",
+      "fixReason": "Disable forwarding client IPs for better privacy and to hide internal network structure."
+    },
+    {
+      "key": "via",
+      "valuePattern": "(?i)^on$",
+      "severity": "Info",
+      "humanDescription": "Via header is enabled, revealing proxy presence to upstream servers.",
+      "suggestedFix": "via off",
+      "fixReason": "Disable Via header to hide the proxy from upstream servers."
+    }
+  ]
+}

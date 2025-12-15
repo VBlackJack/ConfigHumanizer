@@ -1,0 +1,134 @@
+{
+  "formatName": "Prometheus",
+  "filePatterns": ["prometheus.yml", "prometheus.yaml", "*/prometheus/*"],
+  "rules": [
+    {
+      "key": ".*global\\.scrape_interval",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Global scrape interval configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*global\\.evaluation_interval",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Rule evaluation interval configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*alerting\\.alertmanagers",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Alertmanager integration configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*scrape_configs.*job_name",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Scrape job defined.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*static_configs.*targets",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Static scrape targets configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*kubernetes_sd_configs",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Kubernetes service discovery configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*basic_auth\\.username",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Basic authentication configured for scrape target.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*bearer_token_file",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Bearer token authentication configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*tls_config\\.insecure_skip_verify",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "TLS certificate verification disabled for scrape target.",
+      "suggestedFix": "insecure_skip_verify: false",
+      "fixReason": "Enable certificate verification in production."
+    },
+    {
+      "key": ".*scheme",
+      "valuePattern": "(?i)^https$",
+      "severity": "GoodPractice",
+      "humanDescription": "HTTPS scheme used for scraping.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*scheme",
+      "valuePattern": "(?i)^http$",
+      "severity": "Info",
+      "humanDescription": "HTTP scheme used for scraping. Consider HTTPS.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*remote_write",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Remote write configured for long-term storage.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*remote_read",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Remote read configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*rule_files",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Alerting/recording rules files configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*relabel_configs.*action.*drop",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Relabeling with drop action. Some targets filtered out.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*honor_labels",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "Honor labels enabled. Scraped labels override Prometheus labels.",
+      "suggestedFix": "",
+      "fixReason": "Be cautious of label collisions."
+    }
+  ]
+}

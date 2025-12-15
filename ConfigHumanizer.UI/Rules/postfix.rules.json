@@ -1,0 +1,134 @@
+{
+  "formatName": "Postfix",
+  "filePatterns": ["main.cf", "master.cf", "*/postfix/*"],
+  "rules": [
+    {
+      "key": "inet_interfaces",
+      "valuePattern": "^all$",
+      "severity": "Warning",
+      "humanDescription": "Postfix listening on all interfaces.",
+      "suggestedFix": "inet_interfaces = loopback-only",
+      "fixReason": "Limit to localhost unless external mail is needed."
+    },
+    {
+      "key": "inet_interfaces",
+      "valuePattern": ".*loopback.*|.*localhost.*|.*127\\.0\\.0\\.1.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Postfix listening on localhost only.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "mynetworks",
+      "valuePattern": ".*0\\.0\\.0\\.0/0.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "All networks trusted! Open relay vulnerability.",
+      "suggestedFix": "",
+      "fixReason": "Restrict to local networks only."
+    },
+    {
+      "key": "smtpd_relay_restrictions|smtpd_recipient_restrictions",
+      "valuePattern": ".*permit_mynetworks.*permit_sasl_authenticated.*reject_unauth_destination.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Proper relay restrictions configured. Not an open relay.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "smtpd_relay_restrictions",
+      "valuePattern": ".*permit$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Open relay detected! Anyone can send mail through this server.",
+      "suggestedFix": "smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination",
+      "fixReason": "Configure proper relay restrictions."
+    },
+    {
+      "key": "smtpd_use_tls|smtpd_tls_security_level",
+      "valuePattern": "(?i)^yes$|^may$|^encrypt$",
+      "severity": "GoodPractice",
+      "humanDescription": "TLS enabled for incoming connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "smtpd_tls_security_level",
+      "valuePattern": "(?i)^none$",
+      "severity": "Warning",
+      "humanDescription": "TLS disabled for incoming mail.",
+      "suggestedFix": "smtpd_tls_security_level = may",
+      "fixReason": "Enable TLS for encrypted connections."
+    },
+    {
+      "key": "smtp_tls_security_level",
+      "valuePattern": "(?i)^encrypt$|^verify$|^secure$",
+      "severity": "GoodPractice",
+      "humanDescription": "TLS enforced for outgoing mail.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "smtpd_tls_protocols",
+      "valuePattern": ".*!SSLv.*|.*!TLSv1$|.*!TLSv1\\.0.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Weak TLS protocols disabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "smtpd_sasl_auth_enable",
+      "valuePattern": "(?i)^yes$",
+      "severity": "GoodPractice",
+      "humanDescription": "SASL authentication enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "disable_vrfy_command",
+      "valuePattern": "(?i)^yes$",
+      "severity": "GoodPractice",
+      "humanDescription": "VRFY command disabled. Prevents user enumeration.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "disable_vrfy_command",
+      "valuePattern": "(?i)^no$",
+      "severity": "Warning",
+      "humanDescription": "VRFY command enabled. Allows user enumeration.",
+      "suggestedFix": "disable_vrfy_command = yes",
+      "fixReason": "Disable VRFY to prevent enumeration attacks."
+    },
+    {
+      "key": "smtpd_banner",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "SMTP banner configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "message_size_limit",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Message size limit configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "smtpd_helo_required",
+      "valuePattern": "(?i)^yes$",
+      "severity": "GoodPractice",
+      "humanDescription": "HELO/EHLO required. Basic spam protection.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "smtpd_client_restrictions",
+      "valuePattern": ".*reject_rbl_client.*",
+      "severity": "GoodPractice",
+      "humanDescription": "RBL (blacklist) checking enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

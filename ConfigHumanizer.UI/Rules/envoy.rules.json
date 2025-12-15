@@ -1,0 +1,134 @@
+{
+  "formatName": "Envoy",
+  "filePatterns": ["envoy.yaml", "envoy.yml", "*/envoy/*"],
+  "rules": [
+    {
+      "key": ".*admin\\.address.*socket_address.*port_value",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Envoy admin interface enabled. Ensure it's not publicly accessible.",
+      "suggestedFix": "",
+      "fixReason": "Admin interface should be bound to localhost only."
+    },
+    {
+      "key": ".*admin\\.address.*socket_address.*address",
+      "valuePattern": "^0\\.0\\.0\\.0$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Admin interface bound to all interfaces! Publicly accessible.",
+      "suggestedFix": "address: 127.0.0.1",
+      "fixReason": "Bind admin interface to localhost only."
+    },
+    {
+      "key": ".*admin\\.address.*socket_address.*address",
+      "valuePattern": "^127\\.0\\.0\\.1$|^localhost$",
+      "severity": "GoodPractice",
+      "humanDescription": "Admin interface bound to localhost only.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*listeners.*socket_address.*port_value",
+      "valuePattern": "^443$",
+      "severity": "Info",
+      "humanDescription": "Listener on HTTPS port 443.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*listeners.*socket_address.*port_value",
+      "valuePattern": "^80$",
+      "severity": "Info",
+      "humanDescription": "Listener on HTTP port 80.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*tls_context.*tls_minimum_protocol_version",
+      "valuePattern": ".*TLSv1_0.*|.*TLSv1_1.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Weak TLS version allowed. TLS 1.0/1.1 are deprecated.",
+      "suggestedFix": "tls_minimum_protocol_version: TLSv1_2",
+      "fixReason": "Use TLS 1.2 or higher only."
+    },
+    {
+      "key": ".*tls_context.*tls_minimum_protocol_version",
+      "valuePattern": ".*TLSv1_2.*|.*TLSv1_3.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Modern TLS version enforced.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*health_checks",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Health checks configured for upstream clusters.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*circuit_breakers",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Circuit breaker configured. Protects against cascade failures.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*outlier_detection",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Outlier detection enabled. Unhealthy hosts are ejected.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*lb_policy",
+      "valuePattern": ".*ROUND_ROBIN.*",
+      "severity": "Info",
+      "humanDescription": "Round-robin load balancing configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*lb_policy",
+      "valuePattern": ".*LEAST_REQUEST.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Least-request load balancing. Better distribution under load.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*access_log",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Access logging configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*rate_limits",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Rate limiting configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*tracing",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Distributed tracing configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*connect_timeout",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Connection timeout configured for upstream.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

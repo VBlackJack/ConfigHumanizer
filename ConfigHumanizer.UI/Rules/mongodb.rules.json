@@ -1,0 +1,134 @@
+{
+  "formatName": "MongoDB",
+  "filePatterns": ["mongod.conf", "mongodb.conf", "*/mongodb/*"],
+  "rules": [
+    {
+      "key": ".*net\\.bindIp|.*bindIp",
+      "valuePattern": "^0\\.0\\.0\\.0$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "MongoDB listening on all interfaces. Accessible from any network.",
+      "suggestedFix": "bindIp: 127.0.0.1",
+      "fixReason": "Bind to localhost unless remote access is required."
+    },
+    {
+      "key": ".*net\\.bindIp|.*bindIp",
+      "valuePattern": ".*127\\.0\\.0\\.1.*|.*localhost.*",
+      "severity": "GoodPractice",
+      "humanDescription": "MongoDB bound to localhost.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*security\\.authorization",
+      "valuePattern": "(?i)^enabled$",
+      "severity": "GoodPractice",
+      "humanDescription": "Authorization enabled. Users must authenticate.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*security\\.authorization",
+      "valuePattern": "(?i)^disabled$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Authorization disabled! Anyone can access all data.",
+      "suggestedFix": "authorization: enabled",
+      "fixReason": "Enable authorization for security."
+    },
+    {
+      "key": ".*net\\.ssl\\.mode|.*net\\.tls\\.mode",
+      "valuePattern": "(?i)^requireSSL$|^requireTLS$",
+      "severity": "GoodPractice",
+      "humanDescription": "TLS/SSL required for all connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*net\\.ssl\\.mode|.*net\\.tls\\.mode",
+      "valuePattern": "(?i)^disabled$|^allowSSL$",
+      "severity": "Warning",
+      "humanDescription": "TLS/SSL not enforced. Connections may be unencrypted.",
+      "suggestedFix": "net.tls.mode: requireTLS",
+      "fixReason": "Require TLS for encrypted connections."
+    },
+    {
+      "key": ".*net\\.port",
+      "valuePattern": "^27017$",
+      "severity": "Info",
+      "humanDescription": "Using default MongoDB port 27017.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*security\\.javascriptEnabled",
+      "valuePattern": "(?i)^false$",
+      "severity": "GoodPractice",
+      "humanDescription": "JavaScript execution disabled. Prevents injection attacks.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*security\\.javascriptEnabled",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "JavaScript execution enabled. Potential injection risk.",
+      "suggestedFix": "javascriptEnabled: false",
+      "fixReason": "Disable unless required for $where queries."
+    },
+    {
+      "key": ".*systemLog\\.destination",
+      "valuePattern": ".*file.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Logging to file configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*operationProfiling\\.mode",
+      "valuePattern": "(?i)^slowOp$|^all$",
+      "severity": "GoodPractice",
+      "humanDescription": "Query profiling enabled for performance analysis.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*storage\\.journal\\.enabled",
+      "valuePattern": "(?i)^true$",
+      "severity": "GoodPractice",
+      "humanDescription": "Journaling enabled. Data durability improved.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*storage\\.journal\\.enabled",
+      "valuePattern": "(?i)^false$",
+      "severity": "Warning",
+      "humanDescription": "Journaling disabled. Risk of data loss on crash.",
+      "suggestedFix": "journal.enabled: true",
+      "fixReason": "Enable journaling for data safety."
+    },
+    {
+      "key": ".*replication\\.replSetName",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Replica set configured for high availability.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*security\\.keyFile",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Keyfile authentication configured for replica set.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*setParameter\\.authenticationMechanisms",
+      "valuePattern": ".*SCRAM-SHA-256.*",
+      "severity": "GoodPractice",
+      "humanDescription": "SCRAM-SHA-256 authentication mechanism enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

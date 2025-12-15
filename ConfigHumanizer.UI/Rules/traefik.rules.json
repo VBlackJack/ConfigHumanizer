@@ -1,0 +1,134 @@
+{
+  "formatName": "Traefik",
+  "filePatterns": ["traefik.yml", "traefik.yaml", "traefik.toml", "*/traefik/*"],
+  "rules": [
+    {
+      "key": ".*api\\.insecure",
+      "valuePattern": "(?i)^true$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Traefik API in insecure mode. Dashboard exposed without authentication.",
+      "suggestedFix": "api.insecure: false",
+      "fixReason": "Never expose API without authentication in production."
+    },
+    {
+      "key": ".*api\\.dashboard",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "Traefik dashboard enabled. Ensure it's protected.",
+      "suggestedFix": "",
+      "fixReason": "Dashboard should be behind authentication middleware."
+    },
+    {
+      "key": ".*entryPoints.*websecure.*address",
+      "valuePattern": ".*:443.*",
+      "severity": "GoodPractice",
+      "humanDescription": "HTTPS entrypoint configured on port 443.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*entryPoints.*web.*address",
+      "valuePattern": ".*:80.*",
+      "severity": "Info",
+      "humanDescription": "HTTP entrypoint configured on port 80.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*certificatesResolvers.*acme",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Let's Encrypt (ACME) automatic certificate configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*providers\\.docker",
+      "valuePattern": "(?i)^true$",
+      "severity": "Info",
+      "humanDescription": "Docker provider enabled. Auto-discovers containers.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*providers\\.docker\\.exposedByDefault",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "All containers exposed by default. Containers may be unintentionally public.",
+      "suggestedFix": "exposedByDefault: false",
+      "fixReason": "Set to false and explicitly expose only required containers."
+    },
+    {
+      "key": ".*providers\\.docker\\.network",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Docker network explicitly configured for Traefik.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*providers\\.kubernetes",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Kubernetes provider enabled. Ingress controller mode.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*accessLog",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Access logging enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*log\\.level",
+      "valuePattern": "(?i)^DEBUG$",
+      "severity": "Warning",
+      "humanDescription": "Debug logging enabled. Verbose output may impact performance.",
+      "suggestedFix": "log.level: INFO",
+      "fixReason": "Use INFO or WARN level in production."
+    },
+    {
+      "key": ".*middlewares.*basicAuth",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Basic authentication middleware configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*middlewares.*rateLimit",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Rate limiting middleware configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*middlewares.*headers.*stsSeconds",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "HSTS (Strict-Transport-Security) configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*tls\\.minVersion",
+      "valuePattern": ".*VersionTLS10.*|.*VersionTLS11.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Weak TLS version allowed. TLS 1.0/1.1 have known vulnerabilities.",
+      "suggestedFix": "tls.minVersion: VersionTLS12",
+      "fixReason": "Use TLS 1.2 or higher only."
+    },
+    {
+      "key": ".*tls\\.minVersion",
+      "valuePattern": ".*VersionTLS12.*|.*VersionTLS13.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Modern TLS version enforced (TLS 1.2+).",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

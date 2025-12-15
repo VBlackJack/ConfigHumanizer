@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ConfigHumanizer.Core/ConfigHumanizer.Core.csproj" />
+  <Project Path="ConfigHumanizer.UI/ConfigHumanizer.UI.csproj" />
+</Solution>

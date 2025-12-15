@@ -1,0 +1,134 @@
+{
+  "formatName": "Nginx",
+  "filePatterns": ["nginx.conf", "*nginx*", "*.nginx"],
+  "rules": [
+    {
+      "key": ".*server_tokens",
+      "valuePattern": "(?i)^on$",
+      "severity": "Warning",
+      "humanDescription": "Server tokens enabled. Nginx version is exposed in HTTP headers and error pages.",
+      "suggestedFix": "server_tokens off;",
+      "fixReason": "Hide server version to reduce information disclosure to attackers."
+    },
+    {
+      "key": ".*server_tokens",
+      "valuePattern": "(?i)^off$",
+      "severity": "GoodPractice",
+      "humanDescription": "Server tokens disabled. Nginx version is hidden from responses.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*ssl_protocols",
+      "valuePattern": ".*TLSv1\\.0.*|.*SSLv.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Obsolete SSL/TLS protocol enabled. TLSv1.0 and SSLv3 have known vulnerabilities.",
+      "suggestedFix": "ssl_protocols TLSv1.2 TLSv1.3;",
+      "fixReason": "Use only TLSv1.2 and TLSv1.3 for secure communications."
+    },
+    {
+      "key": ".*ssl_protocols",
+      "valuePattern": "^TLSv1\\.2 TLSv1\\.3$|^TLSv1\\.3$",
+      "severity": "GoodPractice",
+      "humanDescription": "Modern TLS protocols only. Secure configuration.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*ssl_ciphers",
+      "valuePattern": ".*DES.*|.*RC4.*|.*MD5.*|.*NULL.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Weak cipher suites enabled. These ciphers are cryptographically broken.",
+      "suggestedFix": "ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;",
+      "fixReason": "Use strong, modern cipher suites only."
+    },
+    {
+      "key": ".*proxy_pass",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Reverse proxy configured to forward requests to backend server.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*listen",
+      "valuePattern": "^80$",
+      "severity": "Info",
+      "humanDescription": "Listening on HTTP port 80. Consider redirecting to HTTPS.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*listen",
+      "valuePattern": ".*443.*ssl.*|.*ssl.*443.*",
+      "severity": "GoodPractice",
+      "humanDescription": "HTTPS enabled on port 443 with SSL/TLS.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*add_header.*X-Frame-Options",
+      "valuePattern": ".*DENY.*|.*SAMEORIGIN.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Clickjacking protection header configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*add_header.*X-Content-Type-Options",
+      "valuePattern": ".*nosniff.*",
+      "severity": "GoodPractice",
+      "humanDescription": "MIME type sniffing prevention header configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*autoindex",
+      "valuePattern": "(?i)^on$",
+      "severity": "Warning",
+      "humanDescription": "Directory listing enabled. Directory contents are visible to users.",
+      "suggestedFix": "autoindex off;",
+      "fixReason": "Disable directory listing to prevent information disclosure."
+    },
+    {
+      "key": ".*client_max_body_size",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Maximum allowed request body size configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*root",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Document root directory configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*upstream",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Upstream server group defined for load balancing.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*ssl_certificate",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "SSL certificate file path configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*gzip",
+      "valuePattern": "(?i)^on$",
+      "severity": "GoodPractice",
+      "humanDescription": "Gzip compression enabled for responses.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

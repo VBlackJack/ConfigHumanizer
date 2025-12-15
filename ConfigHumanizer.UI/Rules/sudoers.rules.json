@@ -1,0 +1,126 @@
+{
+  "formatName": "Sudoers",
+  "filePatterns": ["sudoers", "*/sudoers.d/*"],
+  "rules": [
+    {
+      "key": ".*NOPASSWD.*ALL",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "NOPASSWD with ALL commands. User can run ANY command without password.",
+      "suggestedFix": "",
+      "fixReason": "Limit NOPASSWD to specific commands only."
+    },
+    {
+      "key": ".*NOPASSWD",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "NOPASSWD configured. Commands can be run without password verification.",
+      "suggestedFix": "",
+      "fixReason": "Use NOPASSWD sparingly and only for specific, safe commands."
+    },
+    {
+      "key": "root",
+      "valuePattern": ".*ALL.*",
+      "severity": "Info",
+      "humanDescription": "Root user has full sudo access (default configuration).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*%wheel.*|.*%sudo.*|.*%admin.*",
+      "valuePattern": ".*ALL.*",
+      "severity": "Info",
+      "humanDescription": "Admin group has sudo access. Members can execute commands as root.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*requiretty.*",
+      "severity": "GoodPractice",
+      "humanDescription": "TTY required for sudo. Prevents some automated attack vectors.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*!requiretty.*",
+      "severity": "Warning",
+      "humanDescription": "TTY not required. Sudo can be used from scripts and cron jobs.",
+      "suggestedFix": "Defaults requiretty",
+      "fixReason": "Enable requiretty unless automation requires otherwise."
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*timestamp_timeout.*=.*0.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Password required for every sudo command. Maximum security.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*timestamp_timeout.*=.*-1.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Sudo password never expires. Single auth grants permanent access.",
+      "suggestedFix": "Defaults timestamp_timeout=5",
+      "fixReason": "Set a reasonable timeout (5-15 minutes)."
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*logfile.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Sudo logging configured. Commands are being audited.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*env_reset.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Environment reset enabled. Prevents environment variable attacks.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*!env_reset.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Environment reset disabled. Vulnerable to environment variable attacks.",
+      "suggestedFix": "Defaults env_reset",
+      "fixReason": "Always enable env_reset to prevent LD_PRELOAD and similar attacks."
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*secure_path.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Secure PATH configured. Prevents PATH manipulation attacks.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*ALL.*=.*ALL.*:.*ALL.*ALL",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "User can run commands as ANY user and ANY group.",
+      "suggestedFix": "",
+      "fixReason": "Consider restricting to specific users/groups."
+    },
+    {
+      "key": ".*!/.*",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Command exclusion configured. Specific commands are denied.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Defaults",
+      "valuePattern": ".*passwd_tries.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Password retry limit configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "formatName": "OpenSSH",
+  "filePatterns": ["*sshd_config", "*ssh_config"],
+  "rules": [
+    {
+      "key": "PermitRootLogin",
+      "valuePattern": "yes",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Root login is enabled. This allows direct SSH access as the root user, which is a significant security risk.",
+      "suggestedFix": "PermitRootLogin no",
+      "fixReason": "Disabling root login prevents brute-force attacks on the root account and enforces the principle of least privilege."
+    },
+    {
+      "key": "PermitRootLogin",
+      "valuePattern": "no",
+      "severity": "GoodPractice",
+      "humanDescription": "Root login is disabled. Users must log in with a regular account and use sudo for elevated privileges.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "PermitRootLogin",
+      "valuePattern": "prohibit-password",
+      "severity": "GoodPractice",
+      "humanDescription": "Root login is allowed only with SSH keys (no password). This is a reasonable compromise for some environments.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "PasswordAuthentication",
+      "valuePattern": "yes",
+      "severity": "Warning",
+      "humanDescription": "Password authentication is enabled. Users can log in using passwords, which are vulnerable to brute-force attacks.",
+      "suggestedFix": "PasswordAuthentication no",
+      "fixReason": "SSH key authentication is stronger than passwords and protects against brute-force attacks."
+    },
+    {
+      "key": "PasswordAuthentication",
+      "valuePattern": "no",
+      "severity": "GoodPractice",
+      "humanDescription": "Password authentication is disabled. Users must use SSH keys for authentication, which is more secure.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Port",
+      "valuePattern": "22",
+      "severity": "Info",
+      "humanDescription": "SSH is running on the default port 22. This is the standard port and may be targeted by automated scanners.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Port",
+      "valuePattern": "^(?!22$)\\d+$",
+      "severity": "GoodPractice",
+      "humanDescription": "SSH is running on a non-standard port. Using a non-standard port can reduce automated scanning attempts.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "PermitEmptyPasswords",
+      "valuePattern": "yes",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Empty passwords are permitted. This is extremely dangerous and allows passwordless access.",
+      "suggestedFix": "PermitEmptyPasswords no",
+      "fixReason": "Never allow empty passwords as they completely bypass authentication security."
+    },
+    {
+      "key": "PermitEmptyPasswords",
+      "valuePattern": "no",
+      "severity": "GoodPractice",
+      "humanDescription": "Empty passwords are not permitted. Users must have a password set to authenticate.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "X11Forwarding",
+      "valuePattern": "yes",
+      "severity": "Warning",
+      "humanDescription": "X11 forwarding is enabled. This can be a security risk if not needed, as it exposes the X server.",
+      "suggestedFix": "X11Forwarding no",
+      "fixReason": "Disable X11 forwarding unless you specifically need graphical application forwarding."
+    },
+    {
+      "key": "X11Forwarding",
+      "valuePattern": "no",
+      "severity": "GoodPractice",
+      "humanDescription": "X11 forwarding is disabled. This reduces the attack surface of the SSH server.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "MaxAuthTries",
+      "valuePattern": "^[7-9]|\\d{2,}$",
+      "severity": "Warning",
+      "humanDescription": "Maximum authentication attempts is set high. This may allow more brute-force attempts before disconnection.",
+      "suggestedFix": "MaxAuthTries 3",
+      "fixReason": "Limiting authentication attempts helps prevent brute-force attacks."
+    },
+    {
+      "key": "MaxAuthTries",
+      "valuePattern": "^[1-6]$",
+      "severity": "GoodPractice",
+      "humanDescription": "Maximum authentication attempts is set to a reasonable value, limiting brute-force attempts.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "PubkeyAuthentication",
+      "valuePattern": "yes",
+      "severity": "GoodPractice",
+      "humanDescription": "Public key authentication is enabled. This is the recommended authentication method.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "PubkeyAuthentication",
+      "valuePattern": "no",
+      "severity": "Warning",
+      "humanDescription": "Public key authentication is disabled. Consider enabling it for more secure authentication.",
+      "suggestedFix": "PubkeyAuthentication yes",
+      "fixReason": "Public key authentication is more secure than password authentication."
+    },
+    {
+      "key": "AllowTcpForwarding",
+      "valuePattern": "yes",
+      "severity": "Info",
+      "humanDescription": "TCP forwarding is enabled. This allows SSH tunneling which may or may not be desired.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "AllowTcpForwarding",
+      "valuePattern": "no",
+      "severity": "GoodPractice",
+      "humanDescription": "TCP forwarding is disabled. This prevents SSH from being used for tunneling.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Protocol",
+      "valuePattern": "1",
+      "severity": "CriticalSecurity",
+      "humanDescription": "SSH Protocol 1 is enabled. This protocol has known vulnerabilities and should not be used.",
+      "suggestedFix": "Protocol 2",
+      "fixReason": "SSH Protocol 1 has cryptographic weaknesses. Always use Protocol 2."
+    },
+    {
+      "key": "Protocol",
+      "valuePattern": "2",
+      "severity": "GoodPractice",
+      "humanDescription": "SSH Protocol 2 is enabled. This is the secure and recommended protocol version.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "UsePAM",
+      "valuePattern": "yes",
+      "severity": "Info",
+      "humanDescription": "PAM (Pluggable Authentication Modules) is enabled for authentication.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "LoginGraceTime",
+      "valuePattern": "^(1[2-9][0-9]|[2-9][0-9]{2,}|\\d{4,})$",
+      "severity": "Warning",
+      "humanDescription": "Login grace time is set high. This gives attackers more time to attempt authentication.",
+      "suggestedFix": "LoginGraceTime 60",
+      "fixReason": "A shorter login grace time limits the window for brute-force attacks."
+    }
+  ]
+}

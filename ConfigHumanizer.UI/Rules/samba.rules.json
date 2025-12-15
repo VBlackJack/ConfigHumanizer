@@ -1,0 +1,134 @@
+{
+  "formatName": "Samba",
+  "filePatterns": ["smb.conf", "*/samba/*"],
+  "rules": [
+    {
+      "key": "server min protocol|min protocol",
+      "valuePattern": "(?i)^NT1$|^LANMAN.*|^CORE.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Legacy SMB protocol allowed. SMBv1 has critical vulnerabilities.",
+      "suggestedFix": "server min protocol = SMB2",
+      "fixReason": "Disable SMBv1 to prevent EternalBlue-style attacks."
+    },
+    {
+      "key": "server min protocol|min protocol",
+      "valuePattern": "(?i)^SMB2.*|^SMB3.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Modern SMB protocol enforced (SMBv2/3).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "guest ok|public",
+      "valuePattern": "(?i)^yes$",
+      "severity": "Warning",
+      "humanDescription": "Guest access enabled on share. Anonymous access allowed.",
+      "suggestedFix": "guest ok = no",
+      "fixReason": "Require authentication for shares."
+    },
+    {
+      "key": "guest ok|public",
+      "valuePattern": "(?i)^no$",
+      "severity": "GoodPractice",
+      "humanDescription": "Guest access disabled. Authentication required.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "map to guest",
+      "valuePattern": "(?i)^Bad User$|^Bad Password$",
+      "severity": "Warning",
+      "humanDescription": "Failed logins mapped to guest. May allow unauthorized access.",
+      "suggestedFix": "map to guest = Never",
+      "fixReason": "Reject failed authentication attempts."
+    },
+    {
+      "key": "security",
+      "valuePattern": "(?i)^user$|^ads$|^domain$",
+      "severity": "GoodPractice",
+      "humanDescription": "User-level or domain security configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "security",
+      "valuePattern": "(?i)^share$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Share-level security (deprecated). Very insecure.",
+      "suggestedFix": "security = user",
+      "fixReason": "Use user-level security."
+    },
+    {
+      "key": "encrypt passwords",
+      "valuePattern": "(?i)^no$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Password encryption disabled! Passwords sent in plaintext.",
+      "suggestedFix": "encrypt passwords = yes",
+      "fixReason": "Always encrypt passwords."
+    },
+    {
+      "key": "smb encrypt",
+      "valuePattern": "(?i)^required$|^mandatory$",
+      "severity": "GoodPractice",
+      "humanDescription": "SMB encryption required. Traffic is encrypted.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "smb encrypt",
+      "valuePattern": "(?i)^disabled$|^off$",
+      "severity": "Warning",
+      "humanDescription": "SMB encryption disabled. Traffic is unencrypted.",
+      "suggestedFix": "smb encrypt = desired",
+      "fixReason": "Enable encryption when possible."
+    },
+    {
+      "key": "hosts allow|allow hosts",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Host-based access control configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "hosts deny|deny hosts",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Host-based deny list configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "valid users",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Valid users list configured for share.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "writable|writeable|read only",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Share permissions configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "browseable|browsable",
+      "valuePattern": "(?i)^yes$",
+      "severity": "Info",
+      "humanDescription": "Share visible in network browse list.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "logging",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Logging configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

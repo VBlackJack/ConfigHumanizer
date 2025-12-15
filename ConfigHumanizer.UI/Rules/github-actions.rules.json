@@ -1,0 +1,134 @@
+{
+  "formatName": "GitHubActions",
+  "filePatterns": ["*/.github/workflows/*.yml", "*/.github/workflows/*.yaml"],
+  "rules": [
+    {
+      "key": ".*uses:.*@master|.*uses:.*@main",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Action pinned to branch. Vulnerable to supply chain attacks.",
+      "suggestedFix": "",
+      "fixReason": "Pin actions to specific commit SHA or version tag."
+    },
+    {
+      "key": ".*uses:.*@v\\d+$",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Action pinned to major version. May receive breaking changes.",
+      "suggestedFix": "",
+      "fixReason": "Consider pinning to specific version (e.g., v2.1.0)."
+    },
+    {
+      "key": ".*uses:.*@[a-f0-9]{40}",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Action pinned to commit SHA. Most secure.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*permissions:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Explicit permissions configured. Following least privilege.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*permissions:.*write-all|.*permissions:.*contents:.*write",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Write permissions granted. Ensure this is necessary.",
+      "suggestedFix": "",
+      "fixReason": "Use minimal required permissions."
+    },
+    {
+      "key": ".*secrets\\.GITHUB_TOKEN",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Using GITHUB_TOKEN for authentication.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*secrets\\.",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Using GitHub Secrets for sensitive data.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*run:.*\\$\\{\\{.*\\}\\}",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Expression in run command. Potential injection if from untrusted input.",
+      "suggestedFix": "",
+      "fixReason": "Validate inputs to prevent script injection."
+    },
+    {
+      "key": ".*on:.*pull_request_target",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "pull_request_target trigger. Can expose secrets to fork PRs.",
+      "suggestedFix": "",
+      "fixReason": "Be very careful with pull_request_target."
+    },
+    {
+      "key": ".*on:.*workflow_dispatch",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Manual workflow dispatch enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*continue-on-error:",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "Step continues on error. Failures may be hidden.",
+      "suggestedFix": "",
+      "fixReason": "Consider if failure should be explicit."
+    },
+    {
+      "key": ".*timeout-minutes:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Job timeout configured. Prevents hung workflows.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*concurrency:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Concurrency control configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*environment:",
+      "valuePattern": ".*production.*",
+      "severity": "Info",
+      "humanDescription": "Production environment deployment.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*if:.*github\\.event_name.*==.*",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Conditional step based on event type.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*cache:",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Caching configured. Improves workflow speed.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

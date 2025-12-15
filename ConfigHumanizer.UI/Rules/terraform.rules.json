@@ -1,0 +1,134 @@
+{
+  "formatName": "Terraform",
+  "filePatterns": ["*.tf", "*.tfvars", "terraform.tfstate"],
+  "rules": [
+    {
+      "key": ".*provider.*aws|.*provider.*azurerm|.*provider.*google",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Cloud provider configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*access_key|.*secret_key",
+      "valuePattern": ".+",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Hardcoded credentials detected! Never store secrets in code.",
+      "suggestedFix": "",
+      "fixReason": "Use environment variables or secret management."
+    },
+    {
+      "key": ".*password.*=|.*api_key.*=|.*token.*=",
+      "valuePattern": "^(?!var\\.).*$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Potential hardcoded secret detected.",
+      "suggestedFix": "",
+      "fixReason": "Use variables or secret management."
+    },
+    {
+      "key": ".*backend.*s3|.*backend.*azurerm|.*backend.*gcs",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Remote state backend configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*backend.*local",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Local state backend. Consider remote backend for team collaboration.",
+      "suggestedFix": "",
+      "fixReason": "Use remote backend (S3, Azure Blob, GCS) for teams."
+    },
+    {
+      "key": ".*encrypt.*=",
+      "valuePattern": "(?i)^true$",
+      "severity": "GoodPractice",
+      "humanDescription": "State encryption enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*encrypt.*=",
+      "valuePattern": "(?i)^false$",
+      "severity": "Warning",
+      "humanDescription": "State encryption disabled. Sensitive data may be exposed.",
+      "suggestedFix": "encrypt = true",
+      "fixReason": "Enable encryption for state storage."
+    },
+    {
+      "key": ".*dynamodb_table",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "State locking configured with DynamoDB.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*required_version",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Terraform version constraint specified.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*required_providers",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Provider version constraints specified.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*cidr_blocks.*=",
+      "valuePattern": ".*0\\.0\\.0\\.0/0.*",
+      "severity": "Warning",
+      "humanDescription": "CIDR block 0.0.0.0/0 allows traffic from anywhere.",
+      "suggestedFix": "",
+      "fixReason": "Restrict to specific IP ranges when possible."
+    },
+    {
+      "key": ".*publicly_accessible.*=",
+      "valuePattern": "(?i)^true$",
+      "severity": "Warning",
+      "humanDescription": "Resource publicly accessible from internet.",
+      "suggestedFix": "",
+      "fixReason": "Consider restricting public access."
+    },
+    {
+      "key": ".*deletion_protection.*=",
+      "valuePattern": "(?i)^true$",
+      "severity": "GoodPractice",
+      "humanDescription": "Deletion protection enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*deletion_protection.*=",
+      "valuePattern": "(?i)^false$",
+      "severity": "Warning",
+      "humanDescription": "Deletion protection disabled. Resource can be accidentally deleted.",
+      "suggestedFix": "deletion_protection = true",
+      "fixReason": "Enable for production resources."
+    },
+    {
+      "key": ".*lifecycle.*prevent_destroy",
+      "valuePattern": "(?i)^true$",
+      "severity": "GoodPractice",
+      "humanDescription": "Prevent destroy lifecycle rule enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*versioning.*enabled.*=",
+      "valuePattern": "(?i)^true$",
+      "severity": "GoodPractice",
+      "humanDescription": "Versioning enabled for storage resource.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

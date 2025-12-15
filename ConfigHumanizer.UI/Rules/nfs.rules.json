@@ -1,0 +1,134 @@
+{
+  "formatName": "NFS",
+  "filePatterns": ["exports", "/etc/exports", "*/exports"],
+  "rules": [
+    {
+      "key": ".*\\*.*rw",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "NFS share exported read-write to everyone (*).",
+      "suggestedFix": "",
+      "fixReason": "Restrict exports to specific hosts/networks."
+    },
+    {
+      "key": ".*\\*.*ro",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "NFS share exported read-only to everyone (*).",
+      "suggestedFix": "",
+      "fixReason": "Consider restricting to specific hosts."
+    },
+    {
+      "key": ".*no_root_squash",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "no_root_squash enabled! Remote root has full root access.",
+      "suggestedFix": "",
+      "fixReason": "Use root_squash to map remote root to nobody."
+    },
+    {
+      "key": ".*root_squash",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "root_squash enabled. Remote root mapped to nobody.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*all_squash",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "all_squash enabled. All users mapped to anonymous.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*rw\\b",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Read-write access granted.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*ro\\b",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Read-only access granted.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*sync\\b",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Synchronous writes enabled. Data integrity protected.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*async\\b",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Asynchronous writes enabled. Risk of data loss on crash.",
+      "suggestedFix": "",
+      "fixReason": "Consider sync for data integrity."
+    },
+    {
+      "key": ".*no_subtree_check",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Subtree checking disabled. Better performance.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*subtree_check",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Subtree checking enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*secure\\b",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Secure option enabled. Requires privileged port.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*insecure\\b",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Insecure option enabled. Allows non-privileged ports.",
+      "suggestedFix": "",
+      "fixReason": "Consider using secure option."
+    },
+    {
+      "key": ".*anonuid.*=.*0|.*anongid.*=.*0",
+      "valuePattern": ".*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Anonymous UID/GID mapped to root (0)!",
+      "suggestedFix": "",
+      "fixReason": "Use non-privileged UID/GID for anonymous."
+    },
+    {
+      "key": ".*sec=krb5p|.*sec=krb5i",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Kerberos security with integrity/privacy enabled.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": ".*sec=sys",
+      "valuePattern": ".*",
+      "severity": "Warning",
+      "humanDescription": "Using sys (AUTH_SYS) authentication. UID-based, easily spoofed.",
+      "suggestedFix": "",
+      "fixReason": "Consider Kerberos for better security."
+    }
+  ]
+}

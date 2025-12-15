@@ -1,0 +1,158 @@
+{
+  "formatName": "PHP",
+  "filePatterns": ["php.ini", "*php*.ini"],
+  "rules": [
+    {
+      "key": "expose_php",
+      "valuePattern": "(?i)^On$",
+      "severity": "Warning",
+      "humanDescription": "PHP version exposed in HTTP headers. Attackers can identify PHP vulnerabilities.",
+      "suggestedFix": "expose_php = Off",
+      "fixReason": "Hide PHP version to reduce information disclosure."
+    },
+    {
+      "key": "expose_php",
+      "valuePattern": "(?i)^Off$",
+      "severity": "GoodPractice",
+      "humanDescription": "PHP version hidden from HTTP headers.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "display_errors",
+      "valuePattern": "(?i)^On$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Error messages displayed to users. Can leak sensitive information about the application.",
+      "suggestedFix": "display_errors = Off",
+      "fixReason": "Disable display_errors in production to prevent information leakage."
+    },
+    {
+      "key": "display_errors",
+      "valuePattern": "(?i)^Off$",
+      "severity": "GoodPractice",
+      "humanDescription": "Error display disabled. Errors are logged instead of shown to users.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "log_errors",
+      "valuePattern": "(?i)^On$",
+      "severity": "GoodPractice",
+      "humanDescription": "Error logging enabled. Errors are recorded for debugging.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "log_errors",
+      "valuePattern": "(?i)^Off$",
+      "severity": "Warning",
+      "humanDescription": "Error logging disabled. Errors are silently ignored.",
+      "suggestedFix": "log_errors = On",
+      "fixReason": "Enable logging to track and debug issues."
+    },
+    {
+      "key": "allow_url_include",
+      "valuePattern": "(?i)^On$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Remote file inclusion enabled. Critical vulnerability - allows including remote PHP files.",
+      "suggestedFix": "allow_url_include = Off",
+      "fixReason": "Never enable allow_url_include - major security vulnerability."
+    },
+    {
+      "key": "allow_url_include",
+      "valuePattern": "(?i)^Off$",
+      "severity": "GoodPractice",
+      "humanDescription": "Remote file inclusion disabled. Protected against RFI attacks.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "allow_url_fopen",
+      "valuePattern": "(?i)^On$",
+      "severity": "Warning",
+      "humanDescription": "URL file access enabled. PHP can open remote URLs as files.",
+      "suggestedFix": "allow_url_fopen = Off",
+      "fixReason": "Disable unless specifically required for functionality."
+    },
+    {
+      "key": "register_globals",
+      "valuePattern": "(?i)^On$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Register globals enabled. This is a critical security vulnerability.",
+      "suggestedFix": "register_globals = Off",
+      "fixReason": "register_globals was removed in PHP 5.4 due to security issues."
+    },
+    {
+      "key": "open_basedir",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "open_basedir configured. PHP file access restricted to specified directories.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "disable_functions",
+      "valuePattern": ".*exec.*|.*system.*|.*passthru.*",
+      "severity": "GoodPractice",
+      "humanDescription": "Dangerous functions disabled. Prevents shell command execution.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "disable_functions",
+      "valuePattern": "^$",
+      "severity": "Warning",
+      "humanDescription": "No functions disabled. Consider disabling dangerous functions like exec, system, passthru.",
+      "suggestedFix": "disable_functions = exec,passthru,shell_exec,system,proc_open,popen",
+      "fixReason": "Disable shell execution functions unless required."
+    },
+    {
+      "key": "session.cookie_secure",
+      "valuePattern": "(?i)^On$|^1$",
+      "severity": "GoodPractice",
+      "humanDescription": "Secure session cookies enabled. Cookies only sent over HTTPS.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "session.cookie_secure",
+      "valuePattern": "(?i)^Off$|^0$",
+      "severity": "Warning",
+      "humanDescription": "Session cookies not restricted to HTTPS. Vulnerable to session hijacking.",
+      "suggestedFix": "session.cookie_secure = On",
+      "fixReason": "Enable secure cookies when using HTTPS."
+    },
+    {
+      "key": "session.cookie_httponly",
+      "valuePattern": "(?i)^On$|^1$",
+      "severity": "GoodPractice",
+      "humanDescription": "HTTPOnly session cookies enabled. Prevents JavaScript access to cookies.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "upload_max_filesize",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Maximum file upload size configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "max_execution_time",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Maximum script execution time configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "memory_limit",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "PHP memory limit configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}

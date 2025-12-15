@@ -1,0 +1,126 @@
+{
+  "formatName": "SSHClient",
+  "filePatterns": ["ssh_config", "*/ssh/config", ".ssh/config"],
+  "rules": [
+    {
+      "key": "StrictHostKeyChecking",
+      "valuePattern": "(?i)^no$",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Host key checking disabled. Vulnerable to man-in-the-middle attacks.",
+      "suggestedFix": "StrictHostKeyChecking ask",
+      "fixReason": "Enable host key verification to prevent MITM attacks."
+    },
+    {
+      "key": "StrictHostKeyChecking",
+      "valuePattern": "(?i)^yes$|^accept-new$",
+      "severity": "GoodPractice",
+      "humanDescription": "Host key checking enabled. Protected against MITM attacks.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "UserKnownHostsFile",
+      "valuePattern": ".*/dev/null.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Known hosts file discarded. No host key persistence.",
+      "suggestedFix": "",
+      "fixReason": "Host keys should be stored for verification."
+    },
+    {
+      "key": "PasswordAuthentication",
+      "valuePattern": "(?i)^yes$",
+      "severity": "Warning",
+      "humanDescription": "Password authentication enabled on client side.",
+      "suggestedFix": "PasswordAuthentication no",
+      "fixReason": "Prefer key-based authentication."
+    },
+    {
+      "key": "IdentityFile",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "SSH key file configured for this host.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ForwardAgent",
+      "valuePattern": "(?i)^yes$",
+      "severity": "Warning",
+      "humanDescription": "SSH agent forwarding enabled. Keys accessible on remote hosts.",
+      "suggestedFix": "",
+      "fixReason": "Only enable agent forwarding for trusted hosts."
+    },
+    {
+      "key": "ForwardX11",
+      "valuePattern": "(?i)^yes$",
+      "severity": "Warning",
+      "humanDescription": "X11 forwarding enabled. GUI applications can be displayed locally.",
+      "suggestedFix": "",
+      "fixReason": "X11 forwarding can expose local X server."
+    },
+    {
+      "key": "ProxyJump|ProxyCommand",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "SSH proxy/jump host configured for this connection.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "LocalForward|RemoteForward|DynamicForward",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Port forwarding configured.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Compression",
+      "valuePattern": "(?i)^yes$",
+      "severity": "Info",
+      "humanDescription": "SSH compression enabled. Better for slow connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "ServerAliveInterval",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "Keep-alive configured. Prevents connection timeouts.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Host",
+      "valuePattern": "\\*",
+      "severity": "Info",
+      "humanDescription": "Wildcard host configuration. Applies to all connections.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "Ciphers",
+      "valuePattern": ".*3des.*|.*arcfour.*|.*blowfish.*",
+      "severity": "CriticalSecurity",
+      "humanDescription": "Weak ciphers configured. These are cryptographically broken.",
+      "suggestedFix": "Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr",
+      "fixReason": "Use only strong, modern ciphers."
+    },
+    {
+      "key": "MACs",
+      "valuePattern": ".*md5.*|.*sha1(?!-etm).*",
+      "severity": "Warning",
+      "humanDescription": "Weak MAC algorithms configured.",
+      "suggestedFix": "",
+      "fixReason": "Use SHA-2 based MACs."
+    },
+    {
+      "key": "AddKeysToAgent",
+      "valuePattern": "(?i)^yes$",
+      "severity": "GoodPractice",
+      "humanDescription": "Keys automatically added to SSH agent.",
+      "suggestedFix": "",
+      "fixReason": ""
+    }
+  ]
+}
