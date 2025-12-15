@@ -1,0 +1,219 @@
+{
+  "formatName": "DockerCompose",
+  "description": "Configuration Docker Compose",
+  "version": "1.0",
+  "filePatterns": ["docker-compose*.yml", "docker-compose*.yaml", "compose*.yml", "compose*.yaml"],
+  "fileExtensions": [".yml", ".yaml"],
+  "syntax": "Yaml",
+  "commentChar": "#",
+  "keyValueSeparator": ": ",
+  "indentation": "  ",
+  "documentationUrl": "https://docs.docker.com/compose/compose-file/",
+  "parameterCategories": [
+    {
+      "name": "Service",
+      "description": "Configuration des services",
+      "icon": "📦",
+      "order": 1,
+      "parameters": [
+        {
+          "key": "image",
+          "displayName": "Image Docker",
+          "description": "Nom et tag de l'image Docker à utiliser",
+          "dataType": "String",
+          "example": "nginx:latest",
+          "tags": ["container", "image"]
+        },
+        {
+          "key": "container_name",
+          "displayName": "Nom du conteneur",
+          "description": "Nom personnalisé pour le conteneur",
+          "dataType": "String",
+          "example": "my-nginx"
+        },
+        {
+          "key": "restart",
+          "displayName": "Politique de redémarrage",
+          "description": "Comportement lors d'un arrêt du conteneur",
+          "dataType": "Enum",
+          "defaultValue": "no",
+          "enumValues": [
+            { "value": "no", "displayName": "Jamais", "severity": "Info" },
+            { "value": "always", "displayName": "Toujours", "severity": "GoodPractice" },
+            { "value": "on-failure", "displayName": "Sur échec", "severity": "Info" },
+            { "value": "unless-stopped", "displayName": "Sauf arrêt manuel", "severity": "GoodPractice" }
+          ]
+        },
+        {
+          "key": "command",
+          "displayName": "Commande",
+          "description": "Commande à exécuter au démarrage",
+          "dataType": "String",
+          "example": "python app.py"
+        },
+        {
+          "key": "working_dir",
+          "displayName": "Répertoire de travail",
+          "description": "Répertoire de travail dans le conteneur",
+          "dataType": "Path",
+          "example": "/app"
+        }
+      ]
+    },
+    {
+      "name": "Réseau",
+      "description": "Configuration réseau",
+      "icon": "🌐",
+      "order": 2,
+      "parameters": [
+        {
+          "key": "ports",
+          "displayName": "Ports exposés",
+          "description": "Mappage des ports hôte:conteneur",
+          "dataType": "String",
+          "example": "8080:80",
+          "multiValue": true
+        },
+        {
+          "key": "expose",
+          "displayName": "Ports internes",
+          "description": "Ports exposés aux autres services (pas à l'hôte)",
+          "dataType": "String",
+          "example": "3000",
+          "multiValue": true
+        },
+        {
+          "key": "hostname",
+          "displayName": "Nom d'hôte",
+          "description": "Nom d'hôte personnalisé du conteneur",
+          "dataType": "String",
+          "example": "myservice"
+        },
+        {
+          "key": "dns",
+          "displayName": "Serveurs DNS",
+          "description": "Serveurs DNS personnalisés",
+          "dataType": "String",
+          "example": "8.8.8.8",
+          "multiValue": true
+        }
+      ]
+    },
+    {
+      "name": "Volumes",
+      "description": "Montage de volumes",
+      "icon": "💾",
+      "order": 3,
+      "parameters": [
+        {
+          "key": "volumes",
+          "displayName": "Volumes",
+          "description": "Volumes à monter dans le conteneur",
+          "dataType": "String",
+          "example": "./data:/app/data",
+          "multiValue": true
+        }
+      ]
+    },
+    {
+      "name": "Environnement",
+      "description": "Variables d'environnement",
+      "icon": "🔧",
+      "order": 4,
+      "parameters": [
+        {
+          "key": "environment",
+          "displayName": "Variable d'environnement",
+          "description": "Variable d'environnement à définir",
+          "dataType": "String",
+          "example": "NODE_ENV=production",
+          "multiValue": true
+        },
+        {
+          "key": "env_file",
+          "displayName": "Fichier d'environnement",
+          "description": "Fichier .env à charger",
+          "dataType": "Path",
+          "example": ".env",
+          "multiValue": true
+        }
+      ]
+    },
+    {
+      "name": "Ressources",
+      "description": "Limites de ressources",
+      "icon": "📊",
+      "order": 5,
+      "parameters": [
+        {
+          "key": "mem_limit",
+          "displayName": "Limite mémoire",
+          "description": "Mémoire maximale allouée au conteneur",
+          "dataType": "Size",
+          "example": "512m"
+        },
+        {
+          "key": "cpus",
+          "displayName": "Limite CPU",
+          "description": "Nombre de CPUs alloués (ex: 0.5 = 50%)",
+          "dataType": "String",
+          "example": "0.5"
+        }
+      ]
+    },
+    {
+      "name": "Dépendances",
+      "description": "Ordre de démarrage",
+      "icon": "🔗",
+      "order": 6,
+      "parameters": [
+        {
+          "key": "depends_on",
+          "displayName": "Dépendances",
+          "description": "Services requis avant le démarrage",
+          "dataType": "String",
+          "example": "db",
+          "multiValue": true
+        }
+      ]
+    },
+    {
+      "name": "Santé",
+      "description": "Vérification de santé",
+      "icon": "❤️",
+      "order": 7,
+      "parameters": [
+        {
+          "key": "healthcheck.test",
+          "displayName": "Commande healthcheck",
+          "description": "Commande pour vérifier la santé du service",
+          "dataType": "String",
+          "example": "curl -f http://localhost/ || exit 1"
+        },
+        {
+          "key": "healthcheck.interval",
+          "displayName": "Intervalle healthcheck",
+          "description": "Fréquence des vérifications de santé",
+          "dataType": "Duration",
+          "defaultValue": "30s",
+          "example": "10s"
+        },
+        {
+          "key": "healthcheck.timeout",
+          "displayName": "Timeout healthcheck",
+          "description": "Délai maximum pour une vérification",
+          "dataType": "Duration",
+          "defaultValue": "30s",
+          "example": "5s"
+        },
+        {
+          "key": "healthcheck.retries",
+          "displayName": "Retries healthcheck",
+          "description": "Nombre de tentatives avant échec",
+          "dataType": "Integer",
+          "defaultValue": 3
+        }
+      ]
+    }
+  ]
+}

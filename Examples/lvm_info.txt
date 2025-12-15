@@ -1,0 +1,279 @@
+  --- Physical volume ---
+  PV Name               /dev/sda3
+  VG Name               vg00
+  PV Size               <48.00 GiB / not usable 3.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              12287
+  Free PE               0
+  Allocated PE          12287
+  PV UUID               5fhgIG-yjfl-e3DC-MaBq-XBsp-liHT-Dp6HFe
+   
+  --- Physical volume ---
+  PV Name               /dev/sdb
+  VG Name               shared_data
+  PV Size               20.00 GiB / not usable 4.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              5119
+  Free PE               0
+  Allocated PE          5119
+  PV UUID               NmJCY2-nPkc-pAcm-oiPh-44Mp-7DZq-F5ctYx
+   
+  --- Physical volume ---
+  PV Name               /dev/sdc1
+  VG Name               shared_data
+  PV Size               <30.00 GiB / not usable 3.00 MiB
+  Allocatable           yes 
+  PE Size               4.00 MiB
+  Total PE              7679
+  Free PE               1278
+  Allocated PE          6401
+  PV UUID               W7ZrpM-fV81-txhe-h0r5-rkOf-v8w7-Iufj8B
+   
+  --- Volume group ---
+  VG Name               vg00
+  System ID             
+  Format                lvm2
+  Metadata Areas        1
+  Metadata Sequence No  14
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                11
+  Open LV               11
+  Max PV                0
+  Cur PV                1
+  Act PV                1
+  VG Size               <48.00 GiB
+  PE Size               4.00 MiB
+  Total PE              12287
+  Alloc PE / Size       12287 / <48.00 GiB
+  Free  PE / Size       0 / 0   
+  VG UUID               0dpFVi-M8O3-1Riw-XbAo-UAaS-OR2A-LVcupz
+   
+  --- Volume group ---
+  VG Name               shared_data
+  System ID             
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  5
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                1
+  Open LV               1
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               49.99 GiB
+  PE Size               4.00 MiB
+  Total PE              12798
+  Alloc PE / Size       11520 / 45.00 GiB
+  Free  PE / Size       1278 / 4.99 GiB
+  VG UUID               apl3Ue-Emyy-y9Mw-gQDi-uS08-FZzz-7FdtzL
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/rpm
+  LV Name                rpm
+  VG Name                vg00
+  LV UUID                6yAmDG-oJ1S-iQl8-MAWV-yOCf-2zSR-5y36aa
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:26:57 +0200
+  LV Status              available
+  # open                 1
+  LV Size                2.00 GiB
+  Current LE             512
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:3
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/home
+  LV Name                home
+  VG Name                vg00
+  LV UUID                fj2ZIz-VK98-1Kij-QQmn-96j0-fm33-9TJA1R
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:26:58 +0200
+  LV Status              available
+  # open                 1
+  LV Size                <6.00 GiB
+  Current LE             1535
+  Segments               2
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:4
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/tmp
+  LV Name                tmp
+  VG Name                vg00
+  LV UUID                RroZvd-EvV4-00RP-QS0a-hEWa-ZgiM-5YP5sq
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:26:59 +0200
+  LV Status              available
+  # open                 1
+  LV Size                5.00 GiB
+  Current LE             1280
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:5
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/log
+  LV Name                log
+  VG Name                vg00
+  LV UUID                JHdroX-iwd1-idp2-upNT-zhJ5-Of80-MCb1Fh
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:26:59 +0200
+  LV Status              available
+  # open                 1
+  LV Size                5.00 GiB
+  Current LE             1280
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:6
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/varyum
+  LV Name                varyum
+  VG Name                vg00
+  LV UUID                dYQUjO-1ECs-3cPn-Ouwu-cmJ8-Mwvs-2TK6uB
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:27:00 +0200
+  LV Status              available
+  # open                 1
+  LV Size                5.00 GiB
+  Current LE             1280
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:7
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/var
+  LV Name                var
+  VG Name                vg00
+  LV UUID                LeSff7-xEtL-BXWU-lXL5-i2VO-tq09-iNtg5w
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:27:01 +0200
+  LV Status              available
+  # open                 1
+  LV Size                5.00 GiB
+  Current LE             1280
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:8
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/usr
+  LV Name                usr
+  VG Name                vg00
+  LV UUID                4GYW3H-mnnT-1Q5Y-qn2g-QhsS-nuUX-evHkg2
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:27:01 +0200
+  LV Status              available
+  # open                 1
+  LV Size                5.00 GiB
+  Current LE             1280
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:1
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/root
+  LV Name                root
+  VG Name                vg00
+  LV UUID                eIXMf3-Tp7A-HhW0-un43-gVRf-b12H-3UZHpk
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:27:02 +0200
+  LV Status              available
+  # open                 1
+  LV Size                5.00 GiB
+  Current LE             1280
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:0
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/audit
+  LV Name                audit
+  VG Name                vg00
+  LV UUID                4TkuYW-UW3C-McGE-4qs1-P3k2-uoZR-VtzhL7
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:43:25 +0200
+  LV Status              available
+  # open                 1
+  LV Size                3.00 GiB
+  Current LE             768
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:9
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/rsyslog
+  LV Name                rsyslog
+  VG Name                vg00
+  LV UUID                Vp0hnK-IRUS-g5QU-VdDd-Ahtn-oZk9-ut940R
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 20:44:33 +0200
+  LV Status              available
+  # open                 1
+  LV Size                3.00 GiB
+  Current LE             768
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:10
+   
+  --- Logical volume ---
+  LV Path                /dev/vg00/swap
+  LV Name                swap
+  VG Name                vg00
+  LV UUID                a4bsYR-atdS-awVA-xHcC-lnDf-F3qK-XonkFz
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-04-11 18:45:07 +0200
+  LV Status              available
+  # open                 2
+  LV Size                4.00 GiB
+  Current LE             1024
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:11
+   
+  --- Logical volume ---
+  LV Path                /dev/shared_data/data
+  LV Name                data
+  VG Name                shared_data
+  LV UUID                wwyGK2-ku1M-Tr9v-TGsJ-9fIK-w067-NypnWE
+  LV Write Access        read/write
+  LV Creation host, time ypexch01s, 2019-02-19 15:22:32 +0100
+  LV Status              available
+  # open                 1
+  LV Size                45.00 GiB
+  Current LE             11520
+  Segments               2
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:2
+   

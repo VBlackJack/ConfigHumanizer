@@ -1,0 +1,213 @@
+{
+  "formatName": "Nginx",
+  "description": "Configuration du serveur web Nginx",
+  "version": "1.0",
+  "filePatterns": ["*nginx*.conf", "nginx.conf"],
+  "fileExtensions": [],
+  "syntax": "Block",
+  "commentChar": "#",
+  "keyValueSeparator": " ",
+  "documentationUrl": "https://nginx.org/en/docs/",
+  "parameterCategories": [
+    {
+      "name": "Serveur",
+      "description": "Paramètres du bloc server",
+      "icon": "🌐",
+      "order": 1,
+      "parameters": [
+        {
+          "key": "listen",
+          "displayName": "Port d'écoute",
+          "description": "Port et options d'écoute du serveur",
+          "dataType": "String",
+          "defaultValue": "80",
+          "example": "443 ssl http2",
+          "tags": ["port", "réseau"]
+        },
+        {
+          "key": "server_name",
+          "displayName": "Nom du serveur",
+          "description": "Nom(s) de domaine pour ce bloc server",
+          "dataType": "String",
+          "example": "example.com www.example.com",
+          "tags": ["domaine", "vhost"]
+        },
+        {
+          "key": "root",
+          "displayName": "Racine du site",
+          "description": "Chemin vers les fichiers du site web",
+          "dataType": "Path",
+          "defaultValue": "/var/www/html",
+          "example": "/var/www/mysite"
+        },
+        {
+          "key": "index",
+          "displayName": "Fichiers index",
+          "description": "Fichiers à servir par défaut",
+          "dataType": "String",
+          "defaultValue": "index.html index.htm",
+          "example": "index.php index.html"
+        }
+      ]
+    },
+    {
+      "name": "Sécurité SSL",
+      "description": "Configuration HTTPS/TLS",
+      "icon": "🔒",
+      "order": 2,
+      "parameters": [
+        {
+          "key": "ssl_certificate",
+          "displayName": "Certificat SSL",
+          "description": "Chemin vers le fichier de certificat",
+          "dataType": "Path",
+          "example": "/etc/nginx/ssl/cert.pem"
+        },
+        {
+          "key": "ssl_certificate_key",
+          "displayName": "Clé privée SSL",
+          "description": "Chemin vers la clé privée du certificat",
+          "dataType": "Path",
+          "example": "/etc/nginx/ssl/key.pem"
+        },
+        {
+          "key": "ssl_protocols",
+          "displayName": "Protocoles SSL",
+          "description": "Versions TLS autorisées",
+          "dataType": "String",
+          "defaultValue": "TLSv1.2 TLSv1.3",
+          "example": "TLSv1.2 TLSv1.3",
+          "tags": ["TLS", "sécurité"]
+        },
+        {
+          "key": "ssl_ciphers",
+          "displayName": "Chiffrements SSL",
+          "description": "Liste des suites de chiffrement acceptées",
+          "dataType": "String",
+          "example": "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256"
+        },
+        {
+          "key": "ssl_prefer_server_ciphers",
+          "displayName": "Préférer chiffrements serveur",
+          "description": "Privilégier les chiffrements du serveur",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "on/off"
+        }
+      ]
+    },
+    {
+      "name": "Performance",
+      "description": "Optimisation des performances",
+      "icon": "⚡",
+      "order": 3,
+      "parameters": [
+        {
+          "key": "worker_processes",
+          "displayName": "Processus workers",
+          "description": "Nombre de processus workers (auto = nombre de CPU)",
+          "dataType": "String",
+          "defaultValue": "auto",
+          "example": "4"
+        },
+        {
+          "key": "worker_connections",
+          "displayName": "Connexions par worker",
+          "description": "Nombre maximum de connexions par worker",
+          "dataType": "Integer",
+          "defaultValue": 1024,
+          "validation": {
+            "min": 1,
+            "max": 65535
+          }
+        },
+        {
+          "key": "keepalive_timeout",
+          "displayName": "Timeout Keep-Alive",
+          "description": "Durée de maintien des connexions inactives",
+          "dataType": "Integer",
+          "defaultValue": 65,
+          "unit": "s"
+        },
+        {
+          "key": "gzip",
+          "displayName": "Compression Gzip",
+          "description": "Activer la compression des réponses",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "on/off"
+        },
+        {
+          "key": "client_max_body_size",
+          "displayName": "Taille max requête",
+          "description": "Taille maximale du corps des requêtes",
+          "dataType": "String",
+          "defaultValue": "1m",
+          "example": "100m"
+        }
+      ]
+    },
+    {
+      "name": "Proxy",
+      "description": "Configuration du reverse proxy",
+      "icon": "🔀",
+      "order": 4,
+      "parameters": [
+        {
+          "key": "proxy_pass",
+          "displayName": "URL cible du proxy",
+          "description": "URL du serveur backend",
+          "dataType": "String",
+          "example": "http://127.0.0.1:8080"
+        },
+        {
+          "key": "proxy_set_header",
+          "displayName": "En-tête proxy",
+          "description": "En-têtes à transmettre au backend",
+          "dataType": "String",
+          "example": "Host $host"
+        },
+        {
+          "key": "proxy_connect_timeout",
+          "displayName": "Timeout connexion proxy",
+          "description": "Délai de connexion au backend",
+          "dataType": "Integer",
+          "defaultValue": 60,
+          "unit": "s"
+        },
+        {
+          "key": "proxy_read_timeout",
+          "displayName": "Timeout lecture proxy",
+          "description": "Délai d'attente de réponse du backend",
+          "dataType": "Integer",
+          "defaultValue": 60,
+          "unit": "s"
+        }
+      ]
+    },
+    {
+      "name": "Logging",
+      "description": "Journalisation",
+      "icon": "📝",
+      "order": 5,
+      "parameters": [
+        {
+          "key": "access_log",
+          "displayName": "Journal d'accès",
+          "description": "Chemin vers le fichier de log d'accès",
+          "dataType": "Path",
+          "defaultValue": "/var/log/nginx/access.log",
+          "example": "/var/log/nginx/mysite.access.log combined"
+        },
+        {
+          "key": "error_log",
+          "displayName": "Journal d'erreurs",
+          "description": "Chemin vers le fichier de log d'erreurs",
+          "dataType": "Path",
+          "defaultValue": "/var/log/nginx/error.log",
+          "example": "/var/log/nginx/mysite.error.log warn"
+        }
+      ]
+    }
+  ]
+}

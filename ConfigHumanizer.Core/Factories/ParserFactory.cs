@@ -47,7 +47,7 @@ public static class ParserFactory
         }
 
         // Check for SSH client config
-        if (fileName == "ssh_config" || fileName == "config" && filePath.Contains(".ssh"))
+        if (fileName == "ssh_config" || (fileName == "config" && filePath.Contains(".ssh")))
         {
             return ruleEngine != null ? new SshdConfigParser(ruleEngine, "SSHClient") : new SshdConfigParser();
         }
@@ -63,6 +63,22 @@ public static class ParserFactory
             fileName == "system-auth" || fileName == "password-auth" || fileName == "common-auth")
         {
             return ruleEngine != null ? new SshdConfigParser(ruleEngine, "PAM") : new SshdConfigParser();
+        }
+
+        // Check for Unix account files (passwd, group, shadow)
+        if (fileName == "passwd" || fileName.Contains("passwd"))
+        {
+            return ruleEngine != null ? new UnixAccountParser(ruleEngine, "Passwd") : new UnixAccountParser();
+        }
+
+        if (fileName == "group" || fileName.Contains("group."))
+        {
+            return ruleEngine != null ? new UnixAccountParser(ruleEngine, "Group") : new UnixAccountParser();
+        }
+
+        if (fileName == "shadow" || fileName.Contains("shadow"))
+        {
+            return ruleEngine != null ? new UnixAccountParser(ruleEngine, "Shadow") : new UnixAccountParser();
         }
 
         // Check for iptables/nftables rules

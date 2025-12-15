@@ -1,0 +1,51 @@
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+operator:x:11:0:operator:/root:/sbin/nologin
+games:x:12:100:games:/usr/games:/sbin/nologin
+ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
+nobody:x:99:99:Nobody:/:/sbin/nologin
+systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin
+dbus:x:81:81:System message bus:/:/sbin/nologin
+polkitd:x:999:997:User for polkitd:/:/sbin/nologin
+libstoragemgmt:x:998:996:daemon account for libstoragemgmt:/var/run/lsm:/sbin/nologin
+rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/sbin/nologin
+ntp:x:38:38::/etc/ntp:/sbin/nologin
+postfix:x:89:89::/var/spool/postfix:/sbin/nologin
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+tcpdump:x:72:72::/:/sbin/nologin
+puppet:x:52:52:Puppet:/var/lib/puppet:/sbin/nologin
+clamav:x:997:995:Clamav database update user:/var/lib/clamav:/sbin/nologin
+sssd:x:996:993:User for sssd:/:/sbin/nologin
+nagios:x:995:992::/var/spool/nagios:/sbin/nologin
+nrpe:x:5666:5666:NRPE user for the NRPE service:/var/run/nrpe:/bin/bash
+zabbix:x:994:991:Zabbix Monitoring System:/var/lib/zabbix:/sbin/nologin
+svc_netadmin:x:19000001:100:Network Administrator:/home/svc_netadmin:/bin/bash
+svc_appmgr:x:18000002:100:Application Manager:/home/svc_appmgr:/bin/bash
+svc_dev:x:18000004:100:Developer Account:/home/svc_dev:/bin/bash
+svc_dbadmin:x:12000001:100:DB Administrator:/home/svc_dbadmin:/bin/bash
+svc_operator:x:16000001:100:Operator Account:/home/svc_operator:/bin/bash
+admnet:x:19000000:19000000:Network Admin:/home/admnet:/bin/bash
+dba:x:12000000:12000000:Database Admin:/home/dba:/bin/bash
+svc_sysadmin:x:11000002:100:System Administrator:/home/svc_sysadmin:/bin/bash
+oper:x:16000000:16000000:Operators:/home/oper:/bin/bash
+svc_reader:x:17000002:100:Read-only Account:/home/svc_reader:/bin/bash
+system:x:11000003:11000003:System Account:/home/system:/bin/bash
+svc_integrator:x:14000001:100:Integrator:/home/svc_integrator:/bin/bash
+www:x:18000000:18000005:Web Admin:/home/www:/bin/bash
+integ:x:14000000:14000000:Integration:/home/integ:/bin/bash
+svc_middleware:x:15000002:100:Middleware Admin:/home/svc_middleware:/bin/bash
+reference:x:11000004:11000004:Reference User:/home/reference:/bin/bash
+sprod:x:15000000:15000000:Production Support:/home/sprod:/bin/bash
+stat:x:17000000:17000000:Statistics:/home/stat:/bin/bash
+clamscan:x:993:989:Clamav scanner user:/:/sbin/nologin
+tss:x:59:59:Account used by the trousers package:/dev/null:/sbin/nologin
+svc_monitor:x:22000416:22000416:Monitoring Agent:/home/svc_monitor:/sbin/nologin
+svc_edr:x:992:988:EDR Agent:/opt/edr/home:/sbin/nologin
+svc_vault:x:5667:5667:Vault Management Account:/home/svc_vault:/bin/bash

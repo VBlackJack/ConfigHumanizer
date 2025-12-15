@@ -1,0 +1,133 @@
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/local/bin:/bin:/usr/bin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options change a
+# default value.
+
+Port            22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+# Disable legacy (protocol version 1) support in the server for new
+# installations. In future the default will change to require explicit
+# activation of protocol 1
+Protocol        2
+
+# HostKey for protocol version 1
+#HostKey /etc/ssh/ssh_host_key
+# HostKeys for protocol version 2
+HostKey         /etc/ssh/ssh_host_rsa_key
+
+# Logging
+# obsoletes QuietMode and FascistLogging
+#SyslogFacility AUTH
+SyslogFacility  AUTHPRIV
+LogLevel DEBUG
+
+# Authentication:
+
+#LoginGraceTime 2m
+PermitRootLogin         no
+StrictModes yes
+MaxAuthTries 10
+MaxSessions 10
+
+RSAAuthentication       no
+PubkeyAuthentication    no
+#AuthorizedKeysFile      .ssh/authorized_keys
+AuthorizedKeysCommand   /usr/bin/sss_ssh_authorizedkeys
+AuthorizedKeysCommandUser root
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#RhostsRSAAuthentication no
+# similar for protocol version 2
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# RhostsRSAAuthentication and HostbasedAuthentication
+IgnoreUserKnownHosts yes
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication no
+PermitEmptyPasswords no
+
+# Change to no to disable s/key passwords
+ChallengeResponseAuthentication no
+
+Ciphers aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr
+
+MACS hmac-sha2-256,hmac-sha2-512,umac-128@openssh.com,umac-128-etm@openssh.com,hmac-ripemd160,hmac-ripemd160@openssh.com,hmac-sha1
+
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM          yes
+
+# Accept locale-related environment variables
+AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+AcceptEnv XMODIFIERS
+
+AllowAgentForwarding no
+AllowTcpForwarding no
+#GatewayPorts no
+X11Forwarding no
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PrintMotd yes
+#PrintLastLog yes
+#TCPKeepAlive yes
+#UseLogin no
+#UsePrivilegeSeparation yes
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#ShowPatchLevel no
+UseDNS no
+PidFile                 /var/run/sshd.pid
+#MaxStartups 10
+#PermitTunnel no
+#ChrootDirectory none
+
+# no default banner path
+#Banner none
+
+# override default of no subsystems
+Subsystem       sftp    /usr/libexec/openssh/sftp-server
+
+Match   Address 10.100.10.0/27,10.100.20.0/27,10.100.30.0/26,10.100.40.0/26,10.100.50.0/24
+        RSAAuthentication       yes
+        PubkeyAuthentication    yes
+	PasswordAuthentication  no
+
+#Permit RSA authentification from bastion servers
+Match   Address 10.100.60.0/26,10.100.70.0/26,10.100.80.10
+        RSAAuthentication       yes
+        PubkeyAuthentication    yes
+	PasswordAuthentication  no
+
+#Permit RSA authentification from admin gateways vlan
+Match   Address 10.100.90.0/28,10.100.100.0/28
+        RSAAuthentication       yes
+        PubkeyAuthentication    yes
+	PasswordAuthentication  no
+
+# BEGIN ANSIBLE MANAGED BLOCK
+Match Address 10.100.110.10,10.100.110.20,10.100.110.30,10.100.110.40 User svc_vault
+  PasswordAuthentication yes
+# END ANSIBLE MANAGED BLOCK

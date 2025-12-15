@@ -48,6 +48,11 @@ public class MermaidDiagramGenerator : IDiagramGenerator
             "postfix" => GeneratePostfixDiagram(sb, rules),
             "terraform" => GenerateTerraformDiagram(sb, rules),
             "paloalto" => GeneratePaloAltoDiagram(sb, rules),
+            "passwd" => GeneratePasswdDiagram(sb, rules),
+            "group" => GenerateGroupDiagram(sb, rules),
+            "shadow" => GeneratePasswdDiagram(sb, rules),
+            "sudoers" => GenerateSudoersDiagram(sb, rules),
+            "rsyslog" => GenerateRsyslogDiagram(sb, rules),
             _ => GenerateGenericDiagram(sb, rules, formatName)
         };
     }
@@ -945,79 +950,277 @@ public class MermaidDiagramGenerator : IDiagramGenerator
 
     private static string GeneratePaloAltoDiagram(StringBuilder sb, List<HumanizedRule> rules)
     {
-        sb.AppendLine("    External((External)) --> Firewall{{Palo Alto Firewall}}");
-        sb.AppendLine("    Firewall --> Internal((Internal Network))");
+        // Count rules by severity for summary
+        var totalRules = rules.Count(r => r.Key.StartsWith("fw_rule."));
+        var criticalRules = rules.Count(r => r.Key.StartsWith("fw_rule.") && r.Severity == Severity.CriticalSecurity);
+        var warningRules = rules.Count(r => r.Key.StartsWith("fw_rule.") && r.Severity == Severity.Warning);
+        var goodRules = rules.Count(r => r.Key.StartsWith("fw_rule.") && r.Severity == Severity.GoodPractice);
 
-        // Check for any-source rules (risky)
-        var anySourceRules = rules.Count(r => r.Key.Contains("fw_rule.source_any"));
-        if (anySourceRules > 0)
+        // Simple summary diagram
+        sb.AppendLine("    subgraph FW[\"🔥 Résumé des règles Palo Alto\"]");
+        sb.AppendLine("    direction TB");
+        sb.AppendLine($"    Total[\"📋 Total: {totalRules} règles\"]");
+
+        if (criticalRules > 0)
         {
-            sb.AppendLine($"    Warning[Any Source: {anySourceRules} rules] -.-> Firewall");
-            sb.AppendLine("    style Warning fill:#ffd43b,stroke:#fab005");
+            sb.AppendLine($"    Critical[\"🔴 Critiques: {criticalRules}\"]");
+            sb.AppendLine("    style Critical fill:#ffebee,stroke:#c62828");
+        }
+        if (warningRules > 0)
+        {
+            sb.AppendLine($"    Warning[\"⚠️ Attention: {warningRules}\"]");
+            sb.AppendLine("    style Warning fill:#fff3e0,stroke:#f57c00");
+        }
+        if (goodRules > 0)
+        {
+            sb.AppendLine($"    Good[\"✅ Bonnes pratiques: {goodRules}\"]");
+            sb.AppendLine("    style Good fill:#e8f5e9,stroke:#388e3c");
         }
 
-        // Check for any-dest rules (very risky)
-        var anyDestRules = rules.Count(r => r.Key.Contains("fw_rule.dest_any"));
-        if (anyDestRules > 0)
+        sb.AppendLine("    end");
+        sb.AppendLine();
+
+        // Flow diagram
+        sb.AppendLine("    Internet((Internet)) --> FW");
+        sb.AppendLine("    FW --> Internal((Réseau Interne))");
+
+        return sb.ToString();
+    }
+
+    private static string GeneratePasswdDiagram(StringBuilder sb, List<HumanizedRule> rules)
+    {
+        // Count account types
+        var rootAccounts = rules.Count(r => r.Value.Contains("UID:0 "));
+        var serviceAccounts = rules.Count(r => r.Value.Contains("nologin") || r.Value.Contains("/bin/false"));
+        var interactiveAccounts = rules.Count(r => r.Value.Contains("/bin/bash") || r.Value.Contains("/bin/zsh"));
+        var ldapAccounts = rules.Count(r => r.Value.Contains("UID:") &&
+            int.TryParse(r.Value.Split("UID:")[1].Split(' ')[0], out var uid) && uid >= 10000000);
+
+        sb.AppendLine("    subgraph Users[\"👥 Comptes Utilisateurs\"]");
+        sb.AppendLine("    direction TB");
+        sb.AppendLine($"    Total[\"📋 Total: {rules.Count} comptes\"]");
+        sb.AppendLine("    end");
+        sb.AppendLine();
+
+        // Root accounts
+        if (rootAccounts > 0)
         {
-            sb.AppendLine($"    Critical[Any Dest: {anyDestRules} rules] -.-> Firewall");
-            sb.AppendLine("    style Critical fill:#ff6b6b,stroke:#c92a2a");
+            sb.AppendLine($"    Root[\"🔴 Root (UID 0): {rootAccounts}\"]");
+            sb.AppendLine("    Users --> Root");
+            sb.AppendLine("    style Root fill:#ffebee,stroke:#c62828");
         }
 
-        // Extract zones
-        var zones = rules.Where(r => r.Key.Contains("fw_rule.source_zone") || r.Key.Contains("fw_rule.dest_zone"))
-            .Select(r => r.Value)
-            .Where(v => !string.IsNullOrEmpty(v) && v != "any")
-            .Distinct()
-            .ToList();
-
-        var zoneIndex = 0;
-        foreach (var zone in zones.Take(4))
+        // Interactive accounts
+        if (interactiveAccounts > 0)
         {
-            zoneIndex++;
-            var zoneId = $"Zone{zoneIndex}";
-            sb.AppendLine($"    Firewall --> {zoneId}[/{zone}/]");
-            sb.AppendLine($"    style {zoneId} fill:#74c0fc,stroke:#339af0");
+            sb.AppendLine($"    Interactive[\"👤 Interactifs: {interactiveAccounts}\"]");
+            sb.AppendLine("    Users --> Interactive");
+            sb.AppendLine("    Interactive --> Shell[\"🖥️ Shell bash/zsh\"]");
+            sb.AppendLine("    style Interactive fill:#e3f2fd,stroke:#1565c0");
         }
 
-        // Count open ports
-        var sshRules = rules.Count(r => r.Key.Contains("fw_rule.port.TCP_22"));
-        var rdpRules = rules.Count(r => r.Key.Contains("fw_rule.port.TCP_3389"));
-        var smbRules = rules.Count(r => r.Key.Contains("fw_rule.port.TCP_445"));
-        var httpRules = rules.Count(r => r.Key.Contains("fw_rule.port.TCP_80"));
-
-        if (sshRules > 0)
+        // Service accounts
+        if (serviceAccounts > 0)
         {
-            sb.AppendLine($"    SSH[SSH: {sshRules}] --> Firewall");
-        }
-        if (rdpRules > 0)
-        {
-            sb.AppendLine($"    RDP[RDP: {rdpRules}] --> Firewall");
-            sb.AppendLine("    style RDP fill:#ffd43b,stroke:#fab005");
-        }
-        if (smbRules > 0)
-        {
-            sb.AppendLine($"    SMB[SMB: {smbRules}] --> Firewall");
-            sb.AppendLine("    style SMB fill:#ffd43b,stroke:#fab005");
-        }
-        if (httpRules > 0)
-        {
-            sb.AppendLine($"    HTTP[HTTP: {httpRules}] --> Firewall");
+            sb.AppendLine($"    Service[\"⚙️ Services: {serviceAccounts}\"]");
+            sb.AppendLine("    Users --> Service");
+            sb.AppendLine("    Service --> NoLogin[\"🔒 nologin/false\"]");
+            sb.AppendLine("    style Service fill:#e8f5e9,stroke:#2e7d32");
+            sb.AppendLine("    style NoLogin fill:#e8f5e9,stroke:#2e7d32");
         }
 
-        // Count total rules
-        var totalRules = rules.Count(r => r.Key.Contains("fw_rule.name"));
-        sb.AppendLine($"    Rules{{Total Rules: {totalRules}}} -.-> Firewall");
-
-        // Check tag color
-        var tagColor = rules.FirstOrDefault(r => r.Key.Contains("firewall.tag_color"))?.Value;
-        if (tagColor == "green")
+        // LDAP/AD accounts
+        if (ldapAccounts > 0)
         {
-            sb.AppendLine("    style Firewall fill:#69db7c,stroke:#37b24d");
+            sb.AppendLine($"    LDAP[\"🌐 LDAP/AD: {ldapAccounts}\"]");
+            sb.AppendLine("    Users --> LDAP");
+            sb.AppendLine("    LDAP --> Directory[(Annuaire)]");
+            sb.AppendLine("    style LDAP fill:#fff3e0,stroke:#ef6c00");
         }
-        else if (tagColor == "red")
+
+        // Security concerns
+        var criticalCount = rules.Count(r => r.Severity == Severity.CriticalSecurity);
+        var warningCount = rules.Count(r => r.Severity == Severity.Warning);
+
+        if (criticalCount > 0)
         {
-            sb.AppendLine("    style Firewall fill:#ff6b6b,stroke:#c92a2a");
+            sb.AppendLine($"    Security[\"⚠️ Problèmes critiques: {criticalCount}\"]");
+            sb.AppendLine("    Users -.-> Security");
+            sb.AppendLine("    style Security fill:#ffebee,stroke:#c62828");
+        }
+
+        if (warningCount > 0)
+        {
+            sb.AppendLine($"    Warnings[\"⚡ Avertissements: {warningCount}\"]");
+            sb.AppendLine("    Users -.-> Warnings");
+            sb.AppendLine("    style Warnings fill:#fff3e0,stroke:#f57c00");
+        }
+
+        return sb.ToString();
+    }
+
+    private static string GenerateGroupDiagram(StringBuilder sb, List<HumanizedRule> rules)
+    {
+        // Count group types
+        var systemGroups = rules.Count(r => r.Value.Contains("GID:") &&
+            int.TryParse(r.Value.Split("GID:")[1].Split(' ')[0], out var gid) && gid < 1000);
+        var userGroups = rules.Count(r => r.Value.Contains("GID:") &&
+            int.TryParse(r.Value.Split("GID:")[1].Split(' ')[0], out var gid) && gid >= 1000 && gid < 10000000);
+        var ldapGroups = rules.Count(r => r.Value.Contains("GID:") &&
+            int.TryParse(r.Value.Split("GID:")[1].Split(' ')[0], out var gid) && gid >= 10000000);
+
+        sb.AppendLine("    subgraph Groups[\"👥 Groupes du Système\"]");
+        sb.AppendLine("    direction TB");
+        sb.AppendLine($"    Total[\"📋 Total: {rules.Count} groupes\"]");
+        sb.AppendLine("    end");
+        sb.AppendLine();
+
+        // Privileged groups
+        var wheelGroup = rules.FirstOrDefault(r => r.Key == "wheel" || r.Key == "sudo");
+        var rootGroup = rules.FirstOrDefault(r => r.Key == "root");
+
+        if (rootGroup != null || wheelGroup != null)
+        {
+            sb.AppendLine("    subgraph Privileged[\"⚡ Groupes Privilégiés\"]");
+            if (rootGroup != null)
+            {
+                sb.AppendLine("    RootGrp[\"🔴 root (GID 0)\"]");
+            }
+            if (wheelGroup != null)
+            {
+                var memberCount = wheelGroup.Value.Contains("Membres:") ?
+                    wheelGroup.Value.Split("Membres:")[1].Trim() : "0";
+                sb.AppendLine($"    Wheel[\"⚡ wheel/sudo ({memberCount})\"]");
+            }
+            sb.AppendLine("    end");
+            sb.AppendLine("    Groups --> Privileged");
+            sb.AppendLine("    style Privileged fill:#ffebee,stroke:#c62828");
+        }
+
+        // System groups
+        if (systemGroups > 0)
+        {
+            sb.AppendLine($"    System[\"⚙️ Système: {systemGroups}\"]");
+            sb.AppendLine("    Groups --> System");
+            sb.AppendLine("    style System fill:#e8f5e9,stroke:#2e7d32");
+        }
+
+        // User groups
+        if (userGroups > 0)
+        {
+            sb.AppendLine($"    UserGrps[\"👤 Utilisateurs: {userGroups}\"]");
+            sb.AppendLine("    Groups --> UserGrps");
+            sb.AppendLine("    style UserGrps fill:#e3f2fd,stroke:#1565c0");
+        }
+
+        // LDAP groups
+        if (ldapGroups > 0)
+        {
+            sb.AppendLine($"    LDAPGrps[\"🌐 LDAP/AD: {ldapGroups}\"]");
+            sb.AppendLine("    Groups --> LDAPGrps");
+            sb.AppendLine("    LDAPGrps --> Directory[(Annuaire)]");
+            sb.AppendLine("    style LDAPGrps fill:#fff3e0,stroke:#ef6c00");
+        }
+
+        return sb.ToString();
+    }
+
+    private static string GenerateSudoersDiagram(StringBuilder sb, List<HumanizedRule> rules)
+    {
+        sb.AppendLine("    subgraph Sudo[\"⚡ Configuration Sudoers\"]");
+        sb.AppendLine("    direction TB");
+        sb.AppendLine("    Root[\"🔴 root ALL=(ALL) ALL\"]");
+        sb.AppendLine("    end");
+        sb.AppendLine();
+
+        // Check for NOPASSWD rules
+        var nopasswdRules = rules.Where(r => r.Value.Contains("NOPASSWD") ||
+            r.RawLine.Contains("NOPASSWD")).ToList();
+
+        if (nopasswdRules.Count > 0)
+        {
+            sb.AppendLine("    subgraph NoPass[\"⚠️ Sans mot de passe\"]");
+            var idx = 0;
+            foreach (var rule in nopasswdRules.Take(5))
+            {
+                idx++;
+                var user = rule.Key.Length > 20 ? rule.Key[..17] + "..." : rule.Key;
+                sb.AppendLine($"    NP{idx}[\"{user}\"]");
+            }
+            sb.AppendLine("    end");
+            sb.AppendLine("    Sudo --> NoPass");
+            sb.AppendLine("    style NoPass fill:#ffebee,stroke:#c62828");
+        }
+
+        // Check for wheel group
+        var wheelRule = rules.FirstOrDefault(r => r.Key.Contains("wheel") || r.Key.Contains("%wheel"));
+        if (wheelRule != null)
+        {
+            sb.AppendLine("    Wheel[\"👥 %wheel ALL=(ALL) ALL\"]");
+            sb.AppendLine("    Sudo --> Wheel");
+            sb.AppendLine("    style Wheel fill:#fff3e0,stroke:#f57c00");
+        }
+
+        // Security settings
+        var visiblepw = rules.FirstOrDefault(r => r.Key.Contains("visiblepw"));
+        var envReset = rules.FirstOrDefault(r => r.Key.Contains("env_reset"));
+
+        sb.AppendLine("    subgraph Security[\"🔒 Sécurité\"]");
+        if (visiblepw != null && visiblepw.Value.Contains("!"))
+        {
+            sb.AppendLine("    VP[\"✅ !visiblepw\"]");
+        }
+        if (envReset != null)
+        {
+            sb.AppendLine("    ER[\"✅ env_reset\"]");
+        }
+        sb.AppendLine("    end");
+        sb.AppendLine("    style Security fill:#e8f5e9,stroke:#2e7d32");
+
+        return sb.ToString();
+    }
+
+    private static string GenerateRsyslogDiagram(StringBuilder sb, List<HumanizedRule> rules)
+    {
+        sb.AppendLine("    subgraph Rsyslog[\"📝 Configuration Rsyslog\"]");
+        sb.AppendLine("    direction TB");
+        sb.AppendLine("    end");
+        sb.AppendLine();
+
+        sb.AppendLine("    Sources((Sources)) --> Rsyslog");
+
+        // Check for remote logging
+        var remoteRules = rules.Where(r => r.RawLine.Contains("@@") || r.RawLine.Contains("@")).ToList();
+        if (remoteRules.Count > 0)
+        {
+            sb.AppendLine("    Rsyslog --> Remote[\"🌐 Serveur distant\"]");
+            sb.AppendLine("    style Remote fill:#e3f2fd,stroke:#1565c0");
+        }
+
+        // Check for local files
+        var fileRules = rules.Where(r => r.RawLine.Contains("/var/log/")).ToList();
+        if (fileRules.Count > 0)
+        {
+            sb.AppendLine($"    Rsyslog --> Local[\"📁 Fichiers locaux ({fileRules.Count})\"]");
+            sb.AppendLine("    style Local fill:#e8f5e9,stroke:#2e7d32");
+        }
+
+        // Common log destinations
+        var authLog = rules.Any(r => r.RawLine.Contains("auth") || r.RawLine.Contains("secure"));
+        var kernLog = rules.Any(r => r.RawLine.Contains("kern"));
+        var mailLog = rules.Any(r => r.RawLine.Contains("mail"));
+
+        if (authLog)
+        {
+            sb.AppendLine("    Local --> Auth[\"🔐 Auth/Secure\"]");
+        }
+        if (kernLog)
+        {
+            sb.AppendLine("    Local --> Kern[\"⚙️ Kernel\"]");
+        }
+        if (mailLog)
+        {
+            sb.AppendLine("    Local --> Mail[\"📧 Mail\"]");
         }
 
         return sb.ToString();

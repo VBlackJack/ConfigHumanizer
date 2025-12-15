@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using ConfigHumanizer.Core.Rules;
@@ -24,12 +25,22 @@ namespace ConfigHumanizer.Core.Services;
 public class RuleEngine
 {
     private readonly List<RuleSet> _ruleSets = new();
+    private readonly List<string> _loadErrors = new();
+
+    // Regex timeout to prevent ReDoS attacks
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromMilliseconds(100);
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true
     };
+
+    /// <summary>
+    /// Gets all errors that occurred during rule loading.
+    /// </summary>
+    public IReadOnlyList<string> LoadErrors => _loadErrors.AsReadOnly();
 
     /// <summary>
     /// Gets all loaded rule sets.
@@ -60,10 +71,30 @@ public class RuleEngine
                 {
                     _ruleSets.Add(ruleSet);
                 }
+                else
+                {
+                    var errorMsg = $"Failed to deserialize rule file (null result): {file}";
+                    _loadErrors.Add(errorMsg);
+                    Debug.WriteLine(errorMsg);
+                }
             }
-            catch (Exception)
+            catch (JsonException ex)
             {
-                // Log error in production; skip invalid files for now
+                var errorMsg = $"JSON parsing error in {Path.GetFileName(file)}: {ex.Message}";
+                _loadErrors.Add(errorMsg);
+                Debug.WriteLine(errorMsg);
+            }
+            catch (IOException ex)
+            {
+                var errorMsg = $"IO error reading {Path.GetFileName(file)}: {ex.Message}";
+                _loadErrors.Add(errorMsg);
+                Debug.WriteLine(errorMsg);
+            }
+            catch (Exception ex)
+            {
+                var errorMsg = $"Unexpected error loading {Path.GetFileName(file)}: {ex.Message}";
+                _loadErrors.Add(errorMsg);
+                Debug.WriteLine(errorMsg);
             }
         }
     }
@@ -72,7 +103,8 @@ public class RuleEngine
     /// Loads rules from a JSON string.
     /// </summary>
     /// <param name="json">JSON content representing a RuleSet.</param>
-    public void LoadRulesFromJson(string json)
+    /// <returns>True if rules were loaded successfully, false otherwise.</returns>
+    public bool LoadRulesFromJson(string json)
     {
         try
         {
@@ -80,11 +112,18 @@ public class RuleEngine
             if (ruleSet != null)
             {
                 _ruleSets.Add(ruleSet);
+                return true;
             }
+
+            _loadErrors.Add("Failed to deserialize JSON string (null result)");
+            return false;
         }
-        catch (Exception)
+        catch (JsonException ex)
         {
-            // Log error in production
+            var errorMsg = $"JSON parsing error: {ex.Message}";
+            _loadErrors.Add(errorMsg);
+            Debug.WriteLine(errorMsg);
+            return false;
         }
     }
 
@@ -198,26 +237,34 @@ public class RuleEngine
     /// <summary>
     /// Checks if a value matches a pattern (exact match or regex).
     /// </summary>
-    private static bool IsValueMatch(string value, string pattern)
+    private bool IsValueMatch(string value, string pattern)
     {
         if (string.IsNullOrEmpty(pattern))
         {
             return true; // Empty pattern matches everything
         }
 
-        // Try exact match first (case-insensitive)
+        // Try exact match first (case-insensitive) - most efficient
         if (string.Equals(value, pattern, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
 
-        // Try regex match
+        // Try regex match with timeout to prevent ReDoS attacks
         try
         {
-            return Regex.IsMatch(value, pattern, RegexOptions.IgnoreCase);
+            return Regex.IsMatch(value, pattern, RegexOptions.IgnoreCase, RegexTimeout);
         }
-        catch
+        catch (RegexMatchTimeoutException)
         {
+            // Pattern took too long - log and reject
+            Debug.WriteLine($"Regex timeout for pattern: {pattern}");
+            return false;
+        }
+        catch (ArgumentException ex)
+        {
+            // Invalid regex pattern
+            Debug.WriteLine($"Invalid regex pattern '{pattern}': {ex.Message}");
             return false;
         }
     }

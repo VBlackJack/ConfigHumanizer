@@ -1,0 +1,221 @@
+{
+  "formatName": "MySQL",
+  "description": "Configuration du serveur MySQL/MariaDB",
+  "version": "1.0",
+  "filePatterns": ["my.cnf", "my.ini", "mysql.cnf"],
+  "fileExtensions": [],
+  "syntax": "Ini",
+  "commentChar": "#",
+  "keyValueSeparator": " = ",
+  "documentationUrl": "https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html",
+  "parameterCategories": [
+    {
+      "name": "Réseau",
+      "description": "Configuration réseau",
+      "icon": "🌐",
+      "order": 1,
+      "parameters": [
+        {
+          "key": "port",
+          "displayName": "Port",
+          "description": "Port d'écoute du serveur MySQL",
+          "dataType": "Port",
+          "defaultValue": 3306
+        },
+        {
+          "key": "bind-address",
+          "displayName": "Adresse d'écoute",
+          "description": "Adresse IP sur laquelle écouter (127.0.0.1 = local uniquement)",
+          "dataType": "IpAddress",
+          "defaultValue": "127.0.0.1",
+          "enumValues": [
+            { "value": "127.0.0.1", "displayName": "Localhost uniquement (sécurisé)", "severity": "GoodPractice" },
+            { "value": "0.0.0.0", "displayName": "Toutes les interfaces", "severity": "Warning" }
+          ]
+        },
+        {
+          "key": "max_connections",
+          "displayName": "Connexions max",
+          "description": "Nombre maximum de connexions simultanées",
+          "dataType": "Integer",
+          "defaultValue": 151,
+          "validation": {
+            "min": 1,
+            "max": 100000
+          }
+        },
+        {
+          "key": "skip-networking",
+          "displayName": "Désactiver réseau",
+          "description": "Désactive les connexions réseau (socket local uniquement)",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "1/0"
+        }
+      ]
+    },
+    {
+      "name": "Mémoire",
+      "description": "Configuration de la mémoire",
+      "icon": "💾",
+      "order": 2,
+      "parameters": [
+        {
+          "key": "innodb_buffer_pool_size",
+          "displayName": "Taille buffer pool InnoDB",
+          "description": "Mémoire allouée au cache InnoDB (70-80% de la RAM sur serveur dédié)",
+          "dataType": "Size",
+          "defaultValue": "128M",
+          "example": "4G"
+        },
+        {
+          "key": "key_buffer_size",
+          "displayName": "Taille buffer clés MyISAM",
+          "description": "Mémoire pour le cache des index MyISAM",
+          "dataType": "Size",
+          "defaultValue": "16M"
+        },
+        {
+          "key": "max_allowed_packet",
+          "displayName": "Taille max paquet",
+          "description": "Taille maximale d'un paquet/requête",
+          "dataType": "Size",
+          "defaultValue": "64M"
+        },
+        {
+          "key": "query_cache_size",
+          "displayName": "Taille cache requêtes",
+          "description": "Mémoire pour le cache des requêtes (0 = désactivé)",
+          "dataType": "Size",
+          "defaultValue": "0"
+        }
+      ]
+    },
+    {
+      "name": "Sécurité",
+      "description": "Paramètres de sécurité",
+      "icon": "🔒",
+      "order": 3,
+      "parameters": [
+        {
+          "key": "local-infile",
+          "displayName": "LOAD DATA LOCAL",
+          "description": "Autorise le chargement de fichiers locaux (risque de sécurité)",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "1/0",
+          "enumValues": [
+            { "value": "1", "displayName": "Activé", "severity": "Warning" },
+            { "value": "0", "displayName": "Désactivé (recommandé)", "severity": "GoodPractice" }
+          ]
+        },
+        {
+          "key": "symbolic-links",
+          "displayName": "Liens symboliques",
+          "description": "Autorise les liens symboliques pour les tables",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "1/0",
+          "enumValues": [
+            { "value": "1", "displayName": "Activé", "severity": "Warning" },
+            { "value": "0", "displayName": "Désactivé (recommandé)", "severity": "GoodPractice" }
+          ]
+        },
+        {
+          "key": "skip-show-database",
+          "displayName": "Masquer SHOW DATABASES",
+          "description": "Restreint la commande SHOW DATABASES",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "1/0"
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "description": "Configuration des journaux",
+      "icon": "📝",
+      "order": 4,
+      "parameters": [
+        {
+          "key": "log_error",
+          "displayName": "Journal d'erreurs",
+          "description": "Chemin vers le fichier de log d'erreurs",
+          "dataType": "Path",
+          "defaultValue": "/var/log/mysql/error.log"
+        },
+        {
+          "key": "slow_query_log",
+          "displayName": "Log requêtes lentes",
+          "description": "Active le journal des requêtes lentes",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "1/0"
+        },
+        {
+          "key": "slow_query_log_file",
+          "displayName": "Fichier requêtes lentes",
+          "description": "Chemin vers le fichier de log des requêtes lentes",
+          "dataType": "Path",
+          "defaultValue": "/var/log/mysql/slow.log"
+        },
+        {
+          "key": "long_query_time",
+          "displayName": "Seuil requête lente",
+          "description": "Durée au-delà de laquelle une requête est considérée lente",
+          "dataType": "Integer",
+          "defaultValue": 10,
+          "unit": "s"
+        },
+        {
+          "key": "general_log",
+          "displayName": "Log général",
+          "description": "Active le journal de toutes les requêtes (impact performance)",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "1/0",
+          "enumValues": [
+            { "value": "1", "displayName": "Activé (impact performance)", "severity": "Warning" },
+            { "value": "0", "displayName": "Désactivé", "severity": "Info" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "InnoDB",
+      "description": "Configuration du moteur InnoDB",
+      "icon": "⚙️",
+      "order": 5,
+      "parameters": [
+        {
+          "key": "innodb_file_per_table",
+          "displayName": "Fichier par table",
+          "description": "Stocke chaque table dans son propre fichier",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "1/0"
+        },
+        {
+          "key": "innodb_flush_log_at_trx_commit",
+          "displayName": "Flush logs transaction",
+          "description": "Quand écrire les logs de transaction (1=sûr, 2=rapide)",
+          "dataType": "Enum",
+          "defaultValue": "1",
+          "enumValues": [
+            { "value": "0", "displayName": "Chaque seconde", "description": "Performance maximale, risque de perte", "severity": "Warning" },
+            { "value": "1", "displayName": "Chaque transaction (sûr)", "description": "Conformité ACID complète", "severity": "GoodPractice" },
+            { "value": "2", "displayName": "Compromis", "description": "Écriture OS à chaque transaction", "severity": "Info" }
+          ]
+        },
+        {
+          "key": "innodb_log_file_size",
+          "displayName": "Taille fichier log",
+          "description": "Taille des fichiers de journal redo",
+          "dataType": "Size",
+          "defaultValue": "48M",
+          "example": "256M"
+        }
+      ]
+    }
+  ]
+}

@@ -8,10 +8,24 @@
         xmlns:converters="clr-namespace:ConfigHumanizer.UI.Converters"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
-        Title="ConfigHumanizer - Configuration Analyzer"
-        Height="700" Width="1200"
+        Title="ConfigHumanizer - Analyseur de Configuration"
+        Height="800" Width="1400"
+        MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource LightBackground}">
+        Background="{StaticResource LightBackground}"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver">
+
+    <!-- Raccourcis clavier -->
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenConfigCommand}" />
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveConfigCommand}" />
+        <KeyBinding Key="Z" Modifiers="Ctrl" Command="{Binding UndoCommand}" />
+        <KeyBinding Key="F" Modifiers="Ctrl" Command="{Binding FocusSearchCommand}" />
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding OpenParameterEditorCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding ClearSearchCommand}" />
+    </Window.InputBindings>
 
     <Window.DataContext>
         <viewModels:MainViewModel />
@@ -19,6 +33,13 @@
 
     <Window.Resources>
         <converters:SeverityToColorConverter x:Key="SeverityToColorConverter" />
+        <converters:SeverityToTextConverter x:Key="SeverityToTextConverter" />
+        <converters:SeverityToIconConverter x:Key="SeverityToIconConverter" />
+        <converters:SeverityToBorderColorConverter x:Key="SeverityToBorderColorConverter" />
+        <converters:SeverityToBadgeColorConverter x:Key="SeverityToBadgeColorConverter" />
+        <converters:StringToBrushConverter x:Key="StringToBrushConverter" />
+        <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
+        <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
         <!-- Tab Control Style -->
@@ -62,166 +83,733 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Modern Toolbar -->
+        <!-- ==================== TOOLBAR ==================== -->
         <Border Grid.Row="0"
                 Background="{StaticResource CardBackground}"
                 BorderBrush="{StaticResource BorderColor}"
                 BorderThickness="0,0,0,1"
                 Padding="15,10">
-            <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding OpenConfigCommand}"
-                        Style="{StaticResource ModernButton}"
-                        Margin="0,0,10,0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#x1F4C2;" FontSize="14" Margin="0,0,6,0" />
-                        <TextBlock Text="Open File" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding SaveConfigCommand}"
-                        Style="{StaticResource PrimaryButton}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="&#x1F4BE;" FontSize="14" Margin="0,0,6,0" />
-                        <TextBlock Text="Save" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: File Actions -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Command="{Binding OpenConfigCommand}"
+                            Style="{StaticResource ModernButton}"
+                            ToolTip="Ouvrir un fichier de configuration (Ctrl+O)"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x1F4C2;" FontSize="14" Margin="0,0,6,0" />
+                            <TextBlock Text="Ouvrir" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding SaveConfigCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            ToolTip="Sauvegarder le fichier (Ctrl+S)"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x1F4BE;" FontSize="14" Margin="0,0,6,0" />
+                            <TextBlock Text="Sauver" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Undo Button -->
+                    <Button Command="{Binding UndoCommand}"
+                            Style="{StaticResource ModernButton}"
+                            ToolTip="Annuler la dernière modification (Ctrl+Z)"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="↩️" FontSize="14" Margin="0,0,6,0" />
+                            <TextBlock Text="Annuler" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Recent Files Dropdown -->
+                    <Border Background="{StaticResource CardBackground}"
+                            BorderBrush="{StaticResource BorderColor}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Margin="0,0,8,0"
+                            Visibility="{Binding HasRecentFiles, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ComboBox x:Name="RecentFilesCombo"
+                                  ItemsSource="{Binding RecentFiles}"
+                                  Width="180"
+                                  BorderThickness="0"
+                                  Padding="8,6"
+                                  ToolTip="Fichiers récents">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding Directory}" FontSize="10" Foreground="{StaticResource TextMuted}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Border>
+
+                    <Rectangle Width="1" Fill="{StaticResource BorderColor}" Margin="8,0" />
+
+                    <Button Command="{Binding ExportHtmlCommand}"
+                            Style="{StaticResource ModernButton}"
+                            ToolTip="Exporter le rapport d'analyse en HTML"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x1F4E4;" FontSize="14" Margin="0,0,6,0" />
+                            <TextBlock Text="Exporter" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <Rectangle Width="1" Fill="{StaticResource BorderColor}" Margin="8,0" />
+
+                    <Button Command="{Binding OpenParameterEditorCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            ToolTip="Ajouter un paramètre (Ctrl+N)"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x2795;" FontSize="14" Margin="0,0,6,0" />
+                            <TextBlock Text="Ajouter" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Center: Current File -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="&#x1F4C4;" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding CurrentFileName}"
+                               FontWeight="SemiBold"
+                               FontSize="13"
+                               Foreground="{StaticResource TextDark}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Right: Theme Toggle -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Command="{Binding ToggleDarkModeCommand}"
+                            Style="{StaticResource IconButton}"
+                            ToolTip="Basculer mode sombre/clair"
+                            Padding="10,8">
+                        <TextBlock Text="&#x1F319;" FontSize="16" />
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <!-- Tab Control for Main Content -->
-        <TabControl Grid.Row="1" Margin="10,10,10,0">
+        <!-- ==================== DASHBOARD ==================== -->
+        <Border Grid.Row="1"
+                Background="{StaticResource CardBackground}"
+                BorderBrush="{StaticResource BorderColor}"
+                BorderThickness="0,0,0,1"
+                Padding="15,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Stats Cards -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <!-- Health Score -->
+                    <Border Style="{StaticResource StatCard}">
+                        <Grid>
+                            <Rectangle Width="4" HorizontalAlignment="Left" Margin="-17,0,0,0"
+                                       Fill="{Binding HealthScoreColor, Converter={StaticResource StringToBrushConverter}}" />
+                            <StackPanel Margin="0,0,0,0">
+                                <TextBlock Text="{Binding HealthScoreText}"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="{Binding HealthScoreColor, Converter={StaticResource StringToBrushConverter}}" />
+                                <TextBlock Text="Score santé"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextMuted}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Critical -->
+                    <Border Style="{StaticResource StatCard}">
+                        <Grid>
+                            <Rectangle Width="4" HorizontalAlignment="Left" Margin="-17,0,0,0" Fill="#E74C3C" />
+                            <StackPanel>
+                                <TextBlock Text="{Binding CriticalCount}"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#E74C3C" />
+                                <TextBlock Text="Critique"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextMuted}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Warnings -->
+                    <Border Style="{StaticResource StatCard}">
+                        <Grid>
+                            <Rectangle Width="4" HorizontalAlignment="Left" Margin="-17,0,0,0" Fill="#F39C12" />
+                            <StackPanel>
+                                <TextBlock Text="{Binding WarningCount}"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#F39C12" />
+                                <TextBlock Text="Alertes"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextMuted}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Info -->
+                    <Border Style="{StaticResource StatCard}">
+                        <Grid>
+                            <Rectangle Width="4" HorizontalAlignment="Left" Margin="-17,0,0,0" Fill="#3498DB" />
+                            <StackPanel>
+                                <TextBlock Text="{Binding InfoCount}"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#3498DB" />
+                                <TextBlock Text="Info"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextMuted}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Good Practices -->
+                    <Border Style="{StaticResource StatCard}">
+                        <Grid>
+                            <Rectangle Width="4" HorizontalAlignment="Left" Margin="-17,0,0,0" Fill="#4CAF50" />
+                            <StackPanel>
+                                <TextBlock Text="{Binding GoodCount}"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#4CAF50" />
+                                <TextBlock Text="Bon"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextMuted}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Search & Filters -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Search Box -->
+                    <Grid Margin="0,0,15,0">
+                        <TextBox x:Name="SearchBox"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource SearchTextBox}"
+                                 Width="250"
+                                 ToolTip="Rechercher dans les règles (Ctrl+F)" />
+                        <TextBlock Text="&#x1F50D; Rechercher..."
+                                   IsHitTestVisible="False"
+                                   Foreground="{StaticResource TextMuted}"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,0,0"
+                                   FontSize="13">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <Button Command="{Binding ClearSearchCommand}"
+                                Style="{StaticResource IconButton}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Margin="0,0,4,0"
+                                Padding="6"
+                                Visibility="{Binding SearchText.Length, Converter={StaticResource IntToVisibilityConverter}}">
+                            <TextBlock Text="&#x2715;" FontSize="10" />
+                        </Button>
+                    </Grid>
+
+                    <!-- Filter Toggles -->
+                    <StackPanel Orientation="Horizontal">
+                        <ToggleButton IsChecked="{Binding FilterCritical}"
+                                      Style="{StaticResource FilterToggleButton}"
+                                      ToolTip="Afficher les problèmes critiques"
+                                      Margin="0,0,4,0">
+                            <TextBlock Text="&#x1F534; Critique" />
+                        </ToggleButton>
+                        <ToggleButton IsChecked="{Binding FilterWarning}"
+                                      Style="{StaticResource FilterToggleButton}"
+                                      ToolTip="Afficher les alertes"
+                                      Margin="0,0,4,0">
+                            <TextBlock Text="&#x1F7E0; Alerte" />
+                        </ToggleButton>
+                        <ToggleButton IsChecked="{Binding FilterInfo}"
+                                      Style="{StaticResource FilterToggleButton}"
+                                      ToolTip="Afficher les informations"
+                                      Margin="0,0,4,0">
+                            <TextBlock Text="&#x1F535; Info" />
+                        </ToggleButton>
+                        <ToggleButton IsChecked="{Binding FilterGood}"
+                                      Style="{StaticResource FilterToggleButton}"
+                                      ToolTip="Afficher les bonnes pratiques"
+                                      Margin="0,0,8,0">
+                            <TextBlock Text="&#x1F7E2; Bon" />
+                        </ToggleButton>
+
+                        <Button Command="{Binding JumpToProblemsCommand}"
+                                Style="{StaticResource ModernButton}"
+                                ToolTip="Afficher uniquement les problèmes"
+                                Padding="10,6">
+                            <TextBlock Text="&#x26A0; Problèmes" />
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <TabControl Grid.Row="2" Margin="10,10,10,0">
 
             <!-- Tab 1: Editor & Analysis -->
             <TabItem>
                 <TabItem.Header>
                     <TextBlock FontSize="14">
-                        <Run Text="&#x1F4DD;" /> Editor &amp; Analysis
+                        <Run Text="&#x1F4DD;" /> Éditeur &amp; Analyse
                     </TextBlock>
                 </TabItem.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="1*" MinWidth="300" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="2*" MinWidth="400" />
                     </Grid.ColumnDefinitions>
 
                     <!-- Left Panel: Code Editor -->
                     <Border Grid.Column="0"
-                            Background="{StaticResource DarkBackground}"
-                            Margin="0">
+                            Background="{StaticResource DarkBackground}">
                         <DockPanel>
                             <Border DockPanel.Dock="Top"
                                     Background="#252526"
                                     Padding="12,8">
-                                <StackPanel>
-                                    <TextBlock Text="Configuration File"
-                                               FontWeight="SemiBold"
-                                               FontSize="13"
-                                               Foreground="#CCCCCC" />
-                                    <TextBlock Text="{Binding CurrentFilePath}"
+                                <Grid>
+                                    <StackPanel>
+                                        <TextBlock Text="Fichier de configuration"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="13"
+                                                   Foreground="#CCCCCC" />
+                                        <TextBlock Text="{Binding CurrentFilePath}"
+                                                   FontSize="11"
+                                                   Foreground="#808080"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding CurrentFilePath}"
+                                                   Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <TextBlock Text="Glissez des fichiers ici"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
                                                FontSize="11"
-                                               Foreground="#808080"
-                                               TextTrimming="CharacterEllipsis"
-                                               ToolTip="{Binding CurrentFilePath}"
-                                               Margin="0,2,0,0" />
-                                </StackPanel>
+                                               Foreground="#606060" />
+                                </Grid>
                             </Border>
-                            <TextBox Text="{Binding FileContent, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBox x:Name="CodeEditor"
+                                     Text="{Binding FileContent, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource CodeEditorTextBox}" />
                         </DockPanel>
                     </Border>
 
+                    <!-- Splitter -->
+                    <GridSplitter Grid.Column="1"
+                                  Width="5"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Stretch"
+                                  Background="{StaticResource BorderColor}"
+                                  Cursor="SizeWE" />
+
                     <!-- Right Panel: Analysis Results -->
-                    <Border Grid.Column="1"
+                    <Border Grid.Column="2"
                             Background="{StaticResource LightBackground}"
                             Padding="15">
-                        <DockPanel>
-                            <TextBlock DockPanel.Dock="Top"
-                                       Text="Analysis Results"
-                                       FontWeight="SemiBold"
-                                       FontSize="16"
-                                       Foreground="{StaticResource TextDark}"
-                                       Margin="5,0,0,15" />
-                            <ListView ItemsSource="{Binding Rules}"
+                        <Grid>
+                            <!-- Loading Overlay -->
+                            <Border Background="#80FFFFFF"
+                                    Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Panel.ZIndex="100">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="⏳" FontSize="48" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Analyse en cours..."
+                                               FontSize="14"
+                                               Foreground="{StaticResource TextMuted}"
+                                               Margin="0,10,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <DockPanel>
+                                <!-- Header -->
+                                <Grid DockPanel.Dock="Top" Margin="5,0,5,15">
+                                    <TextBlock Text="Résultats d'analyse"
+                                               FontWeight="SemiBold"
+                                               FontSize="16"
+                                               Foreground="{StaticResource TextDark}" />
+                                    <TextBlock HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextMuted}">
+                                        <Run Text="Affichage" />
+                                        <Run Text="{Binding FilteredRules.Count, Mode=OneWay}" FontWeight="SemiBold" />
+                                        <Run Text="sur" />
+                                        <Run Text="{Binding TotalCount, Mode=OneWay}" />
+                                        <Run Text="règles" />
+                                    </TextBlock>
+                                </Grid>
+
+                                <!-- Empty State when no rules -->
+                                <Border DockPanel.Dock="Top"
+                                        Background="{StaticResource CardBackground}"
+                                        BorderBrush="{StaticResource BorderColor}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="40"
+                                        Margin="5"
+                                        Visibility="{Binding TotalCount, Converter={StaticResource ZeroToVisibilityConverter}}">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="📁" FontSize="64" HorizontalAlignment="Center" />
+                                        <TextBlock Text="Aucun fichier chargé"
+                                                   FontSize="18"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,15,0,8" />
+                                        <TextBlock Text="Glissez-déposez un fichier de configuration ici&#x0a;ou cliquez sur Ouvrir (Ctrl+O)"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   TextAlignment="Center"
+                                                   LineHeight="22" />
+                                        <TextBlock Text="Formats supportés : .conf, .yaml, .json, .tf, .ini, .cfg..."
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,15,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Empty State when filters hide all -->
+                                <Border DockPanel.Dock="Top"
+                                        Background="{StaticResource CardBackground}"
+                                        BorderBrush="{StaticResource BorderColor}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="30"
+                                        Margin="5"
+                                        Visibility="{Binding ShowFilterEmptyState, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="🔍" FontSize="48" HorizontalAlignment="Center" />
+                                        <TextBlock Text="Aucun résultat"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,10,0,5" />
+                                        <TextBlock Text="Essayez de modifier vos filtres ou votre recherche"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   HorizontalAlignment="Center" />
+                                        <Button Command="{Binding ResetFiltersCommand}"
+                                                Style="{StaticResource ModernButton}"
+                                                Content="Réinitialiser les filtres"
+                                                HorizontalAlignment="Center"
+                                                Margin="0,15,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Rules List -->
+                                <ListView ItemsSource="{Binding FilteredRules}"
+                                      SelectedItem="{Binding SelectedRule, Mode=TwoWay}"
                                       BorderThickness="0"
                                       Background="Transparent"
                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      VirtualizingPanel.IsVirtualizing="True"
+                                      VirtualizingPanel.VirtualizationMode="Recycling"
                                       ItemContainerStyle="{StaticResource ModernListViewItem}">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource CardBorder}"
-                                                Background="{Binding Severity, Converter={StaticResource SeverityToColorConverter}}">
-                                            <StackPanel>
-                                                <!-- Header Row -->
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock Text="{Binding Key}"
-                                                               FontWeight="Bold"
-                                                               FontSize="15"
-                                                               Foreground="{StaticResource TextDark}" />
-                                                    <Border Grid.Column="1"
-                                                            Background="#80000000"
-                                                            CornerRadius="3"
-                                                            Padding="8,2">
-                                                        <TextBlock Text="{Binding Value}"
-                                                                   FontFamily="Consolas"
-                                                                   FontSize="12"
-                                                                   Foreground="White" />
+                                        <!-- Main Card with colored left border -->
+                                        <Border Background="{StaticResource CardBackground}"
+                                                BorderBrush="{StaticResource BorderColor}"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Margin="0,0,0,4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="5" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Colored severity indicator bar -->
+                                                <Border Grid.Column="0"
+                                                        Background="{Binding Severity, Converter={StaticResource SeverityToBorderColorConverter}}"
+                                                        CornerRadius="8,0,0,8" />
+
+                                                <!-- Content -->
+                                                <Grid Grid.Column="1" Margin="16,14,16,14">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+
+                                                    <!-- Row 0: Header with badge and actions -->
+                                                    <Grid Grid.Row="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- Severity Badge -->
+                                                        <Border Grid.Column="0"
+                                                                Background="{Binding Severity, Converter={StaticResource SeverityToBadgeColorConverter}}"
+                                                                BorderBrush="{Binding Severity, Converter={StaticResource SeverityToBorderColorConverter}}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="12"
+                                                                Padding="10,4"
+                                                                Margin="0,0,12,0">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="{Binding Severity, Converter={StaticResource SeverityToIconConverter}}"
+                                                                           FontSize="11"
+                                                                           VerticalAlignment="Center"
+                                                                           Margin="0,0,5,0" />
+                                                                <TextBlock Text="{Binding Severity, Converter={StaticResource SeverityToTextConverter}}"
+                                                                           FontSize="10"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="{Binding Severity, Converter={StaticResource SeverityToBorderColorConverter}}"
+                                                                           VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Border>
+
+                                                        <!-- Key Name -->
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding Key}"
+                                                                   FontWeight="SemiBold"
+                                                                   FontSize="15"
+                                                                   Foreground="{StaticResource TextDark}"
+                                                                   VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   ToolTip="{Binding Key}" />
+
+                                                        <!-- Action Buttons -->
+                                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                                            <Button Command="{Binding DataContext.CopyRuleCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    CommandParameter="{Binding}"
+                                                                    Style="{StaticResource IconButton}"
+                                                                    ToolTip="Copier dans le presse-papiers"
+                                                                    Padding="6">
+                                                                <TextBlock Text="📋" FontSize="14" />
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </Grid>
+
+                                                    <!-- Row 1: Value in code block -->
+                                                    <Border Grid.Row="1"
+                                                            Background="#F8F9FA"
+                                                            BorderBrush="#E9ECEF"
+                                                            BorderThickness="1"
+                                                            CornerRadius="4"
+                                                            Padding="10,8"
+                                                            Margin="0,10,0,0">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="*" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="💻"
+                                                                       FontSize="12"
+                                                                       VerticalAlignment="Top"
+                                                                       Margin="0,0,8,0"
+                                                                       Opacity="0.7" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding RawLine}"
+                                                                       FontFamily="Consolas, Courier New"
+                                                                       FontSize="12"
+                                                                       Foreground="#2D3436"
+                                                                       TextWrapping="Wrap"
+                                                                       ToolTip="{Binding RawLine}" />
+                                                        </Grid>
+                                                    </Border>
+
+                                                    <!-- Row 2: Value highlight (if different from raw) -->
+                                                    <Border Grid.Row="2"
+                                                            Background="#2D3436"
+                                                            CornerRadius="4"
+                                                            Padding="10,6"
+                                                            Margin="0,8,0,0"
+                                                            HorizontalAlignment="Left">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="Valeur : "
+                                                                       FontSize="11"
+                                                                       Foreground="#ADB5BD"
+                                                                       VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding Value}"
+                                                                       FontFamily="Consolas, Courier New"
+                                                                       FontSize="12"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="#00D9FF"
+                                                                       VerticalAlignment="Center"
+                                                                       MaxWidth="400"
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       ToolTip="{Binding Value}" />
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- Row 3: Description -->
+                                                    <Border Grid.Row="3"
+                                                            Background="{Binding Severity, Converter={StaticResource SeverityToColorConverter}}"
+                                                            CornerRadius="6"
+                                                            Padding="12,10"
+                                                            Margin="0,12,0,0">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="*" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="💡"
+                                                                       FontSize="16"
+                                                                       VerticalAlignment="Top"
+                                                                       Margin="0,0,10,0" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding HumanDescription}"
+                                                                       TextWrapping="Wrap"
+                                                                       FontSize="13"
+                                                                       Foreground="#2D3436"
+                                                                       LineHeight="21" />
+                                                        </Grid>
+                                                    </Border>
+
+                                                    <!-- Row 4: Fix Available Section -->
+                                                    <Border Grid.Row="4"
+                                                            Margin="0,12,0,0"
+                                                            Background="White"
+                                                            BorderBrush="#27AE60"
+                                                            BorderThickness="2"
+                                                            CornerRadius="6"
+                                                            Padding="14"
+                                                            Visibility="{Binding HasFix, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                            </Grid.RowDefinitions>
+
+                                                            <!-- Fix Header -->
+                                                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                                                <TextBlock Text="🔧" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                                                <TextBlock Text="Correctif disponible"
+                                                                           FontWeight="Bold"
+                                                                           FontSize="13"
+                                                                           Foreground="#27AE60"
+                                                                           VerticalAlignment="Center" />
+                                                            </StackPanel>
+
+                                                            <!-- Fix Reason -->
+                                                            <TextBlock Grid.Row="1"
+                                                                       Text="{Binding FixReason}"
+                                                                       TextWrapping="Wrap"
+                                                                       FontSize="12"
+                                                                       Foreground="#555555"
+                                                                       Margin="0,0,0,12"
+                                                                       LineHeight="19" />
+
+                                                            <!-- Suggested Fix Code -->
+                                                            <Grid Grid.Row="2">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <Border Grid.Column="0"
+                                                                        Background="#E8F8F0"
+                                                                        BorderBrush="#27AE60"
+                                                                        BorderThickness="1"
+                                                                        CornerRadius="4"
+                                                                        Padding="10,8"
+                                                                        Margin="0,0,10,0">
+                                                                    <TextBlock Text="{Binding SuggestedFix}"
+                                                                               FontFamily="Consolas, Courier New"
+                                                                               FontSize="12"
+                                                                               FontWeight="SemiBold"
+                                                                               Foreground="#1E8449"
+                                                                               TextWrapping="Wrap" />
+                                                                </Border>
+
+                                                                <Button Grid.Column="1"
+                                                                        Command="{Binding DataContext.FixCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                        CommandParameter="{Binding}"
+                                                                        Background="#27AE60"
+                                                                        Foreground="White"
+                                                                        BorderThickness="0"
+                                                                        Padding="16,10"
+                                                                        Cursor="Hand"
+                                                                        VerticalAlignment="Center">
+                                                                    <Button.Template>
+                                                                        <ControlTemplate TargetType="Button">
+                                                                            <Border x:Name="border"
+                                                                                    Background="{TemplateBinding Background}"
+                                                                                    CornerRadius="6"
+                                                                                    Padding="{TemplateBinding Padding}">
+                                                                                <StackPanel Orientation="Horizontal">
+                                                                                    <TextBlock Text="✨" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                                                                    <TextBlock Text="Appliquer"
+                                                                                               FontWeight="SemiBold"
+                                                                                               FontSize="12"
+                                                                                               Foreground="White"
+                                                                                               VerticalAlignment="Center" />
+                                                                                </StackPanel>
+                                                                            </Border>
+                                                                            <ControlTemplate.Triggers>
+                                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                                    <Setter TargetName="border" Property="Background" Value="#1E8449" />
+                                                                                </Trigger>
+                                                                            </ControlTemplate.Triggers>
+                                                                        </ControlTemplate>
+                                                                    </Button.Template>
+                                                                </Button>
+                                                            </Grid>
+                                                        </Grid>
                                                     </Border>
                                                 </Grid>
-
-                                                <!-- Description -->
-                                                <TextBlock Text="{Binding HumanDescription}"
-                                                           TextWrapping="Wrap"
-                                                           Margin="0,8,0,0"
-                                                           FontSize="13"
-                                                           Foreground="#444444"
-                                                           LineHeight="20" />
-
-                                                <!-- Fix Available Section -->
-                                                <Border Margin="0,10,0,0"
-                                                        Background="#F8F8F8"
-                                                        CornerRadius="4"
-                                                        Padding="10"
-                                                        Visibility="{Binding HasFix, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding FixReason}"
-                                                                   TextWrapping="Wrap"
-                                                                   FontSize="12"
-                                                                   Foreground="#666666"
-                                                                   Margin="0,0,0,8" />
-                                                        <Button Command="{Binding DataContext.FixCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                CommandParameter="{Binding}"
-                                                                Style="{StaticResource PrimaryButton}"
-                                                                HorizontalAlignment="Left">
-                                                            <StackPanel Orientation="Horizontal">
-                                                                <TextBlock Text="&#x1F6E0;&#xFE0F;" FontSize="12" Margin="0,0,6,0" />
-                                                                <TextBlock Text="Apply Fix: " />
-                                                                <TextBlock Text="{Binding SuggestedFix}" FontWeight="Bold" />
-                                                            </StackPanel>
-                                                        </Button>
-                                                    </StackPanel>
-                                                </Border>
-                                            </StackPanel>
+                                            </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
                             </ListView>
                         </DockPanel>
-                    </Border>
-                </Grid>
-            </TabItem>
+                    </Grid>
+                </Border>
+            </Grid>
+        </TabItem>
 
             <!-- Tab 2: Architecture View -->
             <TabItem>
                 <TabItem.Header>
                     <TextBlock FontSize="14">
-                        <Run Text="&#x1F5FA;" /> Architecture View
+                        <Run Text="&#x1F5FA;" /> Vue Architecture
                     </TextBlock>
                 </TabItem.Header>
                 <Border Background="{StaticResource CardBackground}"
@@ -234,14 +822,22 @@
             </TabItem>
         </TabControl>
 
-        <!-- Status Bar -->
-        <Border Grid.Row="2"
+        <!-- ==================== STATUS BAR ==================== -->
+        <Border Grid.Row="3"
                 Background="{StaticResource PrimaryColor}"
                 Padding="15,8">
-            <TextBlock Text="{Binding StatusMessage}"
-                       FontWeight="SemiBold"
-                       FontSize="12"
-                       Foreground="{StaticResource TextLight}" />
+            <Grid>
+                <TextBlock Text="{Binding StatusMessage}"
+                           FontWeight="SemiBold"
+                           FontSize="12"
+                           Foreground="{StaticResource TextLight}" />
+                <TextBlock HorizontalAlignment="Right"
+                           FontSize="11"
+                           Foreground="{StaticResource TextLight}"
+                           Opacity="0.8">
+                    <Run Text="ConfigHumanizer v1.0 | Ctrl+O Ouvrir | Ctrl+S Sauver | Ctrl+N Ajouter | Ctrl+Z Annuler | Ctrl+F Rechercher" />
+                </TextBlock>
+            </Grid>
         </Border>
     </Grid>
 </Window>

@@ -1,0 +1,10 @@
+[Unit]
+Description = scan /DATA with clamd
+After = clamd@scan.service
+
+[Service]
+Type = simple
+ExecStart = /usr/bin/scan_data.sh >/dev/null 2>&1 &
+
+[Install]
+WantedBy = multi-user.target

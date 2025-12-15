@@ -1,0 +1,513 @@
+{
+  "formatName": "OpenSSH",
+  "description": "Configuration du serveur SSH (sshd_config)",
+  "version": "1.0",
+  "filePatterns": ["*sshd_config", "sshd_config"],
+  "fileExtensions": [],
+  "syntax": "SpaceSeparated",
+  "commentChar": "#",
+  "keyValueSeparator": " ",
+  "documentationUrl": "https://man.openbsd.org/sshd_config",
+  "parameterCategories": [
+    {
+      "name": "Authentification",
+      "description": "Paramètres d'authentification des utilisateurs",
+      "icon": "🔐",
+      "order": 1,
+      "parameters": [
+        {
+          "key": "PermitRootLogin",
+          "displayName": "Connexion Root",
+          "description": "Contrôle si l'utilisateur root peut se connecter via SSH. Pour la sécurité, utilisez 'no' ou 'prohibit-password'.",
+          "dataType": "Enum",
+          "defaultValue": "prohibit-password",
+          "enumValues": [
+            { "value": "yes", "displayName": "Oui (non recommandé)", "description": "Autorise la connexion root avec mot de passe", "severity": "CriticalSecurity" },
+            { "value": "no", "displayName": "Non", "description": "Interdit toute connexion root", "severity": "GoodPractice" },
+            { "value": "prohibit-password", "displayName": "Clé uniquement", "description": "Autorise root seulement avec clé SSH", "severity": "GoodPractice" },
+            { "value": "forced-commands-only", "displayName": "Commandes forcées", "description": "Root uniquement pour commandes spécifiques", "severity": "Info" }
+          ],
+          "securityLevel": "CriticalSecurity",
+          "tags": ["sécurité", "root", "authentification"]
+        },
+        {
+          "key": "PasswordAuthentication",
+          "displayName": "Authentification par mot de passe",
+          "description": "Autorise l'authentification par mot de passe. Désactivez pour forcer l'utilisation de clés SSH.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Activé", "severity": "Warning" },
+            { "value": "no", "displayName": "Désactivé (recommandé)", "severity": "GoodPractice" }
+          ],
+          "securityLevel": "Warning",
+          "tags": ["sécurité", "mot de passe"]
+        },
+        {
+          "key": "PubkeyAuthentication",
+          "displayName": "Authentification par clé publique",
+          "description": "Active l'authentification par clé SSH. Fortement recommandé pour la sécurité.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Activé (recommandé)", "severity": "GoodPractice" },
+            { "value": "no", "displayName": "Désactivé", "severity": "Warning" }
+          ],
+          "tags": ["sécurité", "clé SSH"]
+        },
+        {
+          "key": "MaxAuthTries",
+          "displayName": "Tentatives d'authentification max",
+          "description": "Nombre maximum de tentatives d'authentification par connexion. Réduisez pour limiter les attaques brute-force.",
+          "dataType": "Integer",
+          "defaultValue": 6,
+          "validation": {
+            "min": 1,
+            "max": 20,
+            "errorMessage": "La valeur doit être entre 1 et 20"
+          },
+          "tags": ["sécurité", "brute-force"]
+        },
+        {
+          "key": "MaxSessions",
+          "displayName": "Sessions max par connexion",
+          "description": "Nombre maximum de sessions shell/login par connexion réseau.",
+          "dataType": "Integer",
+          "defaultValue": 10,
+          "validation": {
+            "min": 1,
+            "max": 100
+          }
+        },
+        {
+          "key": "LoginGraceTime",
+          "displayName": "Délai d'authentification",
+          "description": "Temps accordé pour s'authentifier avant déconnexion (en secondes, 0 = illimité).",
+          "dataType": "Duration",
+          "defaultValue": 120,
+          "unit": "s",
+          "validation": {
+            "min": 0,
+            "max": 600
+          },
+          "example": "60"
+        },
+        {
+          "key": "PermitEmptyPasswords",
+          "displayName": "Mots de passe vides",
+          "description": "Autorise les comptes avec mots de passe vides. Toujours désactiver pour la sécurité.",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Autorisé (dangereux)", "severity": "CriticalSecurity" },
+            { "value": "no", "displayName": "Interdit (recommandé)", "severity": "GoodPractice" }
+          ],
+          "securityLevel": "CriticalSecurity"
+        },
+        {
+          "key": "ChallengeResponseAuthentication",
+          "displayName": "Authentification challenge-response",
+          "description": "Active l'authentification challenge-response (PAM). Généralement désactivé si vous utilisez des clés SSH.",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "yes/no"
+        },
+        {
+          "key": "UsePAM",
+          "displayName": "Utiliser PAM",
+          "description": "Active l'interface PAM pour l'authentification. Nécessaire pour certaines fonctionnalités système.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no"
+        }
+      ]
+    },
+    {
+      "name": "Réseau",
+      "description": "Paramètres réseau et connexion",
+      "icon": "🌐",
+      "order": 2,
+      "parameters": [
+        {
+          "key": "Port",
+          "displayName": "Port d'écoute",
+          "description": "Port TCP sur lequel le serveur SSH écoute. Le port par défaut 22 est souvent ciblé par les scans.",
+          "dataType": "Port",
+          "defaultValue": 22,
+          "validation": {
+            "min": 1,
+            "max": 65535
+          },
+          "example": "2222",
+          "tags": ["réseau", "port"]
+        },
+        {
+          "key": "ListenAddress",
+          "displayName": "Adresse d'écoute",
+          "description": "Adresse IP sur laquelle le serveur écoute. 0.0.0.0 = toutes les interfaces.",
+          "dataType": "IpAddress",
+          "defaultValue": "0.0.0.0",
+          "example": "192.168.1.100",
+          "tags": ["réseau", "IP"]
+        },
+        {
+          "key": "AddressFamily",
+          "displayName": "Famille d'adresses",
+          "description": "Type d'adresses IP à utiliser (IPv4, IPv6 ou les deux).",
+          "dataType": "Enum",
+          "defaultValue": "any",
+          "enumValues": [
+            { "value": "any", "displayName": "Tous (IPv4 + IPv6)", "severity": "Info" },
+            { "value": "inet", "displayName": "IPv4 uniquement", "severity": "Info" },
+            { "value": "inet6", "displayName": "IPv6 uniquement", "severity": "Info" }
+          ]
+        },
+        {
+          "key": "TCPKeepAlive",
+          "displayName": "TCP Keep-Alive",
+          "description": "Envoie des messages TCP keep-alive pour détecter les connexions mortes.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no"
+        },
+        {
+          "key": "ClientAliveInterval",
+          "displayName": "Intervalle client alive",
+          "description": "Intervalle en secondes entre les messages de vérification client (0 = désactivé).",
+          "dataType": "Integer",
+          "defaultValue": 0,
+          "unit": "s",
+          "validation": {
+            "min": 0,
+            "max": 3600
+          },
+          "example": "60"
+        },
+        {
+          "key": "ClientAliveCountMax",
+          "displayName": "Nombre max de vérifications client",
+          "description": "Nombre de messages client alive avant déconnexion si pas de réponse.",
+          "dataType": "Integer",
+          "defaultValue": 3,
+          "validation": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transfert",
+      "description": "Paramètres de transfert de ports et X11",
+      "icon": "🔀",
+      "order": 3,
+      "parameters": [
+        {
+          "key": "AllowTcpForwarding",
+          "displayName": "Transfert TCP",
+          "description": "Autorise le transfert de ports TCP. Désactivez si non nécessaire pour réduire la surface d'attaque.",
+          "dataType": "Enum",
+          "defaultValue": "yes",
+          "enumValues": [
+            { "value": "yes", "displayName": "Activé", "severity": "Warning" },
+            { "value": "no", "displayName": "Désactivé", "severity": "GoodPractice" },
+            { "value": "local", "displayName": "Local uniquement", "severity": "Info" },
+            { "value": "remote", "displayName": "Distant uniquement", "severity": "Info" }
+          ],
+          "tags": ["tunnel", "port forwarding"]
+        },
+        {
+          "key": "X11Forwarding",
+          "displayName": "Transfert X11",
+          "description": "Autorise le transfert X11 pour les applications graphiques. Désactivez sur les serveurs.",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Activé", "severity": "Warning" },
+            { "value": "no", "displayName": "Désactivé (recommandé)", "severity": "GoodPractice" }
+          ],
+          "tags": ["X11", "graphique"]
+        },
+        {
+          "key": "GatewayPorts",
+          "displayName": "Ports passerelle",
+          "description": "Autorise les hôtes distants à se connecter aux ports transférés locaux.",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Activé", "severity": "Warning" },
+            { "value": "no", "displayName": "Désactivé (recommandé)", "severity": "GoodPractice" }
+          ]
+        },
+        {
+          "key": "PermitTunnel",
+          "displayName": "Tunnels VPN",
+          "description": "Autorise les tunnels de périphérique (VPN layer 2/3).",
+          "dataType": "Enum",
+          "defaultValue": "no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Tous", "severity": "Warning" },
+            { "value": "no", "displayName": "Aucun", "severity": "GoodPractice" },
+            { "value": "point-to-point", "displayName": "Point-to-point", "severity": "Info" },
+            { "value": "ethernet", "displayName": "Ethernet", "severity": "Info" }
+          ]
+        },
+        {
+          "key": "AllowAgentForwarding",
+          "displayName": "Transfert agent SSH",
+          "description": "Autorise le transfert de l'agent SSH pour l'authentification en cascade.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Activé", "severity": "Info" },
+            { "value": "no", "displayName": "Désactivé", "severity": "Info" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sécurité Avancée",
+      "description": "Paramètres de sécurité avancés",
+      "icon": "🛡️",
+      "order": 4,
+      "parameters": [
+        {
+          "key": "Protocol",
+          "displayName": "Version du protocole",
+          "description": "Version du protocole SSH. La version 1 est obsolète et non sécurisée.",
+          "dataType": "Integer",
+          "defaultValue": 2,
+          "validation": {
+            "min": 2,
+            "max": 2,
+            "errorMessage": "Seul le protocole version 2 est supporté et sécurisé"
+          },
+          "securityLevel": "CriticalSecurity"
+        },
+        {
+          "key": "StrictModes",
+          "displayName": "Mode strict",
+          "description": "Vérifie les permissions des fichiers de configuration et du répertoire home avant l'authentification.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Activé (recommandé)", "severity": "GoodPractice" },
+            { "value": "no", "displayName": "Désactivé", "severity": "Warning" }
+          ]
+        },
+        {
+          "key": "HostbasedAuthentication",
+          "displayName": "Authentification basée sur l'hôte",
+          "description": "Autorise l'authentification basée sur le nom d'hôte. Généralement non recommandé.",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Activé", "severity": "Warning" },
+            { "value": "no", "displayName": "Désactivé (recommandé)", "severity": "GoodPractice" }
+          ]
+        },
+        {
+          "key": "IgnoreRhosts",
+          "displayName": "Ignorer .rhosts",
+          "description": "Ignore les fichiers ~/.rhosts et ~/.shosts pour l'authentification basée sur l'hôte.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Ignorer (recommandé)", "severity": "GoodPractice" },
+            { "value": "no", "displayName": "Utiliser", "severity": "Warning" }
+          ]
+        },
+        {
+          "key": "PermitUserEnvironment",
+          "displayName": "Variables d'environnement utilisateur",
+          "description": "Autorise les utilisateurs à définir des variables d'environnement. Peut poser des risques de sécurité.",
+          "dataType": "Boolean",
+          "defaultValue": false,
+          "booleanFormat": "yes/no",
+          "enumValues": [
+            { "value": "yes", "displayName": "Autorisé", "severity": "Warning" },
+            { "value": "no", "displayName": "Interdit (recommandé)", "severity": "GoodPractice" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chiffrement",
+      "description": "Algorithmes de chiffrement et échange de clés",
+      "icon": "🔒",
+      "order": 5,
+      "parameters": [
+        {
+          "key": "Ciphers",
+          "displayName": "Algorithmes de chiffrement",
+          "description": "Liste des algorithmes de chiffrement acceptés. Utilisez des algorithmes modernes uniquement.",
+          "dataType": "String",
+          "defaultValue": "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com",
+          "example": "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com",
+          "multiValue": true,
+          "multiValueSeparator": ",",
+          "tags": ["chiffrement", "crypto"]
+        },
+        {
+          "key": "MACs",
+          "displayName": "Algorithmes MAC",
+          "description": "Algorithmes de code d'authentification de message acceptés.",
+          "dataType": "String",
+          "defaultValue": "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com",
+          "example": "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com",
+          "multiValue": true,
+          "multiValueSeparator": ",",
+          "tags": ["MAC", "intégrité"]
+        },
+        {
+          "key": "KexAlgorithms",
+          "displayName": "Algorithmes d'échange de clés",
+          "description": "Algorithmes d'échange de clés acceptés.",
+          "dataType": "String",
+          "defaultValue": "curve25519-sha256,curve25519-sha256@libssh.org",
+          "example": "curve25519-sha256,diffie-hellman-group16-sha512",
+          "multiValue": true,
+          "multiValueSeparator": ",",
+          "tags": ["KEX", "Diffie-Hellman"]
+        }
+      ]
+    },
+    {
+      "name": "Journalisation",
+      "description": "Paramètres de logging et audit",
+      "icon": "📝",
+      "order": 6,
+      "parameters": [
+        {
+          "key": "LogLevel",
+          "displayName": "Niveau de log",
+          "description": "Verbosité des messages de log. INFO est recommandé pour la plupart des cas.",
+          "dataType": "Enum",
+          "defaultValue": "INFO",
+          "enumValues": [
+            { "value": "QUIET", "displayName": "Silencieux", "severity": "Warning" },
+            { "value": "FATAL", "displayName": "Fatal uniquement", "severity": "Info" },
+            { "value": "ERROR", "displayName": "Erreurs", "severity": "Info" },
+            { "value": "INFO", "displayName": "Info (recommandé)", "severity": "GoodPractice" },
+            { "value": "VERBOSE", "displayName": "Verbeux", "severity": "Info" },
+            { "value": "DEBUG", "displayName": "Debug", "severity": "Info" },
+            { "value": "DEBUG1", "displayName": "Debug 1", "severity": "Info" },
+            { "value": "DEBUG2", "displayName": "Debug 2", "severity": "Info" },
+            { "value": "DEBUG3", "displayName": "Debug 3", "severity": "Info" }
+          ],
+          "tags": ["log", "audit"]
+        },
+        {
+          "key": "SyslogFacility",
+          "displayName": "Facility Syslog",
+          "description": "Facility syslog utilisée pour les messages de log.",
+          "dataType": "Enum",
+          "defaultValue": "AUTH",
+          "enumValues": [
+            { "value": "DAEMON", "displayName": "DAEMON", "severity": "Info" },
+            { "value": "USER", "displayName": "USER", "severity": "Info" },
+            { "value": "AUTH", "displayName": "AUTH (recommandé)", "severity": "GoodPractice" },
+            { "value": "LOCAL0", "displayName": "LOCAL0", "severity": "Info" },
+            { "value": "LOCAL1", "displayName": "LOCAL1", "severity": "Info" },
+            { "value": "LOCAL2", "displayName": "LOCAL2", "severity": "Info" },
+            { "value": "LOCAL3", "displayName": "LOCAL3", "severity": "Info" },
+            { "value": "LOCAL4", "displayName": "LOCAL4", "severity": "Info" },
+            { "value": "LOCAL5", "displayName": "LOCAL5", "severity": "Info" },
+            { "value": "LOCAL6", "displayName": "LOCAL6", "severity": "Info" },
+            { "value": "LOCAL7", "displayName": "LOCAL7", "severity": "Info" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Accès",
+      "description": "Contrôle d'accès utilisateurs et groupes",
+      "icon": "👥",
+      "order": 7,
+      "parameters": [
+        {
+          "key": "AllowUsers",
+          "displayName": "Utilisateurs autorisés",
+          "description": "Liste des utilisateurs autorisés à se connecter. Supporte les patterns avec wildcards.",
+          "dataType": "String",
+          "example": "admin deploy@192.168.1.*",
+          "multiValue": true,
+          "multiValueSeparator": " ",
+          "tags": ["accès", "utilisateurs"]
+        },
+        {
+          "key": "DenyUsers",
+          "displayName": "Utilisateurs interdits",
+          "description": "Liste des utilisateurs interdits de connexion.",
+          "dataType": "String",
+          "example": "guest test",
+          "multiValue": true,
+          "multiValueSeparator": " ",
+          "tags": ["accès", "utilisateurs"]
+        },
+        {
+          "key": "AllowGroups",
+          "displayName": "Groupes autorisés",
+          "description": "Liste des groupes dont les membres peuvent se connecter.",
+          "dataType": "String",
+          "example": "sshusers admins",
+          "multiValue": true,
+          "multiValueSeparator": " ",
+          "tags": ["accès", "groupes"]
+        },
+        {
+          "key": "DenyGroups",
+          "displayName": "Groupes interdits",
+          "description": "Liste des groupes dont les membres ne peuvent pas se connecter.",
+          "dataType": "String",
+          "example": "noremote",
+          "multiValue": true,
+          "multiValueSeparator": " ",
+          "tags": ["accès", "groupes"]
+        }
+      ]
+    },
+    {
+      "name": "Bannière",
+      "description": "Messages et bannières",
+      "icon": "💬",
+      "order": 8,
+      "parameters": [
+        {
+          "key": "Banner",
+          "displayName": "Fichier bannière",
+          "description": "Chemin vers un fichier contenant un message affiché avant l'authentification.",
+          "dataType": "Path",
+          "defaultValue": "none",
+          "example": "/etc/ssh/banner.txt",
+          "tags": ["bannière", "message"]
+        },
+        {
+          "key": "PrintMotd",
+          "displayName": "Afficher MOTD",
+          "description": "Affiche le message du jour (/etc/motd) après connexion.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no"
+        },
+        {
+          "key": "PrintLastLog",
+          "displayName": "Afficher dernière connexion",
+          "description": "Affiche la date et l'heure de la dernière connexion.",
+          "dataType": "Boolean",
+          "defaultValue": true,
+          "booleanFormat": "yes/no"
+        }
+      ]
+    }
+  ]
+}

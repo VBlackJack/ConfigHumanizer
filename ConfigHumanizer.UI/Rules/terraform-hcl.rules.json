@@ -1,76 +1,173 @@
 {
   "formatName": "Terraform",
   "filePatterns": ["*.tf", "*.tfvars"],
+  "formatDescription": "Terraform est un outil d'Infrastructure as Code (IaC) qui permet de définir et provisionner des ressources cloud de manière déclarative. Les fichiers .tf contiennent la définition de l'infrastructure souhaitée.",
   "rules": [
     {
-      "key": "module.source",
-      "valuePattern": ".*",
+      "key": "module.definition",
+      "valuePattern": "Tenant.*",
       "severity": "Info",
-      "humanDescription": "Terraform module source reference. Verify the module source is from a trusted registry or internal repository.",
+      "humanDescription": "Module Tenant ACI : Crée un tenant (locataire) dans Cisco ACI. Un tenant est un conteneur logique isolé qui regroupe les politiques réseau, les profils d'application et les EPGs d'un projet ou d'une équipe.",
       "suggestedFix": "",
-      "fixReason": "Module sources should be versioned and from trusted registries."
+      "fixReason": ""
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": "BDACI.*|BD.*",
+      "severity": "Info",
+      "humanDescription": "Module Bridge Domain : Crée un domaine de pontage dans ACI. Le Bridge Domain est un domaine de diffusion L2 qui définit un segment réseau avec son sous-réseau IP, sa gateway et ses paramètres de forwarding.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": "EPG.*",
+      "severity": "Info",
+      "humanDescription": "Module EPG (Endpoint Group) : Crée un groupe de points de terminaison. L'EPG est l'unité de base de segmentation dans ACI - il regroupe des VMs ou serveurs ayant les mêmes politiques de sécurité et de connectivité.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": "Contract.*",
+      "severity": "Info",
+      "humanDescription": "Module Contract : Définit les règles de communication entre EPGs. Un contrat spécifie quels ports/protocoles sont autorisés entre un EPG source et un EPG destination (équivalent à une règle firewall interne).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": "NSContract.*",
+      "severity": "Info",
+      "humanDescription": "Module NS Contract (North-South) : Configure les règles firewall Palo Alto pour le trafic entrant/sortant du datacenter. Ces règles contrôlent la communication entre l'infrastructure interne et les réseaux externes.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": "WEITContract.*",
+      "severity": "Info",
+      "humanDescription": "Module WE Inter-Tenant Contract : Permet la communication entre différents tenants ACI. Utilisé pour connecter votre infrastructure à des services partagés (monitoring, packages, etc.) gérés par d'autres équipes.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": "VM.*",
+      "severity": "Info",
+      "humanDescription": "Module VM : Provisionne une machine virtuelle avec l'OS, la taille (CPU/RAM), le stockage et le réseau spécifiés. La VM sera automatiquement rattachée à l'EPG (groupe de sécurité) défini.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": "StaticPort.*",
+      "severity": "Info",
+      "humanDescription": "Module Static Port : Configure un port physique sur un switch ACI pour connecter un équipement bare-metal ou un serveur physique à un EPG spécifique avec un VLAN dédié.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.definition",
+      "valuePattern": "NAT.*",
+      "severity": "Info",
+      "humanDescription": "Module NAT Rules : Configure les règles de translation d'adresses sur le firewall Palo Alto. Permet d'exposer des services internes vers l'extérieur ou de masquer les IPs internes.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.source",
+      "valuePattern": ".*tenantaci.*",
+      "severity": "Info",
+      "humanDescription": "Source du module Tenant ACI. Ce module Terraform interne crée et configure un tenant dans l'infrastructure Cisco ACI.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.source",
+      "valuePattern": ".*bdaci.*",
+      "severity": "Info",
+      "humanDescription": "Source du module Bridge Domain. Configure le domaine de broadcast L2 et les sous-réseaux IP associés.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.source",
+      "valuePattern": ".*epg.*",
+      "severity": "Info",
+      "humanDescription": "Source du module EPG. Crée les groupes de sécurité pour segmenter et protéger les workloads.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.source",
+      "valuePattern": ".*contract.*",
+      "severity": "Info",
+      "humanDescription": "Source du module Contract. Définit les règles de flux autorisés entre les différents EPGs.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.source",
+      "valuePattern": ".*createvm.*",
+      "severity": "Info",
+      "humanDescription": "Source du module de création VM. Provisionne les machines virtuelles sur l'infrastructure de virtualisation.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "module.source",
+      "valuePattern": ".*nscontract.*",
+      "severity": "Info",
+      "humanDescription": "Source du module NS Contract. Configure les règles firewall North-South sur Palo Alto.",
+      "suggestedFix": "",
+      "fixReason": ""
     },
     {
       "key": "module.source",
       "valuePattern": ".*:latest.*",
       "severity": "Warning",
-      "humanDescription": "Module reference uses 'latest' tag. This can lead to unpredictable infrastructure changes.",
-      "suggestedFix": "Pin module to specific version (e.g., ?ref=1.0.0)",
-      "fixReason": "Always pin module versions to ensure reproducible deployments."
+      "humanDescription": "⚠️ Le module utilise le tag 'latest'. Cela peut causer des changements inattendus si le module est mis à jour.",
+      "suggestedFix": "Utiliser une version fixe (ex: ?ref=1.0.0)",
+      "fixReason": "Toujours épingler les versions des modules pour garantir la reproductibilité des déploiements."
     },
     {
       "key": "module.source",
       "valuePattern": "^git::https://.*",
       "severity": "GoodPractice",
-      "humanDescription": "Module source uses HTTPS for Git repository access. This is secure and recommended.",
+      "humanDescription": "✓ Le module est téléchargé via HTTPS sécurisé depuis un dépôt Git interne.",
       "suggestedFix": "",
-      "fixReason": "HTTPS ensures encrypted communication with the Git repository."
+      "fixReason": ""
     },
     {
       "key": "module.source",
       "valuePattern": "^git::http://.*",
       "severity": "CriticalSecurity",
-      "humanDescription": "Module source uses unencrypted HTTP. Credentials and code can be intercepted.",
-      "suggestedFix": "Change http:// to https://",
-      "fixReason": "Always use HTTPS for secure module downloads."
-    },
-    {
-      "key": "module.definition",
-      "valuePattern": ".*",
-      "severity": "Info",
-      "humanDescription": "Terraform module definition. Modules encapsulate reusable infrastructure components.",
-      "suggestedFix": "",
-      "fixReason": ""
-    },
-    {
-      "key": "locals.definition",
-      "valuePattern": ".*",
-      "severity": "Info",
-      "humanDescription": "Local values block for reusable expressions within the configuration.",
-      "suggestedFix": "",
-      "fixReason": ""
+      "humanDescription": "🔴 Le module utilise HTTP non chiffré ! Les credentials et le code peuvent être interceptés.",
+      "suggestedFix": "Remplacer http:// par https://",
+      "fixReason": "Toujours utiliser HTTPS pour télécharger les modules."
     },
     {
       "key": "vm.securityGroup",
       "valuePattern": ".*_GW$",
       "severity": "Info",
-      "humanDescription": "VM assigned to Gateway security group. Gateway VMs typically handle inbound/outbound traffic and require careful network rule configuration.",
+      "humanDescription": "VM assignée au groupe Gateway. Les VMs Gateway servent de point d'entrée administratif (jump host/bastion). Elles reçoivent les connexions SSH/RDP des administrateurs et permettent d'accéder aux autres serveurs.",
       "suggestedFix": "",
-      "fixReason": "Gateway VMs are entry points and should have minimal required ports open."
+      "fixReason": ""
     },
     {
       "key": "vm.securityGroup",
       "valuePattern": ".*_AD_LDAP$",
       "severity": "Info",
-      "humanDescription": "VM assigned to AD/LDAP security group. Contains Active Directory and LDAP services requiring specific port access.",
+      "humanDescription": "VM assignée au groupe AD/LDAP. Contient les contrôleurs de domaine Active Directory et/ou serveurs LDAP. Ces serveurs gèrent l'authentification et les autorisations des utilisateurs et machines.",
       "suggestedFix": "",
-      "fixReason": "AD/LDAP servers should be protected with strict network policies."
+      "fixReason": ""
     },
     {
       "key": "vm.securityGroup",
       "valuePattern": ".*_SERVICES$",
       "severity": "Info",
-      "humanDescription": "VM assigned to Services security group. Contains shared infrastructure services.",
+      "humanDescription": "VM assignée au groupe Services. Héberge les services d'infrastructure partagés : WSUS (mises à jour Windows), Katello (packages Linux), PKI, syslog, etc.",
       "suggestedFix": "",
       "fixReason": ""
     },
@@ -78,47 +175,95 @@
       "key": "vm.securityGroup",
       "valuePattern": ".*_SECU_REPO$",
       "severity": "Info",
-      "humanDescription": "VM assigned to Security Repository group. Likely contains security tools like Wazuh, SIEM, or log collectors.",
+      "humanDescription": "VM assignée au groupe Security Repository. Contient les outils de sécurité : Wazuh (SIEM/EDR), collecteurs de logs, scanners de vulnérabilités. Zone sensible à protéger.",
       "suggestedFix": "",
-      "fixReason": "Security infrastructure should be isolated and protected."
+      "fixReason": ""
     },
     {
-      "key": "vm.os",
-      "valuePattern": "(?i)windows.*",
+      "key": "vm.securityGroup",
+      "valuePattern": ".*_EXCHANGE$|.*_ECH.*",
       "severity": "Info",
-      "humanDescription": "Windows-based VM. Ensure Windows Update (WSUS) and security patches are configured.",
+      "humanDescription": "VM assignée au groupe Exchange/Communication. Héberge les proxies, relais ou services de communication avec l'extérieur.",
       "suggestedFix": "",
       "fixReason": ""
     },
     {
       "key": "vm.os",
-      "valuePattern": "(?i)rhel.*|centos.*|rocky.*|alma.*",
+      "valuePattern": "(?i)windows2022.*",
       "severity": "Info",
-      "humanDescription": "Enterprise Linux-based VM (RHEL/CentOS/Rocky/Alma). Ensure package management (Katello/Satellite) is configured.",
+      "humanDescription": "Système d'exploitation : Windows Server 2022. Version LTS avec support jusqu'en 2031. Inclut les dernières fonctionnalités de sécurité (Secured-core, TLS 1.3).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.os",
+      "valuePattern": "(?i)windows2019.*",
+      "severity": "Info",
+      "humanDescription": "Système d'exploitation : Windows Server 2019. Version stable avec support mainstream jusqu'en 2024, support étendu jusqu'en 2029.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.os",
+      "valuePattern": "(?i)rhel9.*",
+      "severity": "Info",
+      "humanDescription": "Système d'exploitation : Red Hat Enterprise Linux 9. Dernière version majeure RHEL avec support jusqu'en 2032. Kernel 5.14, Python 3.9, OpenSSL 3.0.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.os",
+      "valuePattern": "(?i)rhel8.*",
+      "severity": "Info",
+      "humanDescription": "Système d'exploitation : Red Hat Enterprise Linux 8. Version stable avec support jusqu'en 2029. Kernel 4.18, Python 3.6/3.8.",
       "suggestedFix": "",
       "fixReason": ""
     },
     {
       "key": "vm.netClass",
       "valuePattern": "GOLD.*",
-      "severity": "GoodPractice",
-      "humanDescription": "VM uses GOLD network tier with guaranteed bandwidth and low latency.",
+      "severity": "Info",
+      "humanDescription": "Classe réseau GOLD : Bande passante garantie de 1000 Mbps, latence faible, priorité haute. Recommandé pour les workloads critiques.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.netClass",
+      "valuePattern": "SILVER.*",
+      "severity": "Info",
+      "humanDescription": "Classe réseau SILVER : Bande passante standard, priorité moyenne. Adapté pour les workloads non-critiques.",
       "suggestedFix": "",
       "fixReason": ""
     },
     {
       "key": "vm.storClass",
       "valuePattern": "GOLD.*",
-      "severity": "GoodPractice",
-      "humanDescription": "VM uses GOLD storage tier with high IOPS and reliable performance.",
+      "severity": "Info",
+      "humanDescription": "Classe stockage GOLD : Stockage haute performance avec 2000+ IOPS garantis. Recommandé pour les bases de données et applications I/O intensives.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "vm.storClass",
+      "valuePattern": "SILVER.*",
+      "severity": "Info",
+      "humanDescription": "Classe stockage SILVER : Stockage standard avec performances correctes. Adapté pour les serveurs d'application classiques.",
       "suggestedFix": "",
       "fixReason": ""
     },
     {
       "key": "aci.fabric",
-      "valuePattern": ".*",
+      "valuePattern": ".*DC1.*",
       "severity": "Info",
-      "humanDescription": "Cisco ACI fabric assignment. Defines which ACI fabric controller manages this tenant.",
+      "humanDescription": "Fabric ACI du Datacenter 1. L'infrastructure sera déployée sur le contrôleur APIC du site DC1.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "aci.fabric",
+      "valuePattern": ".*DC2.*",
+      "severity": "Info",
+      "humanDescription": "Fabric ACI du Datacenter 2. L'infrastructure sera déployée sur le contrôleur APIC du site DC2.",
       "suggestedFix": "",
       "fixReason": ""
     },
@@ -126,55 +271,135 @@
       "key": "contract.epg",
       "valuePattern": ".*",
       "severity": "Info",
-      "humanDescription": "Endpoint Group (EPG) reference in firewall contract. EPGs define network segmentation in Cisco ACI.",
+      "humanDescription": "Référence à un EPG dans un contrat. Ce contrat autorise le trafic vers ou depuis cet Endpoint Group.",
       "suggestedFix": "",
       "fixReason": ""
     },
     {
       "key": "contract.tenant",
-      "valuePattern": ".*",
+      "valuePattern": "MONITOR.*",
       "severity": "Info",
-      "humanDescription": "Cross-tenant contract reference. Enables communication between different ACI tenants.",
+      "humanDescription": "Contrat inter-tenant vers le tenant Monitoring. Permet d'envoyer les métriques et alertes vers l'infrastructure de supervision centralisée (Zabbix, Prometheus, etc.).",
       "suggestedFix": "",
-      "fixReason": "Cross-tenant contracts should be reviewed for least-privilege access."
+      "fixReason": ""
+    },
+    {
+      "key": "contract.tenant",
+      "valuePattern": "SHARED.*|CPDC.*",
+      "severity": "Info",
+      "humanDescription": "Contrat inter-tenant vers les services partagés. Permet d'accéder aux ressources communes : serveur Chocolatey, repositories, DNS, NTP, etc.",
+      "suggestedFix": "",
+      "fixReason": ""
     },
     {
       "key": "firewall.ports",
       "valuePattern": ".*TCP_22.*",
       "severity": "Info",
-      "humanDescription": "SSH (TCP/22) port allowed in firewall rule. SSH access should be restricted to administrative networks.",
+      "humanDescription": "Port SSH (TCP/22) autorisé. Permet l'administration à distance sécurisée des serveurs Linux.",
       "suggestedFix": "",
-      "fixReason": "Limit SSH access to jump hosts or VPN connections only."
+      "fixReason": ""
     },
     {
       "key": "firewall.ports",
       "valuePattern": ".*TCP_3389.*",
       "severity": "Info",
-      "humanDescription": "RDP (TCP/3389) port allowed in firewall rule. RDP access should be restricted to administrative networks.",
+      "humanDescription": "Port RDP (TCP/3389) autorisé. Permet l'administration à distance graphique des serveurs Windows.",
       "suggestedFix": "",
-      "fixReason": "Limit RDP access to jump hosts or VPN connections. Consider using RDP Gateway."
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_443.*",
+      "severity": "Info",
+      "humanDescription": "Port HTTPS (TCP/443) autorisé. Communication web sécurisée par TLS.",
+      "suggestedFix": "",
+      "fixReason": ""
     },
     {
       "key": "firewall.ports",
       "valuePattern": ".*TCP_445.*",
       "severity": "Warning",
-      "humanDescription": "SMB (TCP/445) port allowed. SMB should be carefully controlled to prevent lateral movement attacks.",
+      "humanDescription": "⚠️ Port SMB (TCP/445) autorisé. Partage de fichiers Windows. Vérifier que SMBv1 est désactivé et SMB signing activé.",
       "suggestedFix": "",
-      "fixReason": "SMB is commonly targeted in ransomware attacks. Ensure SMBv1 is disabled."
+      "fixReason": "SMB est souvent exploité dans les attaques ransomware pour la propagation latérale."
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_88.*|.*UDP_88.*",
+      "severity": "Info",
+      "humanDescription": "Port Kerberos (TCP/UDP 88) autorisé. Protocole d'authentification Active Directory.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_389.*|.*UDP_389.*",
+      "severity": "Info",
+      "humanDescription": "Port LDAP (TCP/UDP 389) autorisé. Requêtes d'annuaire Active Directory non chiffrées.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_636.*",
+      "severity": "GoodPractice",
+      "humanDescription": "✓ Port LDAPS (TCP/636) autorisé. Requêtes LDAP chiffrées par TLS - plus sécurisé que LDAP simple.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_5985.*|.*TCP_5986.*",
+      "severity": "Info",
+      "humanDescription": "Ports WinRM (TCP/5985-5986) autorisés. Administration PowerShell à distance des serveurs Windows. 5986 = HTTPS (recommandé).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_1514.*|.*TCP_1515.*",
+      "severity": "Info",
+      "humanDescription": "Ports Wazuh Agent (TCP/1514-1515) autorisés. Communication entre les agents Wazuh et le serveur SIEM pour la collecte des événements de sécurité.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_10050.*|.*TCP_10051.*",
+      "severity": "Info",
+      "humanDescription": "Ports Zabbix (TCP/10050-10051) autorisés. 10050 = agent passif (pull), 10051 = agent actif (push). Monitoring de l'infrastructure.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_8530.*|.*TCP_8531.*",
+      "severity": "Info",
+      "humanDescription": "Ports WSUS (TCP/8530-8531) autorisés. Windows Server Update Services - distribution des mises à jour Microsoft.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "firewall.ports",
+      "valuePattern": ".*TCP_8140.*",
+      "severity": "Info",
+      "humanDescription": "Port Puppet/Katello (TCP/8140) autorisé. Communication agent-serveur pour la gestion de configuration et packages Linux.",
+      "suggestedFix": "",
+      "fixReason": ""
     },
     {
       "key": "firewall.ports",
       "valuePattern": ".*TCP_49152-65535.*",
       "severity": "Warning",
-      "humanDescription": "Wide ephemeral port range allowed (49152-65535). This is common for AD but expands attack surface.",
+      "humanDescription": "⚠️ Plage de ports dynamiques Windows (49152-65535) autorisée. Nécessaire pour AD/RPC mais augmente la surface d'attaque.",
       "suggestedFix": "",
-      "fixReason": "Wide port ranges are sometimes necessary for AD RPC but should be monitored."
+      "fixReason": "Cette plage large est requise pour les communications RPC d'Active Directory."
     },
     {
       "key": "firewall.json_file",
       "valuePattern": ".*",
       "severity": "Info",
-      "humanDescription": "JSON file reference for North-South firewall rules (Palo Alto). Review the referenced file for security rules.",
+      "humanDescription": "Référence vers un fichier JSON contenant les règles firewall North-South (Palo Alto). Ces règles définissent le trafic autorisé entre l'infrastructure et l'extérieur.",
       "suggestedFix": "",
       "fixReason": ""
     },
@@ -182,7 +407,7 @@
       "key": "workspace.PROD.*",
       "valuePattern": ".*",
       "severity": "Info",
-      "humanDescription": "Production workspace configuration. Production environments require additional security scrutiny.",
+      "humanDescription": "Configuration pour l'environnement de PRODUCTION. Les changements dans cet environnement impactent les services en production.",
       "suggestedFix": "",
       "fixReason": ""
     },
@@ -190,7 +415,7 @@
       "key": "workspace.DEV.*",
       "valuePattern": ".*",
       "severity": "Info",
-      "humanDescription": "Development workspace configuration.",
+      "humanDescription": "Configuration pour l'environnement de DÉVELOPPEMENT. Environnement de test isolé de la production.",
       "suggestedFix": "",
       "fixReason": ""
     }

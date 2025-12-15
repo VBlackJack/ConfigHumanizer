@@ -1,12 +1,13 @@
 {
   "formatName": "PaloAlto",
   "filePatterns": ["*FW_Rules*.json", "*NAT_Rules*.json", "*fw_rules*.json"],
+  "formatDescription": "Fichier de règles firewall Palo Alto au format JSON. Définit les règles North-South (entrée/sortie du datacenter) qui contrôlent le trafic entre l'infrastructure interne et les réseaux externes (Internet, autres sites, partenaires).",
   "rules": [
     {
       "key": "firewall.tag_color",
       "valuePattern": "green",
       "severity": "GoodPractice",
-      "humanDescription": "Firewall rules tagged with green color indicating approved/reviewed status.",
+      "humanDescription": "✓ Règles marquées en vert : Indique que ces règles ont été validées et approuvées par l'équipe sécurité.",
       "suggestedFix": "",
       "fixReason": ""
     },
@@ -14,47 +15,167 @@
       "key": "firewall.tag_color",
       "valuePattern": "red",
       "severity": "Warning",
-      "humanDescription": "Firewall rules tagged with red color. These may require review or represent temporary rules.",
+      "humanDescription": "⚠️ Règles marquées en rouge : Ces règles sont temporaires ou en attente de validation. À revoir et approuver.",
+      "suggestedFix": "Faire valider les règles et changer le tag en vert",
+      "fixReason": "Les règles non validées peuvent représenter un risque de sécurité."
+    },
+    {
+      "key": "firewall.tag_color",
+      "valuePattern": "yellow",
+      "severity": "Info",
+      "humanDescription": "Règles marquées en jaune : Règles en cours de révision ou de migration.",
       "suggestedFix": "",
-      "fixReason": "Review red-tagged rules and update to approved status after verification."
+      "fixReason": ""
     },
     {
       "key": "fw_rule.name",
-      "valuePattern": ".*",
+      "valuePattern": ".*KMS.*",
       "severity": "Info",
-      "humanDescription": "Palo Alto firewall rule definition. Each rule defines allowed traffic between source and destination.",
+      "humanDescription": "Règle d'activation KMS : Permet aux serveurs Windows de contacter le serveur KMS (Key Management Service) pour activer leur licence. Port TCP/1688.",
       "suggestedFix": "",
       "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*WSUS.*",
+      "severity": "Info",
+      "humanDescription": "Règle WSUS (Windows Server Update Services) : Permet aux serveurs Windows de télécharger les mises à jour de sécurité depuis le serveur WSUS interne. Ports TCP/8530-8531.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*Katello.*|.*RHEL.*",
+      "severity": "Info",
+      "humanDescription": "Règle Katello/Satellite : Permet aux serveurs Linux (RHEL) de télécharger les packages et mises à jour depuis le serveur Katello/Satellite. Port TCP/443.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*SSH.*",
+      "severity": "Info",
+      "humanDescription": "Règle SSH : Autorise les connexions SSH (Secure Shell) pour l'administration à distance des serveurs Linux. Port TCP/22.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*RDP.*",
+      "severity": "Info",
+      "humanDescription": "Règle RDP (Remote Desktop Protocol) : Autorise les connexions bureau à distance pour l'administration des serveurs Windows. Port TCP/3389.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*AD.*|.*LDAP.*",
+      "severity": "Info",
+      "humanDescription": "Règle Active Directory/LDAP : Permet la communication avec les contrôleurs de domaine pour l'authentification, les politiques de groupe et les requêtes d'annuaire.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*Replication.*|.*Failover.*",
+      "severity": "Info",
+      "humanDescription": "Règle de réplication inter-site : Permet la synchronisation des données entre datacenters (AD, bases de données, fichiers). Critique pour la haute disponibilité.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*SOC.*|.*soc.*|.*Concentrator.*",
+      "severity": "Info",
+      "humanDescription": "Règle SOC (Security Operations Center) : Permet l'envoi des logs de sécurité vers le SOC pour analyse et détection des menaces. Ports TCP/6514 (syslog TLS), TCP/1545.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*Chocolatey.*",
+      "severity": "Info",
+      "humanDescription": "Règle Chocolatey : Permet aux serveurs Windows d'accéder au serveur Chocolatey interne pour installer des packages logiciels. Port TCP/80.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*NTLite.*",
+      "severity": "Info",
+      "humanDescription": "Règle NTLite : Permet au serveur NTLite de télécharger les composants depuis le site du vendeur pour la personnalisation des images Windows.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*KeePass.*",
+      "severity": "Info",
+      "humanDescription": "Règle KeePass : Permet l'accès au partage de fichiers contenant les bases KeePass (gestionnaire de mots de passe d'équipe). Port TCP/445 (SMB).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*CRL.*",
+      "severity": "Info",
+      "humanDescription": "Règle CRL (Certificate Revocation List) : Permet de vérifier si un certificat a été révoqué auprès du serveur PKI. Port TCP/80. Essentiel pour la validation des certificats.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.name",
+      "valuePattern": ".*Internet.*",
+      "severity": "Warning",
+      "humanDescription": "⚠️ Règle d'accès Internet : Cette règle autorise l'accès vers Internet. Vérifier que seuls les serveurs nécessaires sont concernés.",
+      "suggestedFix": "",
+      "fixReason": "L'accès Internet direct doit être limité et contrôlé."
     },
     {
       "key": "fw_rule.source_any",
       "valuePattern": "any",
       "severity": "Warning",
-      "humanDescription": "Firewall rule allows traffic from ANY source. This is overly permissive and should be restricted.",
-      "suggestedFix": "Specify source IP addresses or networks",
-      "fixReason": "Any-source rules increase attack surface. Define specific source networks."
+      "humanDescription": "⚠️ Source = ANY : Cette règle accepte le trafic depuis n'importe quelle source. Potentiellement trop permissif.",
+      "suggestedFix": "Restreindre aux IPs ou réseaux sources spécifiques",
+      "fixReason": "Les règles avec source 'any' augmentent la surface d'attaque."
     },
     {
       "key": "fw_rule.dest_any",
       "valuePattern": "any",
       "severity": "CriticalSecurity",
-      "humanDescription": "Firewall rule allows traffic to ANY destination. This is highly permissive and creates security risk.",
-      "suggestedFix": "Specify destination IP addresses or networks",
-      "fixReason": "Any-destination rules allow unrestricted outbound access. Define specific destinations."
+      "humanDescription": "🔴 Destination = ANY : Cette règle autorise le trafic vers n'importe quelle destination. TRÈS RISQUÉ - peut permettre l'exfiltration de données.",
+      "suggestedFix": "Définir les destinations spécifiques autorisées",
+      "fixReason": "Les règles avec destination 'any' permettent à un attaquant de communiquer avec n'importe quel serveur externe."
     },
     {
       "key": "fw_rule.source",
-      "valuePattern": ".*",
+      "valuePattern": ".*\\/24$",
       "severity": "Info",
-      "humanDescription": "Firewall rule source definition. Specifies which networks/hosts can initiate connections.",
+      "humanDescription": "Source = sous-réseau /24 (256 adresses). Toutes les machines de ce sous-réseau peuvent utiliser cette règle.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.source",
+      "valuePattern": ".*\\/26$",
+      "severity": "Info",
+      "humanDescription": "Source = sous-réseau /26 (64 adresses). Sous-réseau de taille moyenne, typique pour un EPG/segment applicatif.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.source",
+      "valuePattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "severity": "GoodPractice",
+      "humanDescription": "✓ Source = IP unique. Règle précise limitée à un seul serveur - bonne pratique de moindre privilège.",
       "suggestedFix": "",
       "fixReason": ""
     },
     {
       "key": "fw_rule.dest",
-      "valuePattern": ".*",
-      "severity": "Info",
-      "humanDescription": "Firewall rule destination definition. Specifies target networks/hosts for allowed traffic.",
+      "valuePattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "severity": "GoodPractice",
+      "humanDescription": "✓ Destination = IP unique. Règle précise limitée à un seul serveur cible - bonne pratique.",
       "suggestedFix": "",
       "fixReason": ""
     },
@@ -62,7 +183,7 @@
       "key": "fw_rule.service",
       "valuePattern": ".*",
       "severity": "Info",
-      "humanDescription": "Service/port definition for the firewall rule.",
+      "humanDescription": "Services/ports autorisés par cette règle. Format: PROTOCOL_PORT (ex: TCP_443 = HTTPS).",
       "suggestedFix": "",
       "fixReason": ""
     },
@@ -70,113 +191,153 @@
       "key": "fw_rule.source_zone",
       "valuePattern": "any",
       "severity": "Warning",
-      "humanDescription": "Rule applies to any source zone. Consider restricting to specific security zones.",
+      "humanDescription": "⚠️ Zone source = ANY. La règle s'applique depuis toutes les zones de sécurité. Préférer une zone spécifique.",
       "suggestedFix": "",
-      "fixReason": "Zone-based policies provide better segmentation control."
+      "fixReason": "Les politiques basées sur les zones offrent un meilleur contrôle."
+    },
+    {
+      "key": "fw_rule.source_zone",
+      "valuePattern": "prod.*",
+      "severity": "Info",
+      "humanDescription": "Zone source = Production. Le trafic provient de la zone de production du datacenter.",
+      "suggestedFix": "",
+      "fixReason": ""
     },
     {
       "key": "fw_rule.dest_zone",
       "valuePattern": "any",
       "severity": "Warning",
-      "humanDescription": "Rule applies to any destination zone. Consider restricting to specific security zones.",
+      "humanDescription": "⚠️ Zone destination = ANY. La règle autorise le trafic vers toutes les zones. Potentiellement trop ouvert.",
       "suggestedFix": "",
-      "fixReason": "Zone-based policies provide better segmentation control."
+      "fixReason": ""
     },
     {
       "key": "fw_rule.port.TCP_22",
       "valuePattern": ".*",
       "severity": "Info",
-      "humanDescription": "SSH access (TCP/22) allowed. Ensure SSH is only accessible from admin networks or jump hosts.",
+      "humanDescription": "Port SSH (TCP/22) : Accès shell sécurisé pour l'administration des serveurs Linux/Unix. Chiffré par défaut.",
       "suggestedFix": "",
-      "fixReason": "SSH should be restricted to authorized admin networks."
+      "fixReason": ""
     },
     {
       "key": "fw_rule.port.TCP_23",
       "valuePattern": ".*",
       "severity": "CriticalSecurity",
-      "humanDescription": "Telnet (TCP/23) access allowed. Telnet transmits credentials in plaintext and is insecure.",
-      "suggestedFix": "Replace Telnet with SSH (TCP/22)",
-      "fixReason": "Telnet is unencrypted and should never be used in production environments."
+      "humanDescription": "🔴 Port Telnet (TCP/23) : Protocole NON CHIFFRÉ ! Les mots de passe transitent en clair sur le réseau.",
+      "suggestedFix": "Remplacer Telnet par SSH (TCP/22)",
+      "fixReason": "Telnet est un protocole obsolète et dangereux. Utiliser SSH à la place."
     },
     {
       "key": "fw_rule.port.TCP_3389",
       "valuePattern": ".*",
       "severity": "Warning",
-      "humanDescription": "RDP access (TCP/3389) allowed. RDP is frequently targeted by attackers and should be protected.",
+      "humanDescription": "⚠️ Port RDP (TCP/3389) : Bureau à distance Windows. Cible fréquente des attaques par force brute.",
       "suggestedFix": "",
-      "fixReason": "Use RDP Gateway, enable NLA, and restrict source IPs for RDP access."
+      "fixReason": "Protéger RDP avec NLA (Network Level Authentication) et limiter les sources autorisées."
     },
     {
       "key": "fw_rule.port.TCP_445",
       "valuePattern": ".*",
       "severity": "Warning",
-      "humanDescription": "SMB file sharing (TCP/445) allowed. SMB is commonly exploited in ransomware attacks.",
+      "humanDescription": "⚠️ Port SMB (TCP/445) : Partage de fichiers Windows. Vecteur d'attaque courant (WannaCry, EternalBlue).",
       "suggestedFix": "",
-      "fixReason": "Ensure SMBv1 is disabled and SMB signing is enabled. Restrict to necessary networks."
+      "fixReason": "Désactiver SMBv1, activer SMB signing, et restreindre aux réseaux de confiance."
     },
     {
       "key": "fw_rule.port.TCP_1433",
       "valuePattern": ".*",
       "severity": "Warning",
-      "humanDescription": "SQL Server (TCP/1433) allowed. Database ports should be restricted to application servers only.",
+      "humanDescription": "⚠️ Port SQL Server (TCP/1433) : Base de données Microsoft SQL Server. Ne jamais exposer directement.",
       "suggestedFix": "",
-      "fixReason": "Never expose database ports directly. Use application tier segmentation."
+      "fixReason": "Les bases de données ne doivent être accessibles que depuis les serveurs applicatifs."
     },
     {
       "key": "fw_rule.port.TCP_3306",
       "valuePattern": ".*",
       "severity": "Warning",
-      "humanDescription": "MySQL (TCP/3306) allowed. Database ports should be restricted to application servers only.",
+      "humanDescription": "⚠️ Port MySQL (TCP/3306) : Base de données MySQL/MariaDB. Ne jamais exposer directement.",
       "suggestedFix": "",
-      "fixReason": "Never expose database ports directly. Use application tier segmentation."
+      "fixReason": "Restreindre l'accès aux serveurs applicatifs uniquement."
     },
     {
       "key": "fw_rule.port.TCP_5432",
       "valuePattern": ".*",
       "severity": "Warning",
-      "humanDescription": "PostgreSQL (TCP/5432) allowed. Database ports should be restricted to application servers only.",
+      "humanDescription": "⚠️ Port PostgreSQL (TCP/5432) : Base de données PostgreSQL. Protéger avec SSL et authentification forte.",
       "suggestedFix": "",
-      "fixReason": "Never expose database ports directly. Use application tier segmentation."
+      "fixReason": "Ne pas exposer les bases de données directement sur le réseau."
     },
     {
       "key": "fw_rule.port.TCP_27017",
       "valuePattern": ".*",
       "severity": "Warning",
-      "humanDescription": "MongoDB (TCP/27017) allowed. Ensure MongoDB authentication is enabled and access is restricted.",
+      "humanDescription": "⚠️ Port MongoDB (TCP/27017) : Base de données NoSQL. ATTENTION : MongoDB sans auth est un risque critique.",
       "suggestedFix": "",
-      "fixReason": "MongoDB default installations lack authentication. Always enable auth and restrict access."
+      "fixReason": "Toujours activer l'authentification MongoDB et restreindre l'accès réseau."
     },
     {
       "key": "fw_rule.port.TCP_6379",
       "valuePattern": ".*",
       "severity": "Warning",
-      "humanDescription": "Redis (TCP/6379) allowed. Redis should be password-protected and not exposed directly.",
+      "humanDescription": "⚠️ Port Redis (TCP/6379) : Cache/base de données en mémoire. Souvent déployé sans authentification.",
       "suggestedFix": "",
-      "fixReason": "Redis without authentication can lead to data theft and remote code execution."
+      "fixReason": "Configurer un mot de passe Redis et restreindre l'accès au réseau local."
     },
     {
       "key": "fw_rule.port.TCP_21",
       "valuePattern": ".*",
       "severity": "CriticalSecurity",
-      "humanDescription": "FTP (TCP/21) allowed. FTP transmits credentials in plaintext and is insecure.",
-      "suggestedFix": "Replace FTP with SFTP (TCP/22) or FTPS",
-      "fixReason": "FTP is unencrypted. Use SFTP or FTPS for secure file transfers."
+      "humanDescription": "🔴 Port FTP (TCP/21) : Protocole de transfert NON CHIFFRÉ ! Utiliser SFTP ou FTPS à la place.",
+      "suggestedFix": "Remplacer FTP par SFTP (TCP/22) ou FTPS (TCP/990)",
+      "fixReason": "FTP transmet les fichiers et mots de passe en clair."
     },
     {
       "key": "fw_rule.port.TCP_80",
       "valuePattern": ".*",
       "severity": "Info",
-      "humanDescription": "HTTP (TCP/80) allowed. Consider whether HTTPS (TCP/443) should be required instead.",
+      "humanDescription": "Port HTTP (TCP/80) : Trafic web non chiffré. Acceptable pour les services internes ou redirection vers HTTPS.",
       "suggestedFix": "",
-      "fixReason": "HTTP traffic is unencrypted. Use HTTPS where possible."
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.port.TCP_443",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "✓ Port HTTPS (TCP/443) : Trafic web chiffré par TLS. Méthode recommandée pour les communications web.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.port.TCP_636",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "✓ Port LDAPS (TCP/636) : LDAP sécurisé par TLS. Préférer LDAPS à LDAP (389) pour les requêtes AD.",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.port.TCP_1688",
+      "valuePattern": ".*",
+      "severity": "Info",
+      "humanDescription": "Port KMS (TCP/1688) : Service d'activation des licences Microsoft (Windows, Office).",
+      "suggestedFix": "",
+      "fixReason": ""
+    },
+    {
+      "key": "fw_rule.port.TCP_6514",
+      "valuePattern": ".*",
+      "severity": "GoodPractice",
+      "humanDescription": "✓ Port Syslog TLS (TCP/6514) : Envoi de logs chiffré vers un serveur syslog/SIEM. Plus sécurisé que UDP/514.",
+      "suggestedFix": "",
+      "fixReason": ""
     },
     {
       "key": "fw_rule.port.wide_range",
       "valuePattern": ".*",
       "severity": "Warning",
-      "humanDescription": "Wide ephemeral port range (49152-65535) allowed. Common for AD/RPC but increases attack surface.",
+      "humanDescription": "⚠️ Plage de ports étendue (49152-65535) : Ports dynamiques RPC Windows. Nécessaire pour AD mais augmente la surface d'attaque.",
       "suggestedFix": "",
-      "fixReason": "Wide port ranges are sometimes necessary but should be carefully documented."
+      "fixReason": "Cette plage est requise pour les communications RPC Active Directory."
     }
   ]
 }

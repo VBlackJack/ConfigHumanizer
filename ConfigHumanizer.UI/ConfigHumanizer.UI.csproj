@@ -19,6 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Schemas\*.params.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3650.58" />
   </ItemGroup>
 

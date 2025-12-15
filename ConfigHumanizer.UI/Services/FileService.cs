@@ -20,6 +20,11 @@ namespace ConfigHumanizer.UI.Services;
 
 public class FileService : IFileService
 {
+    /// <summary>
+    /// Maximum file size allowed (10 MB) to prevent DoS attacks and memory issues.
+    /// </summary>
+    private const long MaxFileSizeBytes = 10 * 1024 * 1024;
+
     public string? OpenFile()
     {
         var openFileDialog = new OpenFileDialog
@@ -36,11 +41,43 @@ public class FileService : IFileService
 
     public string ReadFile(string path)
     {
+        // Validate path
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentException("File path cannot be empty.", nameof(path));
+        }
+
+        if (!File.Exists(path))
+        {
+            throw new FileNotFoundException($"File not found: {path}", path);
+        }
+
+        // Check file size to prevent DoS
+        var fileInfo = new FileInfo(path);
+        if (fileInfo.Length > MaxFileSizeBytes)
+        {
+            throw new InvalidOperationException(
+                $"File too large ({fileInfo.Length / 1024.0 / 1024.0:F2} MB). Maximum allowed size is {MaxFileSizeBytes / 1024.0 / 1024.0:F0} MB.");
+        }
+
         return File.ReadAllText(path);
     }
 
     public void SaveFile(string path, string content)
     {
+        // Validate path
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentException("File path cannot be empty.", nameof(path));
+        }
+
+        // Validate content size
+        if (content != null && content.Length > MaxFileSizeBytes)
+        {
+            throw new InvalidOperationException(
+                $"Content too large. Maximum allowed size is {MaxFileSizeBytes / 1024.0 / 1024.0:F0} MB.");
+        }
+
         // Create backup if file exists
         if (File.Exists(path))
         {
@@ -49,6 +86,6 @@ public class FileService : IFileService
         }
 
         // Write the new content
-        File.WriteAllText(path, content);
+        File.WriteAllText(path, content ?? string.Empty);
     }
 }
