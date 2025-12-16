@@ -468,7 +468,7 @@
                             <StackPanel>
                                 <TextBlock FontSize="24" FontWeight="Bold"
                                            Foreground="{StaticResource PrimaryColor}">
-                                    <Run Text="{Binding DashboardAverageScore, StringFormat={}{0:F0}}"/><Run Text="%"/>
+                                    <Run Text="{Binding DashboardAverageScore, StringFormat={}{0:F0}, Mode=OneWay}"/><Run Text="%"/>
                                 </TextBlock>
                                 <TextBlock Text="Score Moyen" FontSize="11"
                                            Foreground="{StaticResource TextMuted}"/>
