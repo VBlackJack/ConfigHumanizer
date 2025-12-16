@@ -41,40 +41,43 @@ public partial class MainWindow : Window
 
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        // Initialize WebView2
+        // Subscribe to ViewModel property changes (outside WebView2 try-catch)
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.PropertyChanged += ViewModel_PropertyChanged;
+            viewModel.FocusSearchRequested += ViewModel_FocusSearchRequested;
+            viewModel.HighlightLineRequested += ViewModel_HighlightLineRequested;
+
+            // Initialize CodeEditor with current content
+            CodeEditor.Text = viewModel.FileContent ?? string.Empty;
+
+            // Apply initial syntax highlighting
+            ApplySyntaxHighlighting(viewModel.SyntaxHighlightingName);
+
+            // Subscribe to CodeEditor.TextChanged to update ViewModel
+            CodeEditor.TextChanged += CodeEditor_TextChanged;
+        }
+
+        // Initialize WebView2 (optional - diagrams may not work without it)
         try
         {
             await DiagramWebView.EnsureCoreWebView2Async();
 
-            // Subscribe to ViewModel property changes
-            if (DataContext is MainViewModel viewModel)
+            if (DataContext is MainViewModel viewModel2)
             {
-                viewModel.PropertyChanged += ViewModel_PropertyChanged;
-                viewModel.FocusSearchRequested += ViewModel_FocusSearchRequested;
-                viewModel.HighlightLineRequested += ViewModel_HighlightLineRequested;
-
-                // Initialize CodeEditor with current content
-                CodeEditor.Text = viewModel.FileContent ?? string.Empty;
-
-                // Apply initial syntax highlighting
-                ApplySyntaxHighlighting(viewModel.SyntaxHighlightingName);
-
-                // Subscribe to CodeEditor.TextChanged to update ViewModel
-                CodeEditor.TextChanged += CodeEditor_TextChanged;
-
                 // Subscribe to WebView2 messages for diagram click-to-scroll
                 DiagramWebView.WebMessageReceived += DiagramWebView_WebMessageReceived;
 
                 // Initial render
-                if (!string.IsNullOrEmpty(viewModel.MermaidHtml))
+                if (!string.IsNullOrEmpty(viewModel2.MermaidHtml))
                 {
-                    DiagramWebView.NavigateToString(viewModel.MermaidHtml);
+                    DiagramWebView.NavigateToString(viewModel2.MermaidHtml);
                 }
             }
         }
         catch (Exception ex)
         {
-            // WebView2 runtime may not be installed
+            // WebView2 runtime may not be installed - diagrams won't work but editor still functions
             System.Diagnostics.Debug.WriteLine($"WebView2 initialization failed: {ex.Message}");
         }
     }
