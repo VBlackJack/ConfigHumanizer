@@ -51,10 +51,11 @@ public class YamlConfigParser : BaseConfigParser
         try
         {
             var yamlObject = _deserializer.Deserialize<object>(fileContent);
+            var lines = fileContent.Split('\n');
 
             if (yamlObject != null)
             {
-                FlattenYaml(yamlObject, string.Empty, rules, fileContent);
+                FlattenYaml(yamlObject, string.Empty, rules, lines);
             }
         }
         catch (Exception)
@@ -65,7 +66,7 @@ public class YamlConfigParser : BaseConfigParser
         return rules;
     }
 
-    private void FlattenYaml(object obj, string prefix, List<HumanizedRule> rules, string fileContent)
+    private void FlattenYaml(object obj, string prefix, List<HumanizedRule> rules, string[] lines)
     {
         switch (obj)
         {
@@ -77,13 +78,13 @@ public class YamlConfigParser : BaseConfigParser
 
                     if (kvp.Value is Dictionary<object, object> || kvp.Value is List<object>)
                     {
-                        FlattenYaml(kvp.Value, newPrefix, rules, fileContent);
+                        FlattenYaml(kvp.Value, newPrefix, rules, lines);
                     }
                     else
                     {
                         var value = kvp.Value?.ToString() ?? string.Empty;
-                        var rawLine = FindRawLine(fileContent, key, value);
-                        var rule = MatchAndCreateRule(rawLine, newPrefix, value);
+                        var (rawLine, lineIndex) = FindRawLine(lines, key, value);
+                        var rule = MatchAndCreateRule(rawLine, newPrefix, value, lineIndex);
                         rules.Add(rule);
                     }
                 }
@@ -97,13 +98,13 @@ public class YamlConfigParser : BaseConfigParser
 
                     if (item is Dictionary<object, object> || item is List<object>)
                     {
-                        FlattenYaml(item, newPrefix, rules, fileContent);
+                        FlattenYaml(item, newPrefix, rules, lines);
                     }
                     else
                     {
                         var value = item?.ToString() ?? string.Empty;
-                        var rawLine = $"{prefix}: {value}";
-                        var rule = MatchAndCreateRule(rawLine, newPrefix, value);
+                        var (rawLine, lineIndex) = FindRawLineByValue(lines, value);
+                        var rule = MatchAndCreateRule(rawLine, newPrefix, value, lineIndex);
                         rules.Add(rule);
                     }
                 }
@@ -112,28 +113,42 @@ public class YamlConfigParser : BaseConfigParser
             default:
                 // Scalar value at root level
                 var scalarValue = obj?.ToString() ?? string.Empty;
-                var scalarLine = $"{prefix}: {scalarValue}";
-                var scalarRule = MatchAndCreateRule(scalarLine, prefix, scalarValue);
+                var (scalarRawLine, scalarLineIndex) = FindRawLineByValue(lines, scalarValue);
+                var scalarRule = MatchAndCreateRule(scalarRawLine, prefix, scalarValue, scalarLineIndex);
                 rules.Add(scalarRule);
                 break;
         }
     }
 
-    private static string FindRawLine(string fileContent, string key, string value)
+    private static (string rawLine, int lineIndex) FindRawLine(string[] lines, string key, string value)
     {
         // Try to find the original line in the YAML content
-        var lines = fileContent.Split('\n');
-
-        foreach (var line in lines)
+        for (var i = 0; i < lines.Length; i++)
         {
-            var trimmed = line.Trim();
+            var trimmed = lines[i].Trim();
             if (trimmed.StartsWith($"{key}:") || trimmed.StartsWith($"- {key}:"))
             {
-                return trimmed;
+                return (trimmed, i);
             }
         }
 
-        // Fallback to constructed line
-        return $"{key}: {value}";
+        // Fallback to constructed line with unknown index
+        return ($"{key}: {value}", -1);
+    }
+
+    private static (string rawLine, int lineIndex) FindRawLineByValue(string[] lines, string value)
+    {
+        // Try to find a line containing this value
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var trimmed = lines[i].Trim();
+            if (trimmed.Contains(value))
+            {
+                return (trimmed, i);
+            }
+        }
+
+        // Fallback with unknown index
+        return (value, -1);
     }
 }

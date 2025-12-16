@@ -32,5 +32,11 @@ public class HumanizedRule
     public string SuggestedFix { get; set; } = string.Empty;
     public string FixReason { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The 0-based line index in the original file where this rule was found.
+    /// -1 indicates the line index is unknown or not applicable.
+    /// </summary>
+    public int LineIndex { get; set; } = -1;
+
     public bool HasFix => !string.IsNullOrEmpty(SuggestedFix);
 }

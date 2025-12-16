@@ -1,0 +1,466 @@
+{
+  "formatName": "Rsyslog",
+  "description": "Configuration du daemon rsyslog",
+  "version": "1.0",
+  "filePatterns": ["rsyslog.conf", "*/rsyslog.d/*"],
+  "fileExtensions": [".conf"],
+  "syntax": "SpaceSeparated",
+  "commentChar": "#",
+  "keyValueSeparator": " ",
+  "documentationUrl": "https://www.rsyslog.com/doc/",
+  "parameterCategories": [
+    {
+      "name": "Modules",
+      "description": "Chargement des modules rsyslog",
+      "icon": "🔌",
+      "order": 1,
+      "parameters": [
+        {
+          "key": "$ModLoad imuxsock",
+          "displayName": "Socket Unix local",
+          "description": "Reçoit les logs via /dev/log (socket Unix)",
+          "dataType": "String",
+          "defaultValue": "$ModLoad imuxsock",
+          "example": "$ModLoad imuxsock",
+          "tags": ["module", "local"]
+        },
+        {
+          "key": "$ModLoad imjournal",
+          "displayName": "Journal systemd",
+          "description": "Reçoit les logs depuis le journal systemd",
+          "dataType": "String",
+          "defaultValue": "$ModLoad imjournal",
+          "example": "$ModLoad imjournal",
+          "tags": ["module", "systemd"]
+        },
+        {
+          "key": "$ModLoad imklog",
+          "displayName": "Logs kernel",
+          "description": "Reçoit les messages du kernel",
+          "dataType": "String",
+          "defaultValue": "$ModLoad imklog",
+          "example": "$ModLoad imklog",
+          "tags": ["module", "kernel"]
+        },
+        {
+          "key": "$ModLoad imudp",
+          "displayName": "Réception UDP",
+          "description": "Active la réception de logs via UDP (non fiable)",
+          "dataType": "String",
+          "example": "$ModLoad imudp",
+          "securityLevel": "Warning",
+          "tags": ["module", "réseau", "UDP"]
+        },
+        {
+          "key": "$ModLoad imtcp",
+          "displayName": "Réception TCP",
+          "description": "Active la réception de logs via TCP (fiable)",
+          "dataType": "String",
+          "example": "$ModLoad imtcp",
+          "tags": ["module", "réseau", "TCP"]
+        },
+        {
+          "key": "$ModLoad imrelp",
+          "displayName": "Réception RELP",
+          "description": "Active RELP (Reliable Event Logging Protocol)",
+          "dataType": "String",
+          "example": "$ModLoad imrelp",
+          "securityLevel": "GoodPractice",
+          "tags": ["module", "réseau", "RELP"]
+        },
+        {
+          "key": "$ModLoad omrelp",
+          "displayName": "Envoi RELP",
+          "description": "Active l'envoi de logs via RELP",
+          "dataType": "String",
+          "example": "$ModLoad omrelp",
+          "tags": ["module", "réseau"]
+        }
+      ]
+    },
+    {
+      "name": "Réception réseau",
+      "description": "Configuration de la réception de logs distants",
+      "icon": "🌐",
+      "order": 2,
+      "parameters": [
+        {
+          "key": "$UDPServerRun",
+          "displayName": "Port UDP",
+          "description": "Port d'écoute pour les logs UDP",
+          "dataType": "Port",
+          "defaultValue": 514,
+          "example": "$UDPServerRun 514",
+          "securityLevel": "Warning",
+          "tags": ["réseau", "UDP"]
+        },
+        {
+          "key": "$InputTCPServerRun",
+          "displayName": "Port TCP",
+          "description": "Port d'écoute pour les logs TCP",
+          "dataType": "Port",
+          "defaultValue": 514,
+          "example": "$InputTCPServerRun 514",
+          "tags": ["réseau", "TCP"]
+        },
+        {
+          "key": "$InputRELPServerRun",
+          "displayName": "Port RELP",
+          "description": "Port d'écoute pour les logs RELP",
+          "dataType": "Port",
+          "defaultValue": 2514,
+          "example": "$InputRELPServerRun 2514",
+          "tags": ["réseau", "RELP"]
+        },
+        {
+          "key": "$AllowedSender",
+          "displayName": "Expéditeurs autorisés",
+          "description": "Restreint les sources de logs autorisées",
+          "dataType": "String",
+          "example": "$AllowedSender UDP, 192.168.1.0/24",
+          "tags": ["sécurité", "ACL"]
+        }
+      ]
+    },
+    {
+      "name": "Fichiers",
+      "description": "Paramètres des fichiers de logs",
+      "icon": "📁",
+      "order": 3,
+      "parameters": [
+        {
+          "key": "$WorkDirectory",
+          "displayName": "Répertoire de travail",
+          "description": "Répertoire pour les fichiers temporaires et queues",
+          "dataType": "Path",
+          "defaultValue": "/var/lib/rsyslog",
+          "example": "$WorkDirectory /var/lib/rsyslog",
+          "tags": ["fichiers"]
+        },
+        {
+          "key": "$FileOwner",
+          "displayName": "Propriétaire des fichiers",
+          "description": "Utilisateur propriétaire des fichiers de log créés",
+          "dataType": "String",
+          "defaultValue": "root",
+          "example": "$FileOwner syslog",
+          "tags": ["fichiers", "permissions"]
+        },
+        {
+          "key": "$FileGroup",
+          "displayName": "Groupe des fichiers",
+          "description": "Groupe propriétaire des fichiers de log créés",
+          "dataType": "String",
+          "defaultValue": "adm",
+          "example": "$FileGroup adm",
+          "tags": ["fichiers", "permissions"]
+        },
+        {
+          "key": "$FileCreateMode",
+          "displayName": "Permissions des fichiers",
+          "description": "Permissions Unix des fichiers de log créés",
+          "dataType": "Enum",
+          "defaultValue": "0640",
+          "enumValues": [
+            { "value": "0600", "displayName": "0600 (propriétaire seul)", "severity": "GoodPractice" },
+            { "value": "0640", "displayName": "0640 (groupe lecture)", "severity": "GoodPractice" },
+            { "value": "0644", "displayName": "0644 (tous lecture)", "severity": "Warning" }
+          ],
+          "example": "$FileCreateMode 0640",
+          "tags": ["fichiers", "permissions", "sécurité"]
+        },
+        {
+          "key": "$DirCreateMode",
+          "displayName": "Permissions des répertoires",
+          "description": "Permissions Unix des répertoires créés",
+          "dataType": "Enum",
+          "defaultValue": "0755",
+          "enumValues": [
+            { "value": "0700", "displayName": "0700 (propriétaire seul)", "severity": "GoodPractice" },
+            { "value": "0750", "displayName": "0750 (groupe accès)", "severity": "GoodPractice" },
+            { "value": "0755", "displayName": "0755 (tous accès)", "severity": "Info" }
+          ],
+          "example": "$DirCreateMode 0750",
+          "tags": ["fichiers", "permissions"]
+        },
+        {
+          "key": "$Umask",
+          "displayName": "Umask",
+          "description": "Masque de création de fichiers",
+          "dataType": "String",
+          "defaultValue": "0000",
+          "example": "$Umask 0022",
+          "tags": ["fichiers", "permissions"]
+        }
+      ]
+    },
+    {
+      "name": "Envoi distant",
+      "description": "Configuration de l'envoi vers des serveurs distants",
+      "icon": "📤",
+      "order": 4,
+      "parameters": [
+        {
+          "key": "*.* @@",
+          "displayName": "Envoi TCP (tous logs)",
+          "description": "Envoie tous les logs via TCP vers un serveur distant",
+          "dataType": "String",
+          "example": "*.* @@192.168.1.100:514",
+          "securityLevel": "GoodPractice",
+          "tags": ["distant", "TCP"]
+        },
+        {
+          "key": "*.* @",
+          "displayName": "Envoi UDP (tous logs)",
+          "description": "Envoie tous les logs via UDP vers un serveur distant",
+          "dataType": "String",
+          "example": "*.* @192.168.1.100:514",
+          "securityLevel": "Warning",
+          "tags": ["distant", "UDP"]
+        },
+        {
+          "key": "auth,authpriv.* @@",
+          "displayName": "Envoi auth TCP",
+          "description": "Envoie les logs d'authentification via TCP",
+          "dataType": "String",
+          "example": "auth,authpriv.* @@logserver.example.com:514",
+          "tags": ["distant", "sécurité"]
+        },
+        {
+          "key": ":omrelp:",
+          "displayName": "Envoi RELP",
+          "description": "Envoie les logs via RELP (plus fiable)",
+          "dataType": "String",
+          "example": "*.* :omrelp:logserver.example.com:2514",
+          "securityLevel": "GoodPractice",
+          "tags": ["distant", "RELP"]
+        }
+      ]
+    },
+    {
+      "name": "Règles de routage",
+      "description": "Règles de routage des logs vers fichiers locaux",
+      "icon": "📋",
+      "order": 5,
+      "parameters": [
+        {
+          "key": "auth,authpriv.*",
+          "displayName": "Logs authentification",
+          "description": "Enregistre les logs d'authentification",
+          "dataType": "String",
+          "defaultValue": "/var/log/auth.log",
+          "example": "auth,authpriv.* /var/log/auth.log",
+          "tags": ["routage", "sécurité"]
+        },
+        {
+          "key": "*.*;auth,authpriv.none",
+          "displayName": "Logs système (sauf auth)",
+          "description": "Tous les logs sauf authentification",
+          "dataType": "String",
+          "defaultValue": "/var/log/syslog",
+          "example": "*.*;auth,authpriv.none /var/log/syslog",
+          "tags": ["routage"]
+        },
+        {
+          "key": "kern.*",
+          "displayName": "Logs kernel",
+          "description": "Messages du noyau Linux",
+          "dataType": "String",
+          "defaultValue": "/var/log/kern.log",
+          "example": "kern.* /var/log/kern.log",
+          "tags": ["routage", "kernel"]
+        },
+        {
+          "key": "mail.*",
+          "displayName": "Logs mail",
+          "description": "Logs du serveur de messagerie",
+          "dataType": "String",
+          "defaultValue": "/var/log/mail.log",
+          "example": "mail.* /var/log/mail.log",
+          "tags": ["routage", "mail"]
+        },
+        {
+          "key": "cron.*",
+          "displayName": "Logs cron",
+          "description": "Logs des tâches planifiées",
+          "dataType": "String",
+          "defaultValue": "/var/log/cron.log",
+          "example": "cron.* /var/log/cron.log",
+          "tags": ["routage", "cron"]
+        },
+        {
+          "key": "*.emerg",
+          "displayName": "Urgences",
+          "description": "Messages d'urgence à tous les utilisateurs",
+          "dataType": "String",
+          "defaultValue": ":omusrmsg:*",
+          "example": "*.emerg :omusrmsg:*",
+          "tags": ["routage", "urgence"]
+        },
+        {
+          "key": "local0.*",
+          "displayName": "Facility local0",
+          "description": "Logs personnalisés local0",
+          "dataType": "String",
+          "example": "local0.* /var/log/local0.log",
+          "tags": ["routage", "custom"]
+        },
+        {
+          "key": "local7.*",
+          "displayName": "Facility local7",
+          "description": "Logs personnalisés local7 (souvent boot)",
+          "dataType": "String",
+          "example": "local7.* /var/log/boot.log",
+          "tags": ["routage", "custom"]
+        }
+      ]
+    },
+    {
+      "name": "Queue",
+      "description": "Configuration des files d'attente",
+      "icon": "📊",
+      "order": 6,
+      "parameters": [
+        {
+          "key": "$ActionQueueType",
+          "displayName": "Type de queue",
+          "description": "Type de file d'attente pour les actions",
+          "dataType": "Enum",
+          "defaultValue": "Direct",
+          "enumValues": [
+            { "value": "Direct", "displayName": "Direct (synchrone)", "severity": "Info" },
+            { "value": "LinkedList", "displayName": "LinkedList (async mémoire)", "severity": "GoodPractice" },
+            { "value": "FixedArray", "displayName": "FixedArray (async rapide)", "severity": "GoodPractice" },
+            { "value": "Disk", "displayName": "Disk (persistant)", "severity": "GoodPractice" }
+          ],
+          "example": "$ActionQueueType LinkedList",
+          "tags": ["queue", "performance"]
+        },
+        {
+          "key": "$ActionQueueFileName",
+          "displayName": "Fichier de queue",
+          "description": "Nom de base du fichier de queue sur disque",
+          "dataType": "String",
+          "example": "$ActionQueueFileName fwdRule1",
+          "tags": ["queue", "persistance"]
+        },
+        {
+          "key": "$ActionQueueMaxDiskSpace",
+          "displayName": "Espace disque max",
+          "description": "Espace disque maximum pour la queue",
+          "dataType": "Size",
+          "defaultValue": "1g",
+          "example": "$ActionQueueMaxDiskSpace 1g",
+          "tags": ["queue", "limite"]
+        },
+        {
+          "key": "$ActionQueueSaveOnShutdown",
+          "displayName": "Sauvegarder à l'arrêt",
+          "description": "Sauvegarde la queue lors de l'arrêt du service",
+          "dataType": "Enum",
+          "enumValues": [
+            { "value": "on", "displayName": "Activé", "severity": "GoodPractice" },
+            { "value": "off", "displayName": "Désactivé", "severity": "Warning" }
+          ],
+          "example": "$ActionQueueSaveOnShutdown on",
+          "tags": ["queue", "persistance"]
+        },
+        {
+          "key": "$ActionResumeRetryCount",
+          "displayName": "Tentatives de reprise",
+          "description": "Nombre de tentatives de reconnexion (-1 = infini)",
+          "dataType": "Integer",
+          "defaultValue": -1,
+          "example": "$ActionResumeRetryCount -1",
+          "tags": ["queue", "fiabilité"]
+        }
+      ]
+    },
+    {
+      "name": "TLS/Sécurité",
+      "description": "Configuration du chiffrement TLS",
+      "icon": "🔒",
+      "order": 7,
+      "parameters": [
+        {
+          "key": "$DefaultNetstreamDriver",
+          "displayName": "Driver réseau",
+          "description": "Driver de chiffrement par défaut",
+          "dataType": "Enum",
+          "enumValues": [
+            { "value": "gtls", "displayName": "GnuTLS", "severity": "GoodPractice" },
+            { "value": "ossl", "displayName": "OpenSSL", "severity": "GoodPractice" }
+          ],
+          "example": "$DefaultNetstreamDriver gtls",
+          "tags": ["TLS", "sécurité"]
+        },
+        {
+          "key": "$DefaultNetstreamDriverCAFile",
+          "displayName": "Certificat CA",
+          "description": "Chemin vers le certificat de l'autorité de certification",
+          "dataType": "Path",
+          "example": "$DefaultNetstreamDriverCAFile /etc/rsyslog.d/ca.pem",
+          "tags": ["TLS", "certificat"]
+        },
+        {
+          "key": "$DefaultNetstreamDriverCertFile",
+          "displayName": "Certificat serveur",
+          "description": "Chemin vers le certificat du serveur",
+          "dataType": "Path",
+          "example": "$DefaultNetstreamDriverCertFile /etc/rsyslog.d/cert.pem",
+          "tags": ["TLS", "certificat"]
+        },
+        {
+          "key": "$DefaultNetstreamDriverKeyFile",
+          "displayName": "Clé privée",
+          "description": "Chemin vers la clé privée du serveur",
+          "dataType": "Path",
+          "example": "$DefaultNetstreamDriverKeyFile /etc/rsyslog.d/key.pem",
+          "tags": ["TLS", "certificat"]
+        },
+        {
+          "key": "$ActionSendStreamDriverMode",
+          "displayName": "Mode TLS sortant",
+          "description": "Active TLS pour les connexions sortantes",
+          "dataType": "Enum",
+          "enumValues": [
+            { "value": "0", "displayName": "Désactivé", "severity": "Warning" },
+            { "value": "1", "displayName": "Activé", "severity": "GoodPractice" }
+          ],
+          "example": "$ActionSendStreamDriverMode 1",
+          "tags": ["TLS", "sortant"]
+        },
+        {
+          "key": "$ActionSendStreamDriverAuthMode",
+          "displayName": "Auth TLS sortante",
+          "description": "Mode d'authentification TLS pour les connexions sortantes",
+          "dataType": "Enum",
+          "enumValues": [
+            { "value": "anon", "displayName": "Anonyme", "severity": "Warning" },
+            { "value": "x509/name", "displayName": "Certificat X.509", "severity": "GoodPractice" },
+            { "value": "x509/fingerprint", "displayName": "Empreinte X.509", "severity": "GoodPractice" }
+          ],
+          "example": "$ActionSendStreamDriverAuthMode x509/name",
+          "tags": ["TLS", "authentification"]
+        }
+      ]
+    },
+    {
+      "name": "Inclusions",
+      "description": "Inclusion de fichiers de configuration",
+      "icon": "📎",
+      "order": 8,
+      "parameters": [
+        {
+          "key": "$IncludeConfig",
+          "displayName": "Inclure configuration",
+          "description": "Inclut des fichiers de configuration additionnels",
+          "dataType": "Path",
+          "defaultValue": "/etc/rsyslog.d/*.conf",
+          "example": "$IncludeConfig /etc/rsyslog.d/*.conf",
+          "tags": ["include"]
+        }
+      ]
+    }
+  ]
+}

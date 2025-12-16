@@ -529,6 +529,7 @@ public class MermaidDiagramGenerator : IDiagramGenerator
         {
             var serviceId = SanitizeMermaidId(serviceName!);
             sb.AppendLine($"    Docker --> {serviceId}[{serviceName}]");
+            sb.AppendLine($"    click {serviceId} call onNodeClick(\"{serviceName}:\")");
 
             // Check image for database styling
             var imageRule = rules.FirstOrDefault(r =>

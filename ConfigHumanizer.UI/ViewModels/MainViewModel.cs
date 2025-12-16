@@ -79,6 +79,11 @@ public class MainViewModel : INotifyPropertyChanged
     // Selection
     private HumanizedRule? _selectedRule;
 
+    // Dashboard
+    private ObservableCollection<FileAnalysisSummary> _dashboardItems = new();
+    private bool _isDashboardVisible;
+    private string _scannedFolderPath = string.Empty;
+
     public MainViewModel() : this(new FileService())
     {
     }
@@ -112,6 +117,9 @@ public class MainViewModel : INotifyPropertyChanged
         FocusSearchCommand = new RelayCommand(FocusSearch);
         ResetFiltersCommand = new RelayCommand(ResetFilters);
         OpenParameterEditorCommand = new RelayCommand(OpenParameterEditor, CanOpenParameterEditor);
+        OpenFolderCommand = new RelayCommand(OpenFolder);
+        OpenDashboardFileCommand = new RelayCommand(OpenDashboardFile);
+        CloseDashboardCommand = new RelayCommand(CloseDashboard);
 
         // Load recent files
         LoadRecentFiles();
@@ -145,6 +153,9 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand FocusSearchCommand { get; }
     public ICommand ResetFiltersCommand { get; }
     public ICommand OpenParameterEditorCommand { get; }
+    public ICommand OpenFolderCommand { get; }
+    public ICommand OpenDashboardFileCommand { get; }
+    public ICommand CloseDashboardCommand { get; }
     #endregion
 
     #region Events
@@ -200,6 +211,67 @@ public class MainViewModel : INotifyPropertyChanged
     }
 
     public string CurrentFileName => Path.GetFileName(_currentFilePath);
+
+    /// <summary>
+    /// Returns the appropriate AvalonEdit syntax highlighting name based on file extension.
+    /// </summary>
+    public string SyntaxHighlightingName => GetSyntaxHighlightingName(_currentFilePath);
+
+    private static string GetSyntaxHighlightingName(string filePath)
+    {
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        var fileName = Path.GetFileName(filePath).ToLowerInvariant();
+
+        return extension switch
+        {
+            // XML-based formats
+            ".xml" or ".config" or ".csproj" or ".xaml" or ".xsd" or ".xslt" or ".svg" => "XML",
+
+            // JSON
+            ".json" => "JavaScript",
+
+            // YAML
+            ".yaml" or ".yml" => "MarkDown", // AvalonEdit doesn't have native YAML, MarkDown is readable
+
+            // C# / .NET
+            ".cs" => "C#",
+            ".vb" => "VB",
+
+            // Web
+            ".html" or ".htm" => "HTML",
+            ".css" => "CSS",
+            ".js" => "JavaScript",
+            ".ts" => "JavaScript",
+
+            // Shell / Scripts
+            ".sh" or ".bash" => "MarkDown",
+            ".ps1" or ".psm1" => "PowerShell",
+            ".py" => "Python",
+
+            // SQL
+            ".sql" => "TSQL",
+
+            // C/C++
+            ".c" or ".h" => "C++",
+            ".cpp" or ".hpp" or ".cc" => "C++",
+
+            // Java
+            ".java" => "Java",
+
+            // PHP
+            ".php" => "PHP",
+
+            // Config files (use XML-like highlighting for structure visibility)
+            ".conf" or ".cfg" or ".ini" or ".tf" or ".hcl" => "MarkDown",
+
+            // Docker
+            _ when fileName == "dockerfile" || fileName.StartsWith("dockerfile.") => "MarkDown",
+            _ when fileName == "docker-compose.yml" || fileName == "docker-compose.yaml" => "MarkDown",
+
+            // Default
+            _ => "MarkDown" // MarkDown provides decent readability for config files
+        };
+    }
 
     public string FileContent
     {
@@ -380,6 +452,32 @@ public class MainViewModel : INotifyPropertyChanged
     }
 
     public bool HasRecentFiles => RecentFiles.Count > 0;
+    #endregion
+
+    #region Dashboard Properties
+    public ObservableCollection<FileAnalysisSummary> DashboardItems
+    {
+        get => _dashboardItems;
+        set => SetProperty(ref _dashboardItems, value);
+    }
+
+    public bool IsDashboardVisible
+    {
+        get => _isDashboardVisible;
+        set => SetProperty(ref _isDashboardVisible, value);
+    }
+
+    public string ScannedFolderPath
+    {
+        get => _scannedFolderPath;
+        set => SetProperty(ref _scannedFolderPath, value);
+    }
+
+    public int DashboardTotalFiles => DashboardItems.Count;
+    public int DashboardCriticalFiles => DashboardItems.Count(f => f.HealthScore <= 50);
+    public int DashboardWarningFiles => DashboardItems.Count(f => f.HealthScore > 50 && f.HealthScore <= 80);
+    public int DashboardHealthyFiles => DashboardItems.Count(f => f.HealthScore > 80);
+    public double DashboardAverageScore => DashboardItems.Count > 0 ? DashboardItems.Average(f => f.HealthScore) : 0;
     #endregion
 
     #region Core Methods
@@ -563,16 +661,12 @@ public class MainViewModel : INotifyPropertyChanged
         var textColor = darkMode ? "#cccccc" : "#333333";
         var theme = darkMode ? "dark" : "default";
 
-        // Mermaid 11.4.0 with SRI (Subresource Integrity) for security
-        const string mermaidVersion = "11.4.0";
-        const string mermaidSri = "sha384-sPe5cvleqMFiPNELO0mSy9nYv9bRKuqICe9LwJp8LZkEiwWnJVaJcNcwYmpb8RCU";
-
+        // Use mermaid 10.x for better compatibility
         return $$"""
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
-                <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
                 <style>
                     body {
                         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -591,26 +685,39 @@ public class MainViewModel : INotifyPropertyChanged
                         border-radius: 10px;
                         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                     }
+                    .error {
+                        color: #c62828;
+                        padding: 20px;
+                        text-align: center;
+                    }
                 </style>
             </head>
             <body>
                 <div class="mermaid">
             {{mermaidCode}}
                 </div>
-                <script src="https://cdn.jsdelivr.net/npm/mermaid@{{mermaidVersion}}/dist/mermaid.min.js"
-                        integrity="{{mermaidSri}}"
-                        crossorigin="anonymous"></script>
+                <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
                 <script>
-                    mermaid.initialize({
-                        startOnLoad: true,
-                        theme: '{{theme}}',
-                        securityLevel: 'strict',
-                        flowchart: {
-                            useMaxWidth: true,
-                            htmlLabels: true,
-                            curve: 'basis'
+                    function onNodeClick(searchText) {
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(searchText);
                         }
-                    });
+                    }
+
+                    try {
+                        mermaid.initialize({
+                            startOnLoad: true,
+                            theme: '{{theme}}',
+                            securityLevel: 'loose',
+                            flowchart: {
+                                useMaxWidth: true,
+                                htmlLabels: true,
+                                curve: 'basis'
+                            }
+                        });
+                    } catch (e) {
+                        document.body.innerHTML = '<div class="error">Erreur de chargement du diagramme: ' + e.message + '</div>';
+                    }
                 </script>
             </body>
             </html>
@@ -625,16 +732,13 @@ public class MainViewModel : INotifyPropertyChanged
         if (parameter is not HumanizedRule rule || !rule.HasFix)
             return;
 
-        var result = MessageBox.Show(
-            $"Voulez-vous appliquer ce correctif ?\n\n" +
-            $"Avant : {rule.RawLine}\n" +
-            $"Après : {rule.SuggestedFix}\n\n" +
-            $"Raison : {rule.FixReason}",
-            "Confirmer le correctif",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+        var confirmWindow = new FixConfirmationWindow
+        {
+            Owner = Application.Current.MainWindow
+        };
+        confirmWindow.Setup(rule.RawLine, rule.SuggestedFix, rule.FixReason);
 
-        if (result == MessageBoxResult.Yes)
+        if (confirmWindow.ShowDialog() == true)
         {
             ApplyFix(rule);
         }
@@ -645,12 +749,62 @@ public class MainViewModel : INotifyPropertyChanged
         // Save current state for undo
         SaveToUndoHistory();
 
-        // Apply fix without triggering debounce
-        _fileContent = _fileContent.Replace(rule.RawLine, rule.SuggestedFix);
-        OnPropertyChanged(nameof(FileContent));
-        ParseConfig();
+        // Split content into lines for targeted replacement
+        var lines = _fileContent.Split('\n').ToList();
+        var fixApplied = false;
+        var usedFallback = false;
 
-        StatusMessage = $"✅ Correctif appliqué : {rule.Key} → {rule.SuggestedFix}";
+        // Try line-based replacement if we have a valid line index
+        if (rule.LineIndex >= 0 && rule.LineIndex < lines.Count)
+        {
+            var targetLine = lines[rule.LineIndex];
+
+            // Sanity check: verify the line contains the expected content
+            if (targetLine.Trim() == rule.RawLine.Trim() || targetLine.Contains(rule.RawLine.Trim()))
+            {
+                // Replace the entire line, preserving leading whitespace
+                var leadingWhitespace = targetLine.Length - targetLine.TrimStart().Length;
+                var prefix = targetLine[..leadingWhitespace];
+                lines[rule.LineIndex] = prefix + rule.SuggestedFix;
+                fixApplied = true;
+            }
+        }
+
+        // Fallback to string replacement if line-based failed
+        if (!fixApplied)
+        {
+            var newContent = _fileContent.Replace(rule.RawLine, rule.SuggestedFix);
+            if (newContent != _fileContent)
+            {
+                _fileContent = newContent;
+                fixApplied = true;
+                usedFallback = true;
+            }
+        }
+        else
+        {
+            // Join lines back together
+            _fileContent = string.Join("\n", lines);
+        }
+
+        if (fixApplied)
+        {
+            OnPropertyChanged(nameof(FileContent));
+            ParseConfig();
+
+            if (usedFallback)
+            {
+                StatusMessage = $"⚠️ Ligne décalée, remplacement approximatif : {rule.Key} → {rule.SuggestedFix}";
+            }
+            else
+            {
+                StatusMessage = $"✅ Correctif appliqué : {rule.Key} → {rule.SuggestedFix}";
+            }
+        }
+        else
+        {
+            StatusMessage = $"❌ Impossible d'appliquer le correctif : ligne non trouvée";
+        }
     }
 
     private void SaveToUndoHistory()
@@ -921,6 +1075,131 @@ public class MainViewModel : INotifyPropertyChanged
         {
             LoadFile(recent.Path);
         }
+    }
+
+    private void OpenFolder()
+    {
+        var path = _fileService.OpenFolder();
+        if (!string.IsNullOrEmpty(path))
+        {
+            ScannedFolderPath = path;
+            IsDashboardVisible = true;
+            _ = ScanFolderAsync(path);
+        }
+    }
+
+    private async Task ScanFolderAsync(string folderPath)
+    {
+        IsLoading = true;
+        StatusMessage = "Scanning folder...";
+
+        try
+        {
+            var items = new List<FileAnalysisSummary>();
+
+            // Get all files recursively
+            var files = await Task.Run(() => Directory.GetFiles(folderPath, "*.*", SearchOption.AllDirectories));
+
+            var processedCount = 0;
+            var totalFiles = files.Length;
+
+            foreach (var filePath in files)
+            {
+                try
+                {
+                    // Skip binary files and very large files
+                    var fileInfo = new FileInfo(filePath);
+                    if (fileInfo.Length > 5 * 1024 * 1024) continue; // Skip files > 5MB
+
+                    var content = await Task.Run(() => File.ReadAllText(filePath));
+
+                    // Detect format
+                    var formatName = DetectFormatName(filePath, content);
+
+                    // Skip unsupported formats
+                    if (formatName == "Generic" || string.IsNullOrEmpty(formatName))
+                        continue;
+
+                    // Parse the file
+                    var parser = ParserFactory.GetParser(filePath, content, _ruleEngine);
+                    var rules = parser.Parse(content);
+
+                    if (rules.Count == 0) continue;
+
+                    // Calculate stats
+                    var criticalCount = rules.Count(r => r.Severity == Severity.CriticalSecurity);
+                    var warningCount = rules.Count(r => r.Severity == Severity.Warning);
+                    var infoCount = rules.Count(r => r.Severity == Severity.Info);
+                    var goodCount = rules.Count(r => r.Severity == Severity.GoodPractice);
+                    var totalRules = rules.Count;
+
+                    double healthScore = 100;
+                    if (totalRules > 0)
+                    {
+                        var weightedScore = (goodCount * 100) + (infoCount * 75) + (warningCount * 25) + (criticalCount * 0);
+                        healthScore = weightedScore / (double)totalRules;
+                    }
+
+                    items.Add(new FileAnalysisSummary
+                    {
+                        FilePath = filePath,
+                        FileName = Path.GetFileName(filePath),
+                        Format = formatName,
+                        HealthScore = healthScore,
+                        CriticalCount = criticalCount,
+                        WarningCount = warningCount,
+                        InfoCount = infoCount,
+                        GoodCount = goodCount,
+                        TotalRules = totalRules
+                    });
+
+                    processedCount++;
+                    StatusMessage = $"Scanning... {processedCount} files analyzed";
+                }
+                catch
+                {
+                    // Skip files that can't be read
+                }
+            }
+
+            // Sort by health score (worst first)
+            items = items.OrderBy(i => i.HealthScore).ToList();
+
+            // Update on UI thread
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                DashboardItems = new ObservableCollection<FileAnalysisSummary>(items);
+                OnPropertyChanged(nameof(DashboardTotalFiles));
+                OnPropertyChanged(nameof(DashboardCriticalFiles));
+                OnPropertyChanged(nameof(DashboardWarningFiles));
+                OnPropertyChanged(nameof(DashboardHealthyFiles));
+                OnPropertyChanged(nameof(DashboardAverageScore));
+            });
+
+            StatusMessage = $"Scan complete: {items.Count} configuration files found";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Scan error: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void OpenDashboardFile(object? parameter)
+    {
+        if (parameter is FileAnalysisSummary item)
+        {
+            LoadFile(item.FilePath);
+            IsDashboardVisible = false;
+        }
+    }
+
+    private void CloseDashboard()
+    {
+        IsDashboardVisible = false;
     }
     #endregion
 

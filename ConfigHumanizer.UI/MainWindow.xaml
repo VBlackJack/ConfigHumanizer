@@ -7,6 +7,7 @@
         xmlns:viewModels="clr-namespace:ConfigHumanizer.UI.ViewModels"
         xmlns:converters="clr-namespace:ConfigHumanizer.UI.Converters"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         mc:Ignorable="d"
         Title="ConfigHumanizer - Analyseur de Configuration"
         Height="800" Width="1400"
@@ -41,6 +42,7 @@
         <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
         <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
 
         <!-- Tab Control Style -->
         <Style TargetType="TabControl">
@@ -113,6 +115,16 @@
                         </StackPanel>
                     </Button>
 
+                    <Button Command="{Binding OpenFolderCommand}"
+                            Style="{StaticResource ModernButton}"
+                            ToolTip="Scanner un dossier de configuration"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x1F4C1;" FontSize="14" Margin="0,0,6,0" />
+                            <TextBlock Text="Dossier" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
                     <Button Command="{Binding SaveConfigCommand}"
                             Style="{StaticResource PrimaryButton}"
                             ToolTip="Sauvegarder le fichier (Ctrl+S)"
@@ -170,17 +182,6 @@
                         </StackPanel>
                     </Button>
 
-                    <Rectangle Width="1" Fill="{StaticResource BorderColor}" Margin="8,0" />
-
-                    <Button Command="{Binding OpenParameterEditorCommand}"
-                            Style="{StaticResource PrimaryButton}"
-                            ToolTip="Ajouter un paramètre (Ctrl+N)"
-                            Margin="0,0,8,0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#x2795;" FontSize="14" Margin="0,0,6,0" />
-                            <TextBlock Text="Ajouter" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
                 </StackPanel>
 
                 <!-- Center: Current File -->
@@ -381,7 +382,233 @@
         </Border>
 
         <!-- ==================== MAIN CONTENT ==================== -->
-        <TabControl Grid.Row="2" Margin="10,10,10,0">
+        <Grid Grid.Row="2" Margin="10,10,10,0">
+            <!-- Dashboard View (visible when IsDashboardVisible is true) -->
+            <Border Background="{StaticResource CardBackground}"
+                    BorderBrush="{StaticResource BorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Visibility="{Binding IsDashboardVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Dashboard Header -->
+                    <Border Grid.Row="0" Background="{StaticResource PrimaryColor}" Padding="16">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Dashboard - Analyse de Dossier"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="White"/>
+                                <TextBlock Text="{Binding ScannedFolderPath}"
+                                           FontSize="12"
+                                           Foreground="White"
+                                           Opacity="0.8"
+                                           Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <Button Command="{Binding CloseDashboardCommand}"
+                                    Style="{StaticResource IconButton}"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Padding="8">
+                                <TextBlock Text="✕" FontSize="16" Foreground="White"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Dashboard Stats -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="16,12">
+                        <Border Style="{StaticResource StatCard}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding DashboardTotalFiles}"
+                                           FontSize="24" FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryColor}"/>
+                                <TextBlock Text="Fichiers" FontSize="11"
+                                           Foreground="{StaticResource TextMuted}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}">
+                            <Grid>
+                                <Rectangle Width="4" HorizontalAlignment="Left" Margin="-17,0,0,0" Fill="#E74C3C"/>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DashboardCriticalFiles}"
+                                               FontSize="24" FontWeight="Bold" Foreground="#E74C3C"/>
+                                    <TextBlock Text="Critiques" FontSize="11"
+                                               Foreground="{StaticResource TextMuted}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}">
+                            <Grid>
+                                <Rectangle Width="4" HorizontalAlignment="Left" Margin="-17,0,0,0" Fill="#F39C12"/>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DashboardWarningFiles}"
+                                               FontSize="24" FontWeight="Bold" Foreground="#F39C12"/>
+                                    <TextBlock Text="Attention" FontSize="11"
+                                               Foreground="{StaticResource TextMuted}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}">
+                            <Grid>
+                                <Rectangle Width="4" HorizontalAlignment="Left" Margin="-17,0,0,0" Fill="#4CAF50"/>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DashboardHealthyFiles}"
+                                               FontSize="24" FontWeight="Bold" Foreground="#4CAF50"/>
+                                    <TextBlock Text="Sains" FontSize="11"
+                                               Foreground="{StaticResource TextMuted}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}">
+                            <StackPanel>
+                                <TextBlock FontSize="24" FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryColor}">
+                                    <Run Text="{Binding DashboardAverageScore, StringFormat={}{0:F0}}"/><Run Text="%"/>
+                                </TextBlock>
+                                <TextBlock Text="Score Moyen" FontSize="11"
+                                           Foreground="{StaticResource TextMuted}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Dashboard DataGrid -->
+                    <DataGrid Grid.Row="2"
+                              ItemsSource="{Binding DashboardItems}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              SelectionMode="Single"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              GridLinesVisibility="Horizontal"
+                              HeadersVisibility="Column"
+                              BorderThickness="0"
+                              Background="Transparent"
+                              RowBackground="{StaticResource CardBackground}"
+                              AlternatingRowBackground="#FAFAFA"
+                              Margin="16,0,16,16">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <EventSetter Event="MouseDoubleClick" Handler="DashboardRow_MouseDoubleClick"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource HoverColor}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <!-- Status Color -->
+                            <DataGridTemplateColumn Header="" Width="40">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Ellipse Width="12" Height="12"
+                                                 Fill="{Binding StatusColor, Converter={StaticResource StringToBrushConverter}}"
+                                                 HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- File Name -->
+                            <DataGridTextColumn Header="Fichier" Binding="{Binding FileName}" Width="200">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="4"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Format -->
+                            <DataGridTextColumn Header="Format" Binding="{Binding Format}" Width="120">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="4"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Health Score -->
+                            <DataGridTemplateColumn Header="Score" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="4">
+                                            <ProgressBar Value="{Binding HealthScore}"
+                                                         Maximum="100"
+                                                         Height="16"
+                                                         Background="#E0E0E0"
+                                                         Foreground="{Binding StatusColor, Converter={StaticResource StringToBrushConverter}}"/>
+                                            <TextBlock Text="{Binding HealthScore, StringFormat={}{0:F0}%}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="10"
+                                                       FontWeight="Bold"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Critical Count -->
+                            <DataGridTemplateColumn Header="Critiques" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#FFEBEE"
+                                                CornerRadius="10"
+                                                Padding="8,2"
+                                                HorizontalAlignment="Center"
+                                                Visibility="{Binding CriticalCount, Converter={StaticResource IntToVisibilityConverter}}">
+                                            <TextBlock Text="{Binding CriticalCount}"
+                                                       FontWeight="Bold"
+                                                       Foreground="#C62828"
+                                                       FontSize="11"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Warning Count -->
+                            <DataGridTemplateColumn Header="Alertes" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#FFF3E0"
+                                                CornerRadius="10"
+                                                Padding="8,2"
+                                                HorizontalAlignment="Center"
+                                                Visibility="{Binding WarningCount, Converter={StaticResource IntToVisibilityConverter}}">
+                                            <TextBlock Text="{Binding WarningCount}"
+                                                       FontWeight="Bold"
+                                                       Foreground="#E65100"
+                                                       FontSize="11"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- File Path -->
+                            <DataGridTextColumn Header="Chemin" Binding="{Binding FilePath}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Padding" Value="4"/>
+                                        <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <!-- Editor View (hidden when dashboard is visible) -->
+            <TabControl Visibility="{Binding IsDashboardVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}, ConverterParameter=Inverse}">
 
             <!-- Tab 1: Editor & Analysis -->
             <TabItem>
@@ -424,9 +651,11 @@
                                                Foreground="#606060" />
                                 </Grid>
                             </Border>
-                            <TextBox x:Name="CodeEditor"
-                                     Text="{Binding FileContent, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource CodeEditorTextBox}" />
+                            <avalonEdit:TextEditor x:Name="CodeEditor"
+                                                   FontFamily="Consolas"
+                                                   FontSize="14"
+                                                   ShowLineNumbers="True"
+                                                   SyntaxHighlighting="XML" />
                         </DockPanel>
                     </Border>
 
@@ -459,11 +688,57 @@
                             <DockPanel>
                                 <!-- Header -->
                                 <Grid DockPanel.Dock="Top" Margin="5,0,5,15">
-                                    <TextBlock Text="Résultats d'analyse"
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="Résultats d'analyse"
                                                FontWeight="SemiBold"
                                                FontSize="16"
+                                               VerticalAlignment="Center"
                                                Foreground="{StaticResource TextDark}" />
-                                    <TextBlock HorizontalAlignment="Right"
+
+                                    <!-- Bouton Ajouter bien visible -->
+                                    <Button Grid.Column="1"
+                                            Command="{Binding OpenParameterEditorCommand}"
+                                            ToolTip="Ajouter un paramètre de configuration (Ctrl+N)"
+                                            Margin="20,0,0,0"
+                                            Padding="14,8"
+                                            Background="#27AE60"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border"
+                                                        Background="{TemplateBinding Background}"
+                                                        CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="&#x2795;" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                                        <TextBlock Text="Ajouter un paramètre"
+                                                                   FontWeight="SemiBold"
+                                                                   FontSize="13"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#1E8449" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#196F3D" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+
+                                    <TextBlock Grid.Column="2"
+                                               HorizontalAlignment="Right"
                                                VerticalAlignment="Center"
                                                FontSize="12"
                                                Foreground="{StaticResource TextMuted}">
@@ -821,6 +1096,7 @@
                 </Border>
             </TabItem>
         </TabControl>
+        </Grid>
 
         <!-- ==================== STATUS BAR ==================== -->
         <Border Grid.Row="3"

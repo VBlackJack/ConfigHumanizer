@@ -15,7 +15,12 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using ConfigHumanizer.Core.Models;
 using ConfigHumanizer.UI.ViewModels;
+using ICSharpCode.AvalonEdit;
+using ICSharpCode.AvalonEdit.Highlighting;
+using Microsoft.Web.WebView2.Core;
 
 namespace ConfigHumanizer.UI;
 
@@ -48,6 +53,18 @@ public partial class MainWindow : Window
                 viewModel.FocusSearchRequested += ViewModel_FocusSearchRequested;
                 viewModel.HighlightLineRequested += ViewModel_HighlightLineRequested;
 
+                // Initialize CodeEditor with current content
+                CodeEditor.Text = viewModel.FileContent ?? string.Empty;
+
+                // Apply initial syntax highlighting
+                ApplySyntaxHighlighting(viewModel.SyntaxHighlightingName);
+
+                // Subscribe to CodeEditor.TextChanged to update ViewModel
+                CodeEditor.TextChanged += CodeEditor_TextChanged;
+
+                // Subscribe to WebView2 messages for diagram click-to-scroll
+                DiagramWebView.WebMessageReceived += DiagramWebView_WebMessageReceived;
+
                 // Initial render
                 if (!string.IsNullOrEmpty(viewModel.MermaidHtml))
                 {
@@ -62,10 +79,45 @@ public partial class MainWindow : Window
         }
     }
 
+    private void CodeEditor_TextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.FileContent = CodeEditor.Text;
+        }
+    }
+
     private void ViewModel_FocusSearchRequested(object? sender, EventArgs e)
     {
         SearchBox.Focus();
         SearchBox.SelectAll();
+    }
+
+    private void DiagramWebView_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        try
+        {
+            var searchText = e.TryGetWebMessageAsString();
+            if (string.IsNullOrEmpty(searchText))
+                return;
+
+            var index = CodeEditor.Text.IndexOf(searchText, StringComparison.Ordinal);
+            if (index >= 0)
+            {
+                // Get the line number from the document offset
+                var line = CodeEditor.Document.GetLineByOffset(index);
+                if (line != null)
+                {
+                    CodeEditor.ScrollToLine(line.LineNumber);
+                    CodeEditor.Select(index, searchText.Length);
+                    CodeEditor.Focus();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"WebMessageReceived failed: {ex.Message}");
+        }
     }
 
     private void ViewModel_HighlightLineRequested(object? sender, HighlightLineEventArgs e)
@@ -77,19 +129,15 @@ public partial class MainWindow : Window
                 // Focus the code editor
                 CodeEditor.Focus();
 
-                // Select the text
-                CodeEditor.SelectionStart = e.StartIndex;
-                CodeEditor.SelectionLength = e.Length;
+                // Select the text using AvalonEdit API
+                CodeEditor.Select(e.StartIndex, e.Length);
 
-                // Scroll to make the selection visible
-                var lineIndex = CodeEditor.GetLineIndexFromCharacterIndex(e.StartIndex);
-                if (lineIndex >= 0)
+                // Get the line number from the document offset
+                var line = CodeEditor.Document.GetLineByOffset(e.StartIndex);
+                if (line != null)
                 {
-                    CodeEditor.ScrollToLine(lineIndex);
+                    CodeEditor.ScrollToLine(line.LineNumber);
                 }
-
-                // Flash effect: briefly change selection background
-                // This provides visual feedback even if the TextBox loses focus
             }
             catch (Exception ex)
             {
@@ -100,7 +148,10 @@ public partial class MainWindow : Window
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.MermaidHtml) && sender is MainViewModel viewModel)
+        if (sender is not MainViewModel viewModel)
+            return;
+
+        if (e.PropertyName == nameof(MainViewModel.MermaidHtml))
         {
             // Update WebView2 content on UI thread
             Dispatcher.InvokeAsync(() =>
@@ -110,6 +161,44 @@ public partial class MainWindow : Window
                     DiagramWebView.NavigateToString(viewModel.MermaidHtml);
                 }
             });
+        }
+        else if (e.PropertyName == nameof(MainViewModel.FileContent))
+        {
+            // Update CodeEditor when ViewModel's FileContent changes (e.g., file loaded)
+            Dispatcher.InvokeAsync(() =>
+            {
+                var newContent = viewModel.FileContent ?? string.Empty;
+                if (CodeEditor.Text != newContent)
+                {
+                    CodeEditor.Text = newContent;
+                }
+            });
+        }
+        else if (e.PropertyName == nameof(MainViewModel.CurrentFilePath))
+        {
+            // Update syntax highlighting when a new file is loaded
+            Dispatcher.InvokeAsync(() =>
+            {
+                ApplySyntaxHighlighting(viewModel.SyntaxHighlightingName);
+            });
+        }
+    }
+
+    /// <summary>
+    /// Applies syntax highlighting to the code editor based on the highlighting name.
+    /// </summary>
+    private void ApplySyntaxHighlighting(string highlightingName)
+    {
+        try
+        {
+            var highlighting = HighlightingManager.Instance.GetDefinition(highlightingName);
+            CodeEditor.SyntaxHighlighting = highlighting;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to apply syntax highlighting '{highlightingName}': {ex.Message}");
+            // Fall back to no highlighting
+            CodeEditor.SyntaxHighlighting = null;
         }
     }
 
@@ -149,6 +238,17 @@ public partial class MainWindow : Window
             viewModel.LoadFile(recent.Path);
             // Reset selection so user can select the same file again
             RecentFilesCombo.SelectedItem = null;
+        }
+    }
+
+    private void DashboardRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is DataGridRow row && row.Item is FileAnalysisSummary item)
+        {
+            if (DataContext is MainViewModel viewModel)
+            {
+                viewModel.OpenDashboardFileCommand.Execute(item);
+            }
         }
     }
 }

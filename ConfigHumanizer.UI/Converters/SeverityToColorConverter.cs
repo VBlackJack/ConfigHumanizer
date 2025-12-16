@@ -258,3 +258,26 @@ public class SeverityToBadgeColorConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Converts boolean to Visibility with optional inversion via parameter.
+/// Set ConverterParameter to "Inverse" to invert the logic.
+/// </summary>
+public class InverseBooleanToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        var boolValue = value is bool b && b;
+        var inverse = parameter is string s && s.Equals("Inverse", StringComparison.OrdinalIgnoreCase);
+
+        if (inverse)
+            boolValue = !boolValue;
+
+        return boolValue ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

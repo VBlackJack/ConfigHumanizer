@@ -39,9 +39,9 @@ public class IniConfigParser : BaseConfigParser
 
         var lines = fileContent.Split('\n', StringSplitOptions.None);
 
-        foreach (var line in lines)
+        for (var i = 0; i < lines.Length; i++)
         {
-            var trimmedLine = line.Trim();
+            var trimmedLine = lines[i].Trim();
 
             // Skip empty lines and comments (starting with ; or #)
             if (string.IsNullOrWhiteSpace(trimmedLine) ||
@@ -53,7 +53,7 @@ public class IniConfigParser : BaseConfigParser
             if (trimmedLine.StartsWith('[') && trimmedLine.EndsWith(']'))
                 continue;
 
-            var rule = ParseLine(trimmedLine);
+            var rule = ParseLine(trimmedLine, i);
             if (rule != null)
             {
                 rules.Add(rule);
@@ -63,7 +63,7 @@ public class IniConfigParser : BaseConfigParser
         return rules;
     }
 
-    private HumanizedRule? ParseLine(string line)
+    private HumanizedRule? ParseLine(string line, int lineIndex)
     {
         // Split by '=' to get key and value
         var separatorIndex = line.IndexOf('=');
@@ -74,6 +74,6 @@ public class IniConfigParser : BaseConfigParser
         var value = line[(separatorIndex + 1)..].Trim();
 
         // Use rule engine if available
-        return MatchAndCreateRule(line, key, value);
+        return MatchAndCreateRule(line, key, value, lineIndex);
     }
 }

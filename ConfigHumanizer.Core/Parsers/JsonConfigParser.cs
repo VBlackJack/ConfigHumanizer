@@ -38,6 +38,8 @@ public class JsonConfigParser : BaseConfigParser
     {
     }
 
+    private string[] _lines = [];
+
     public override List<HumanizedRule> Parse(string fileContent)
     {
         var rules = new List<HumanizedRule>();
@@ -47,6 +49,7 @@ public class JsonConfigParser : BaseConfigParser
 
         try
         {
+            _lines = fileContent.Split('\n');
             using var document = JsonDocument.Parse(fileContent, JsonOptions);
             FlattenJson(document.RootElement, string.Empty, rules);
         }
@@ -82,27 +85,51 @@ public class JsonConfigParser : BaseConfigParser
 
             case JsonValueKind.String:
                 var stringValue = element.GetString() ?? string.Empty;
-                var stringRule = MatchAndCreateRule($"\"{prefix}\": \"{stringValue}\"", prefix, stringValue);
+                var (stringLine, stringLineIndex) = FindJsonLine(prefix, stringValue);
+                var stringRule = MatchAndCreateRule(stringLine, prefix, stringValue, stringLineIndex);
                 rules.Add(stringRule);
                 break;
 
             case JsonValueKind.Number:
                 var numValue = element.GetRawText();
-                var numRule = MatchAndCreateRule($"\"{prefix}\": {numValue}", prefix, numValue);
+                var (numLine, numLineIndex) = FindJsonLine(prefix, numValue);
+                var numRule = MatchAndCreateRule(numLine, prefix, numValue, numLineIndex);
                 rules.Add(numRule);
                 break;
 
             case JsonValueKind.True:
             case JsonValueKind.False:
                 var boolValue = element.GetBoolean().ToString().ToLowerInvariant();
-                var boolRule = MatchAndCreateRule($"\"{prefix}\": {boolValue}", prefix, boolValue);
+                var (boolLine, boolLineIndex) = FindJsonLine(prefix, boolValue);
+                var boolRule = MatchAndCreateRule(boolLine, prefix, boolValue, boolLineIndex);
                 rules.Add(boolRule);
                 break;
 
             case JsonValueKind.Null:
-                var nullRule = MatchAndCreateRule($"\"{prefix}\": null", prefix, "null");
+                var (nullLine, nullLineIndex) = FindJsonLine(prefix, "null");
+                var nullRule = MatchAndCreateRule(nullLine, prefix, "null", nullLineIndex);
                 rules.Add(nullRule);
                 break;
         }
+    }
+
+    private (string rawLine, int lineIndex) FindJsonLine(string key, string value)
+    {
+        // Extract the last part of the key for searching
+        var keyPart = key.Contains('.') ? key.Split('.').Last() : key;
+        keyPart = keyPart.TrimEnd(']').Split('[').First(); // Handle array notation
+
+        // Try to find a line containing this key and value
+        for (var i = 0; i < _lines.Length; i++)
+        {
+            var line = _lines[i];
+            if (line.Contains($"\"{keyPart}\"") && (line.Contains(value) || line.Contains($"\"{value}\"")))
+            {
+                return (line.Trim(), i);
+            }
+        }
+
+        // Fallback to constructed line with unknown index
+        return ($"\"{key}\": {(value == "null" || value == "true" || value == "false" || double.TryParse(value, out _) ? value : $"\"{value}\"")}", -1);
     }
 }

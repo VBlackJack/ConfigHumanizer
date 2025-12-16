@@ -39,15 +39,15 @@ public class SshdConfigParser : BaseConfigParser
 
         var lines = fileContent.Split('\n', StringSplitOptions.None);
 
-        foreach (var line in lines)
+        for (var i = 0; i < lines.Length; i++)
         {
-            var trimmedLine = line.Trim();
+            var trimmedLine = lines[i].Trim();
 
             // Skip empty lines and comments
             if (string.IsNullOrWhiteSpace(trimmedLine) || trimmedLine.StartsWith('#'))
                 continue;
 
-            var rule = ParseLine(trimmedLine);
+            var rule = ParseLine(trimmedLine, i);
             if (rule != null)
             {
                 rules.Add(rule);
@@ -57,7 +57,7 @@ public class SshdConfigParser : BaseConfigParser
         return rules;
     }
 
-    private HumanizedRule? ParseLine(string line)
+    private HumanizedRule? ParseLine(string line, int lineIndex)
     {
         // Split by whitespace to get key and value
         var parts = line.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -69,6 +69,6 @@ public class SshdConfigParser : BaseConfigParser
         var value = parts[1].Trim();
 
         // Use rule engine if available
-        return MatchAndCreateRule(line, key, value);
+        return MatchAndCreateRule(line, key, value, lineIndex);
     }
 }

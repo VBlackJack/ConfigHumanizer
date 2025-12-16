@@ -30,4 +30,9 @@ public interface IFileService
     /// Saves content to a file at the specified path.
     /// </summary>
     void SaveFile(string path, string content);
+
+    /// <summary>
+    /// Opens a folder browser dialog and returns the selected folder path, or null if canceled.
+    /// </summary>
+    string? OpenFolder();
 }

@@ -41,22 +41,22 @@ public class BlockConfigParser : BaseConfigParser
         var contextStack = new Stack<string>();
         var lines = fileContent.Split('\n', StringSplitOptions.None);
 
-        foreach (var rawLine in lines)
+        for (var i = 0; i < lines.Length; i++)
         {
-            var line = rawLine.Trim();
+            var line = lines[i].Trim();
 
             // Skip empty lines and comments
             if (string.IsNullOrWhiteSpace(line) || line.StartsWith('#'))
                 continue;
 
             // Process the line for blocks and directives
-            ProcessLine(line, rawLine, contextStack, rules);
+            ProcessLine(line, lines[i], contextStack, rules, i);
         }
 
         return rules;
     }
 
-    private void ProcessLine(string line, string rawLine, Stack<string> contextStack, List<HumanizedRule> rules)
+    private void ProcessLine(string line, string rawLine, Stack<string> contextStack, List<HumanizedRule> rules, int lineIndex)
     {
         // Check for block start: "server {" or "location / {"
         if (line.Contains('{'))
@@ -75,7 +75,7 @@ public class BlockConfigParser : BaseConfigParser
                 var directive = ParseDirective(beforeBrace);
                 if (directive.HasValue)
                 {
-                    AddRule(rules, rawLine, contextStack, directive.Value.key, directive.Value.value);
+                    AddRule(rules, rawLine, contextStack, directive.Value.key, directive.Value.value, lineIndex);
                 }
             }
         }
@@ -96,7 +96,7 @@ public class BlockConfigParser : BaseConfigParser
             var directive = ParseDirective(directiveLine);
             if (directive.HasValue)
             {
-                AddRule(rules, rawLine, contextStack, directive.Value.key, directive.Value.value);
+                AddRule(rules, rawLine, contextStack, directive.Value.key, directive.Value.value, lineIndex);
             }
         }
     }
@@ -152,7 +152,7 @@ public class BlockConfigParser : BaseConfigParser
         return (key, value);
     }
 
-    private void AddRule(List<HumanizedRule> rules, string rawLine, Stack<string> contextStack, string key, string value)
+    private void AddRule(List<HumanizedRule> rules, string rawLine, Stack<string> contextStack, string key, string value, int lineIndex)
     {
         // Build full context path
         var contextPath = contextStack.Count > 0
@@ -161,7 +161,7 @@ public class BlockConfigParser : BaseConfigParser
 
         var fullKey = contextPath + key;
 
-        var rule = MatchAndCreateRule(rawLine.Trim(), fullKey, value);
+        var rule = MatchAndCreateRule(rawLine.Trim(), fullKey, value, lineIndex);
         rules.Add(rule);
     }
 }

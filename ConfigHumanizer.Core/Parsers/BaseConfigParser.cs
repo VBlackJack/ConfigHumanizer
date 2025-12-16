@@ -42,7 +42,7 @@ public abstract class BaseConfigParser : IConfigParser
     /// <summary>
     /// Creates a HumanizedRule from a matched AnalysisRule.
     /// </summary>
-    protected HumanizedRule CreateRuleFromAnalysis(string rawLine, string key, string value, AnalysisRule rule)
+    protected HumanizedRule CreateRuleFromAnalysis(string rawLine, string key, string value, AnalysisRule rule, int lineIndex = -1)
     {
         return new HumanizedRule
         {
@@ -52,14 +52,15 @@ public abstract class BaseConfigParser : IConfigParser
             HumanDescription = rule.HumanDescription,
             Severity = ParseSeverity(rule.Severity),
             SuggestedFix = rule.SuggestedFix,
-            FixReason = rule.FixReason
+            FixReason = rule.FixReason,
+            LineIndex = lineIndex
         };
     }
 
     /// <summary>
     /// Creates a default Info-level HumanizedRule when no rule matches.
     /// </summary>
-    protected HumanizedRule CreateDefaultRule(string rawLine, string key, string value)
+    protected HumanizedRule CreateDefaultRule(string rawLine, string key, string value, int lineIndex = -1)
     {
         return new HumanizedRule
         {
@@ -69,7 +70,8 @@ public abstract class BaseConfigParser : IConfigParser
             HumanDescription = $"Configuration option '{key}' is set to '{value}'.",
             Severity = Severity.Info,
             SuggestedFix = string.Empty,
-            FixReason = string.Empty
+            FixReason = string.Empty,
+            LineIndex = lineIndex
         };
     }
 
@@ -90,17 +92,21 @@ public abstract class BaseConfigParser : IConfigParser
     /// <summary>
     /// Tries to match a rule and create a HumanizedRule.
     /// </summary>
-    protected HumanizedRule MatchAndCreateRule(string rawLine, string key, string value)
+    /// <param name="rawLine">The raw line from the configuration file.</param>
+    /// <param name="key">The configuration key.</param>
+    /// <param name="value">The configuration value.</param>
+    /// <param name="lineIndex">The 0-based line index in the original file (-1 if unknown).</param>
+    protected HumanizedRule MatchAndCreateRule(string rawLine, string key, string value, int lineIndex = -1)
     {
         if (RuleEngine != null)
         {
             var matchedRule = RuleEngine.MatchRule(key, value, FormatName);
             if (matchedRule != null)
             {
-                return CreateRuleFromAnalysis(rawLine, key, value, matchedRule);
+                return CreateRuleFromAnalysis(rawLine, key, value, matchedRule, lineIndex);
             }
         }
 
-        return CreateDefaultRule(rawLine, key, value);
+        return CreateDefaultRule(rawLine, key, value, lineIndex);
     }
 }

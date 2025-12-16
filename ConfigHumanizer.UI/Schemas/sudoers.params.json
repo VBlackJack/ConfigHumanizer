@@ -1,0 +1,272 @@
+{
+  "formatName": "Sudoers",
+  "description": "Configuration sudo (/etc/sudoers)",
+  "version": "1.0",
+  "filePatterns": ["sudoers", "*sudoers*"],
+  "fileExtensions": [],
+  "syntax": "SpaceSeparated",
+  "commentChar": "#",
+  "keyValueSeparator": " ",
+  "documentationUrl": "https://www.sudo.ws/docs/man/sudoers.man/",
+  "parameterCategories": [
+    {
+      "name": "Defaults",
+      "description": "Options par défaut de sudo",
+      "icon": "⚙️",
+      "order": 1,
+      "parameters": [
+        {
+          "key": "Defaults",
+          "displayName": "Option par défaut",
+          "description": "Définit une option globale pour sudo",
+          "dataType": "Enum",
+          "enumValues": [
+            { "value": "env_reset", "displayName": "Réinitialiser environnement", "description": "Nettoie les variables d'environnement", "severity": "GoodPractice" },
+            { "value": "mail_badpass", "displayName": "Email si mauvais mot de passe", "description": "Envoie un email en cas d'échec", "severity": "Info" },
+            { "value": "secure_path", "displayName": "PATH sécurisé", "description": "Définit un PATH sûr pour les commandes", "severity": "GoodPractice" },
+            { "value": "requiretty", "displayName": "Exiger TTY", "description": "Sudo uniquement depuis un terminal", "severity": "GoodPractice" },
+            { "value": "!requiretty", "displayName": "Ne pas exiger TTY", "description": "Permet sudo sans terminal (scripts)", "severity": "Warning" },
+            { "value": "visiblepw", "displayName": "Mot de passe visible", "description": "Permet d'afficher le mot de passe", "severity": "CriticalSecurity" },
+            { "value": "!visiblepw", "displayName": "Masquer mot de passe", "description": "Cache le mot de passe à la saisie", "severity": "GoodPractice" },
+            { "value": "always_set_home", "displayName": "Définir HOME", "description": "Définit HOME au répertoire cible", "severity": "Info" },
+            { "value": "logfile", "displayName": "Fichier de log", "description": "Active la journalisation sudo", "severity": "GoodPractice" },
+            { "value": "log_input", "displayName": "Logger les entrées", "description": "Enregistre les entrées utilisateur", "severity": "Info" },
+            { "value": "log_output", "displayName": "Logger les sorties", "description": "Enregistre les sorties des commandes", "severity": "Info" },
+            { "value": "insults", "displayName": "Insultes activées", "description": "Affiche des insultes humoristiques", "severity": "Info" },
+            { "value": "!insults", "displayName": "Insultes désactivées", "description": "Désactive les insultes", "severity": "Info" }
+          ],
+          "tags": ["defaults", "options"]
+        },
+        {
+          "key": "Defaults env_keep",
+          "displayName": "Conserver variable d'environnement",
+          "description": "Variables à conserver lors de l'exécution sudo",
+          "dataType": "String",
+          "example": "Defaults env_keep += \"HTTP_PROXY HTTPS_PROXY\"",
+          "tags": ["environnement"]
+        },
+        {
+          "key": "Defaults secure_path",
+          "displayName": "PATH sécurisé",
+          "description": "Chemin sécurisé pour l'exécution des commandes",
+          "dataType": "String",
+          "defaultValue": "/sbin:/bin:/usr/sbin:/usr/bin",
+          "example": "Defaults secure_path=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"",
+          "tags": ["sécurité", "PATH"]
+        },
+        {
+          "key": "Defaults timestamp_timeout",
+          "displayName": "Timeout du timestamp",
+          "description": "Durée de validité du mot de passe (minutes, 0=toujours demander)",
+          "dataType": "Integer",
+          "defaultValue": 5,
+          "unit": "min",
+          "validation": {
+            "min": 0,
+            "max": 60
+          },
+          "example": "Defaults timestamp_timeout=10"
+        },
+        {
+          "key": "Defaults passwd_tries",
+          "displayName": "Tentatives mot de passe",
+          "description": "Nombre de tentatives avant échec",
+          "dataType": "Integer",
+          "defaultValue": 3,
+          "validation": {
+            "min": 1,
+            "max": 10
+          },
+          "example": "Defaults passwd_tries=5"
+        },
+        {
+          "key": "Defaults logfile",
+          "displayName": "Fichier de log",
+          "description": "Chemin du fichier de journalisation sudo",
+          "dataType": "Path",
+          "example": "Defaults logfile=\"/var/log/sudo.log\"",
+          "tags": ["audit", "log"]
+        }
+      ]
+    },
+    {
+      "name": "Alias Utilisateurs",
+      "description": "Groupes d'utilisateurs",
+      "icon": "👥",
+      "order": 2,
+      "parameters": [
+        {
+          "key": "User_Alias",
+          "displayName": "Alias utilisateur",
+          "description": "Définit un groupe d'utilisateurs",
+          "dataType": "String",
+          "example": "User_Alias ADMINS = alice, bob, charlie",
+          "tags": ["alias", "utilisateurs"]
+        }
+      ]
+    },
+    {
+      "name": "Alias Commandes",
+      "description": "Groupes de commandes",
+      "icon": "📜",
+      "order": 3,
+      "parameters": [
+        {
+          "key": "Cmnd_Alias",
+          "displayName": "Alias de commandes",
+          "description": "Définit un groupe de commandes",
+          "dataType": "String",
+          "example": "Cmnd_Alias SHUTDOWN = /sbin/shutdown, /sbin/reboot, /sbin/halt",
+          "tags": ["alias", "commandes"]
+        },
+        {
+          "key": "Cmnd_Alias NETWORKING",
+          "displayName": "Commandes réseau",
+          "description": "Commandes d'administration réseau",
+          "dataType": "String",
+          "example": "Cmnd_Alias NETWORKING = /sbin/ifconfig, /sbin/route, /sbin/ip",
+          "tags": ["réseau"]
+        },
+        {
+          "key": "Cmnd_Alias SOFTWARE",
+          "displayName": "Commandes logiciels",
+          "description": "Commandes de gestion des paquets",
+          "dataType": "String",
+          "example": "Cmnd_Alias SOFTWARE = /usr/bin/apt, /usr/bin/yum, /usr/bin/dnf",
+          "tags": ["paquets"]
+        },
+        {
+          "key": "Cmnd_Alias SERVICES",
+          "displayName": "Commandes services",
+          "description": "Commandes de gestion des services",
+          "dataType": "String",
+          "example": "Cmnd_Alias SERVICES = /usr/bin/systemctl, /usr/sbin/service",
+          "tags": ["services"]
+        }
+      ]
+    },
+    {
+      "name": "Alias Hôtes",
+      "description": "Groupes de machines",
+      "icon": "🖥️",
+      "order": 4,
+      "parameters": [
+        {
+          "key": "Host_Alias",
+          "displayName": "Alias d'hôtes",
+          "description": "Définit un groupe de machines",
+          "dataType": "String",
+          "example": "Host_Alias SERVERS = web1, web2, db1",
+          "tags": ["alias", "hôtes"]
+        }
+      ]
+    },
+    {
+      "name": "Règles Utilisateurs",
+      "description": "Permissions sudo pour utilisateurs",
+      "icon": "🔐",
+      "order": 5,
+      "parameters": [
+        {
+          "key": "root",
+          "displayName": "Permissions root",
+          "description": "Règle sudo pour l'utilisateur root",
+          "dataType": "String",
+          "defaultValue": "root ALL=(ALL:ALL) ALL",
+          "example": "root ALL=(ALL:ALL) ALL"
+        },
+        {
+          "key": "user ALL=(ALL) NOPASSWD: ALL",
+          "displayName": "Utilisateur sans mot de passe (DANGEREUX)",
+          "description": "Permet à un utilisateur d'exécuter sudo sans mot de passe",
+          "dataType": "String",
+          "example": "deploy ALL=(ALL) NOPASSWD: ALL",
+          "securityLevel": "CriticalSecurity",
+          "tags": ["NOPASSWD", "dangereux"]
+        },
+        {
+          "key": "user ALL=(ALL) NOPASSWD: /path/to/command",
+          "displayName": "Commande spécifique sans mot de passe",
+          "description": "Autorise une commande spécifique sans mot de passe",
+          "dataType": "String",
+          "example": "backup ALL=(ALL) NOPASSWD: /usr/bin/rsync",
+          "securityLevel": "Warning",
+          "tags": ["NOPASSWD", "commande"]
+        },
+        {
+          "key": "user ALL=(ALL:ALL) ALL",
+          "displayName": "Accès sudo complet",
+          "description": "Donne tous les droits sudo avec mot de passe",
+          "dataType": "String",
+          "example": "admin ALL=(ALL:ALL) ALL",
+          "securityLevel": "Warning"
+        }
+      ]
+    },
+    {
+      "name": "Règles Groupes",
+      "description": "Permissions sudo pour groupes",
+      "icon": "👥",
+      "order": 6,
+      "parameters": [
+        {
+          "key": "%wheel ALL=(ALL:ALL) ALL",
+          "displayName": "Groupe wheel (admin)",
+          "description": "Membres du groupe wheel ont accès sudo",
+          "dataType": "String",
+          "example": "%wheel ALL=(ALL:ALL) ALL",
+          "tags": ["groupe", "wheel"]
+        },
+        {
+          "key": "%sudo ALL=(ALL:ALL) ALL",
+          "displayName": "Groupe sudo",
+          "description": "Membres du groupe sudo ont accès sudo",
+          "dataType": "String",
+          "example": "%sudo ALL=(ALL:ALL) ALL",
+          "tags": ["groupe", "sudo"]
+        },
+        {
+          "key": "%admin ALL=(ALL) NOPASSWD: ALL",
+          "displayName": "Groupe admin sans mot de passe (DANGEREUX)",
+          "description": "Groupe admin sans mot de passe requis",
+          "dataType": "String",
+          "example": "%admin ALL=(ALL) NOPASSWD: ALL",
+          "securityLevel": "CriticalSecurity"
+        },
+        {
+          "key": "%group ALL=(ALL) NOPASSWD: /path",
+          "displayName": "Groupe avec commande spécifique",
+          "description": "Autorise un groupe pour une commande spécifique",
+          "dataType": "String",
+          "example": "%developers ALL=(ALL) NOPASSWD: /usr/bin/docker",
+          "securityLevel": "Warning"
+        }
+      ]
+    },
+    {
+      "name": "Inclusions",
+      "description": "Fichiers de configuration additionnels",
+      "icon": "📁",
+      "order": 7,
+      "parameters": [
+        {
+          "key": "#includedir",
+          "displayName": "Inclure répertoire",
+          "description": "Inclut tous les fichiers d'un répertoire",
+          "dataType": "Path",
+          "defaultValue": "/etc/sudoers.d",
+          "example": "#includedir /etc/sudoers.d",
+          "tags": ["include", "répertoire"]
+        },
+        {
+          "key": "#include",
+          "displayName": "Inclure fichier",
+          "description": "Inclut un fichier de configuration spécifique",
+          "dataType": "Path",
+          "example": "#include /etc/sudoers.local",
+          "tags": ["include", "fichier"]
+        }
+      ]
+    }
+  ]
+}
