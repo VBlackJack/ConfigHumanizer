@@ -2,7 +2,7 @@
   "formatName": "OpenSSH",
   "description": "Configuration du serveur SSH (sshd_config)",
   "version": "1.0",
-  "filePatterns": ["*sshd_config", "sshd_config"],
+  "filePatterns": ["*sshd_config*", "*sshd_config", "sshd_config"],
   "fileExtensions": [],
   "syntax": "SpaceSeparated",
   "commentChar": "#",
