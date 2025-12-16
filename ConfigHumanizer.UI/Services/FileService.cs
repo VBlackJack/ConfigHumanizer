@@ -30,8 +30,17 @@ public class FileService : IFileService
     {
         var openFileDialog = new OpenFileDialog
         {
-            Title = "Open Configuration File",
-            Filter = "Config Files (*.conf;*_config;*.cfg)|*.conf;*_config;*.cfg|All Files (*.*)|*.*",
+            Title = "Ouvrir un fichier de configuration",
+            Filter = "Tous les fichiers de config|*.conf;*.cfg;*.ini;*.yaml;*.yml;*.json;*.xml;*.cnf;*.tf;*.tfvars;*.hcl;*.service;*.txt;*_config;sshd_config;sudoers;hosts;fstab;crontab;*.rules|" +
+                     "SSH (sshd_config)|*sshd_config*;*ssh_config*|" +
+                     "YAML (*.yaml;*.yml)|*.yaml;*.yml|" +
+                     "JSON (*.json)|*.json|" +
+                     "INI/CFG (*.ini;*.cfg;*.conf;*.cnf)|*.ini;*.cfg;*.conf;*.cnf|" +
+                     "Terraform (*.tf;*.tfvars;*.hcl)|*.tf;*.tfvars;*.hcl|" +
+                     "Systemd (*.service)|*.service;*.socket;*.timer|" +
+                     "XML (*.xml;*.config)|*.xml;*.config|" +
+                     "Texte (*.txt)|*.txt|" +
+                     "Tous les fichiers (*.*)|*.*",
             FilterIndex = 1,
             CheckFileExists = true,
             CheckPathExists = true
