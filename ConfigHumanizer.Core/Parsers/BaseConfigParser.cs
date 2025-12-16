@@ -53,7 +53,8 @@ public abstract class BaseConfigParser : IConfigParser
             Severity = ParseSeverity(rule.Severity),
             SuggestedFix = rule.SuggestedFix,
             FixReason = rule.FixReason,
-            LineIndex = lineIndex
+            LineIndex = lineIndex,
+            EducationalContent = rule.EducationalContent
         };
     }
 

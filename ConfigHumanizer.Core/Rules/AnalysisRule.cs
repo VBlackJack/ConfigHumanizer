@@ -56,4 +56,10 @@ public class AnalysisRule
     /// </summary>
     [JsonPropertyName("fixReason")]
     public string FixReason { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Detailed educational content explaining the configuration concept for junior developers.
+    /// </summary>
+    [JsonPropertyName("educationalContent")]
+    public string EducationalContent { get; set; } = string.Empty;
 }

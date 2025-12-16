@@ -845,6 +845,7 @@
                                                         <RowDefinition Height="Auto" />
                                                         <RowDefinition Height="Auto" />
                                                         <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
                                                     </Grid.RowDefinitions>
 
                                                     <!-- Row 0: Header with badge and actions -->
@@ -1068,6 +1069,35 @@
                                                             </Grid>
                                                         </Grid>
                                                     </Border>
+
+                                                    <!-- Row 5: Educational Content Section -->
+                                                    <Expander Grid.Row="5"
+                                                              Margin="0,12,0,0"
+                                                              Visibility="{Binding HasEducationalContent, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                              IsExpanded="False">
+                                                        <Expander.Header>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="📚" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                                                <TextBlock Text="Comprendre cette configuration (Détails pédagogiques)"
+                                                                           FontWeight="SemiBold"
+                                                                           FontSize="12"
+                                                                           Foreground="#5D4E37"
+                                                                           VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Expander.Header>
+                                                        <Border Background="#FFF9C4"
+                                                                BorderBrush="#F9E79F"
+                                                                BorderThickness="1"
+                                                                CornerRadius="6"
+                                                                Padding="14"
+                                                                Margin="0,8,0,0">
+                                                            <TextBlock Text="{Binding EducationalContent}"
+                                                                       TextWrapping="Wrap"
+                                                                       FontSize="12"
+                                                                       Foreground="#5D4E37"
+                                                                       LineHeight="20" />
+                                                        </Border>
+                                                    </Expander>
                                                 </Grid>
                                             </Grid>
                                         </Border>

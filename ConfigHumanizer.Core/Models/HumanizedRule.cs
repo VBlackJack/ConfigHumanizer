@@ -38,5 +38,11 @@ public class HumanizedRule
     /// </summary>
     public int LineIndex { get; set; } = -1;
 
+    /// <summary>
+    /// Detailed educational content explaining the configuration concept for junior developers.
+    /// </summary>
+    public string EducationalContent { get; set; } = string.Empty;
+
     public bool HasFix => !string.IsNullOrEmpty(SuggestedFix);
+    public bool HasEducationalContent => !string.IsNullOrEmpty(EducationalContent);
 }

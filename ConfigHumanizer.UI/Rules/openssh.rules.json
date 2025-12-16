@@ -8,7 +8,8 @@
       "severity": "CriticalSecurity",
       "humanDescription": "Root login is enabled. This allows direct SSH access as the root user, which is a significant security risk.",
       "suggestedFix": "PermitRootLogin no",
-      "fixReason": "Disabling root login prevents brute-force attacks on the root account and enforces the principle of least privilege."
+      "fixReason": "Disabling root login prevents brute-force attacks on the root account and enforces the principle of least privilege.",
+      "educationalContent": "Le compte 'root' est le super-administrateur de Linux avec tous les pouvoirs. Autoriser root à se connecter directement par SSH est très risqué car :\n\n1. C'est le premier compte que les pirates attaquent (nom prévisible)\n2. Un accès root = contrôle total du serveur\n3. Pas de traçabilité des actions (qui a fait quoi ?)\n\nBonne pratique : Se connecter avec un utilisateur normal, puis utiliser 'sudo' pour les tâches administratives. Cela crée une trace d'audit et limite les dégâts en cas de compromission."
     },
     {
       "key": "PermitRootLogin",
@@ -16,7 +17,8 @@
       "severity": "GoodPractice",
       "humanDescription": "Root login is disabled. Users must log in with a regular account and use sudo for elevated privileges.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Excellent choix de sécurité ! En désactivant l'accès root direct, vous forcez les administrateurs à :\n\n1. Se connecter avec leur compte personnel (traçabilité)\n2. Utiliser 'sudo' pour les commandes privilégiées\n3. Avoir une double authentification naturelle\n\nCela suit le principe du 'moindre privilège' : n'avoir que les droits nécessaires, au moment nécessaire."
     },
     {
       "key": "PermitRootLogin",
@@ -24,7 +26,8 @@
       "severity": "GoodPractice",
       "humanDescription": "Root login is allowed only with SSH keys (no password). This is a reasonable compromise for some environments.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Ce paramètre est un bon compromis : root peut se connecter, mais UNIQUEMENT avec une clé SSH (pas de mot de passe).\n\nPourquoi c'est acceptable :\n- Les clés SSH sont quasi-impossibles à deviner (contrairement aux mots de passe)\n- Utile pour l'automatisation (scripts, Ansible, etc.)\n- Bloque les attaques par force brute\n\nAttention : Assurez-vous que la clé privée correspondante est bien protégée !"
     },
     {
       "key": "PasswordAuthentication",
@@ -32,7 +35,8 @@
       "severity": "Warning",
       "humanDescription": "Password authentication is enabled. Users can log in using passwords, which are vulnerable to brute-force attacks.",
       "suggestedFix": "PasswordAuthentication no",
-      "fixReason": "SSH key authentication is stronger than passwords and protects against brute-force attacks."
+      "fixReason": "SSH key authentication is stronger than passwords and protects against brute-force attacks.",
+      "educationalContent": "L'authentification par mot de passe est pratique mais risquée :\n\n1. Les mots de passe peuvent être devinés (attaque par dictionnaire)\n2. Ils peuvent être interceptés (keyloggers, shoulder surfing)\n3. Les utilisateurs réutilisent souvent les mêmes mots de passe\n\nLes clés SSH sont bien plus sûres car :\n- Elles font 2048+ bits (impossible à deviner)\n- La clé privée ne quitte jamais votre machine\n- Pas de transmission de secret lors de la connexion\n\nConseil : Désactivez les mots de passe et utilisez 'ssh-keygen' pour créer vos clés."
     },
     {
       "key": "PasswordAuthentication",
@@ -40,7 +44,8 @@
       "severity": "GoodPractice",
       "humanDescription": "Password authentication is disabled. Users must use SSH keys for authentication, which is more secure.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Bravo ! En désactivant les mots de passe, vous éliminez une grande partie des attaques SSH.\n\nPour vous connecter, vous devez maintenant :\n1. Générer une paire de clés : ssh-keygen -t ed25519\n2. Copier la clé publique sur le serveur : ssh-copy-id user@serveur\n3. Se connecter : ssh user@serveur (automatique !)\n\nAvantages :\n- Impossible de deviner une clé de 256+ bits\n- Connexion plus rapide (pas de saisie)\n- Peut être protégée par une passphrase locale"
     },
     {
       "key": "Port",
@@ -48,7 +53,8 @@
       "severity": "Info",
       "humanDescription": "SSH is running on the default port 22. This is the standard port and may be targeted by automated scanners.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Le port 22 est le port standard de SSH, comme le port 80 pour HTTP.\n\nPourquoi c'est important :\n- Les scanners automatiques cherchent le port 22 en premier\n- Des milliers de tentatives de connexion par jour sont normales\n- Ce n'est PAS une faille en soi, mais ça attire l'attention\n\nOptions :\n- Garder le port 22 avec fail2ban (bloque les IPs malveillantes)\n- Changer le port (ex: 2222) pour réduire le 'bruit'\n- Utiliser le port knocking (technique avancée)\n\nNote : Changer le port est de la 'sécurité par l'obscurité', pas une vraie protection !"
     },
     {
       "key": "Port",
@@ -56,7 +62,8 @@
       "severity": "GoodPractice",
       "humanDescription": "SSH is running on a non-standard port. Using a non-standard port can reduce automated scanning attempts.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Vous utilisez un port non-standard pour SSH. C'est une bonne pratique de 'réduction du bruit'.\n\nAvantages :\n- Moins de tentatives automatisées dans les logs\n- Les scripts basiques ne vous trouveront pas\n- Réduit la charge du serveur (moins de connexions à rejeter)\n\nAttention :\n- Ce n'est PAS une vraie mesure de sécurité (un scan complet vous trouvera)\n- N'oubliez pas de mettre à jour vos scripts et configurations\n- Utilisez : ssh -p VOTRE_PORT user@serveur\n\nConseil : Combinez avec fail2ban pour une vraie protection."
     },
     {
       "key": "PermitEmptyPasswords",
@@ -64,7 +71,8 @@
       "severity": "CriticalSecurity",
       "humanDescription": "Empty passwords are permitted. This is extremely dangerous and allows passwordless access.",
       "suggestedFix": "PermitEmptyPasswords no",
-      "fixReason": "Never allow empty passwords as they completely bypass authentication security."
+      "fixReason": "Never allow empty passwords as they completely bypass authentication security.",
+      "educationalContent": "DANGER CRITIQUE ! Autoriser les mots de passe vides signifie qu'un compte sans mot de passe peut se connecter par SSH.\n\nRisques :\n- N'importe qui connaissant un nom d'utilisateur peut entrer\n- Certains comptes système n'ont pas de mot de passe par défaut\n- C'est comme laisser la porte d'entrée grande ouverte\n\nCette option ne devrait JAMAIS être activée sur un serveur en production. Désactivez-la immédiatement !"
     },
     {
       "key": "PermitEmptyPasswords",
@@ -72,7 +80,8 @@
       "severity": "GoodPractice",
       "humanDescription": "Empty passwords are not permitted. Users must have a password set to authenticate.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Parfait ! Les mots de passe vides sont interdits.\n\nCela signifie que même si un compte utilisateur n'a pas de mot de passe défini (ce qui peut arriver), il ne pourra pas se connecter par SSH.\n\nC'est une sécurité de base essentielle qui devrait toujours être activée."
     },
     {
       "key": "X11Forwarding",
@@ -80,7 +89,8 @@
       "severity": "Warning",
       "humanDescription": "X11 forwarding is enabled. This can be a security risk if not needed, as it exposes the X server.",
       "suggestedFix": "X11Forwarding no",
-      "fixReason": "Disable X11 forwarding unless you specifically need graphical application forwarding."
+      "fixReason": "Disable X11 forwarding unless you specifically need graphical application forwarding.",
+      "educationalContent": "X11 Forwarding permet d'afficher des applications graphiques distantes sur votre écran local.\n\nExemple : Lancer Firefox sur un serveur et voir la fenêtre chez vous.\n\nRisques potentiels :\n- Le serveur X local peut être exploité par un serveur compromis\n- Augmente la surface d'attaque\n- Consomme plus de bande passante\n\nQuand le garder activé :\n- Administration de serveurs avec GUI\n- Développement à distance\n- Accès à des outils graphiques spécifiques\n\nSi vous n'utilisez que le terminal : désactivez-le !"
     },
     {
       "key": "X11Forwarding",
@@ -88,7 +98,8 @@
       "severity": "GoodPractice",
       "humanDescription": "X11 forwarding is disabled. This reduces the attack surface of the SSH server.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "X11 Forwarding est désactivé - bonne pratique si vous n'avez pas besoin d'applications graphiques.\n\nLa plupart des serveurs sont administrés en ligne de commande, donc X11 est inutile.\n\nSi vous avez besoin d'un accès graphique occasionnel, vous pouvez toujours utiliser VNC ou un bureau à distance dédié."
     },
     {
       "key": "MaxAuthTries",
@@ -96,7 +107,8 @@
       "severity": "Warning",
       "humanDescription": "Maximum authentication attempts is set high. This may allow more brute-force attempts before disconnection.",
       "suggestedFix": "MaxAuthTries 3",
-      "fixReason": "Limiting authentication attempts helps prevent brute-force attacks."
+      "fixReason": "Limiting authentication attempts helps prevent brute-force attacks.",
+      "educationalContent": "MaxAuthTries définit combien de tentatives de connexion sont autorisées avant déconnexion.\n\nUne valeur élevée (7+) permet aux attaquants de :\n- Essayer plus de mots de passe par connexion\n- Ralentir fail2ban (qui compte les connexions, pas les essais)\n- Mener des attaques par dictionnaire plus efficaces\n\nRecommandation : 3-4 essais maximum\n- Assez pour les erreurs de frappe légitimes\n- Pas assez pour une attaque efficace\n\nCombinez avec fail2ban pour bloquer les IPs après X échecs."
     },
     {
       "key": "MaxAuthTries",
@@ -104,7 +116,8 @@
       "severity": "GoodPractice",
       "humanDescription": "Maximum authentication attempts is set to a reasonable value, limiting brute-force attempts.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Excellent ! Un nombre limité de tentatives de connexion est configuré.\n\nCela signifie qu'après quelques échecs, la connexion est fermée. L'attaquant doit recommencer une nouvelle session, ce qui :\n- Ralentit les attaques par force brute\n- Facilite la détection par fail2ban\n- Génère plus de logs pour analyse"
     },
     {
       "key": "PubkeyAuthentication",
@@ -112,7 +125,8 @@
       "severity": "GoodPractice",
       "humanDescription": "Public key authentication is enabled. This is the recommended authentication method.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "L'authentification par clé publique est LA méthode recommandée pour SSH.\n\nComment ça marche (simplifié) :\n1. Vous avez une clé privée (secrète, sur votre PC)\n2. Le serveur a votre clé publique (peut être partagée)\n3. À la connexion, vous prouvez posséder la clé privée sans la révéler\n\nAvantages :\n- Impossible à deviner (cryptographie asymétrique)\n- Pas de mot de passe à retenir ou taper\n- Peut être protégée par une passphrase locale\n- Révocation facile (supprimer la clé publique du serveur)\n\nPour commencer : ssh-keygen -t ed25519 -C 'mon-pc'"
     },
     {
       "key": "PubkeyAuthentication",
@@ -120,7 +134,8 @@
       "severity": "Warning",
       "humanDescription": "Public key authentication is disabled. Consider enabling it for more secure authentication.",
       "suggestedFix": "PubkeyAuthentication yes",
-      "fixReason": "Public key authentication is more secure than password authentication."
+      "fixReason": "Public key authentication is more secure than password authentication.",
+      "educationalContent": "L'authentification par clé publique est désactivée - ce n'est pas recommandé !\n\nSans clés SSH, vous êtes limité aux mots de passe, qui sont :\n- Vulnérables aux attaques par force brute\n- Potentiellement interceptables\n- Souvent réutilisés entre services\n\nActivez cette option et configurez des clés SSH pour chaque utilisateur. C'est le standard de l'industrie pour la sécurité SSH."
     },
     {
       "key": "AllowTcpForwarding",
@@ -128,7 +143,8 @@
       "severity": "Info",
       "humanDescription": "TCP forwarding is enabled. This allows SSH tunneling which may or may not be desired.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Le TCP Forwarding permet de créer des 'tunnels' SSH pour faire passer d'autres connexions.\n\nExemples d'utilisation :\n- Accéder à une base de données interne via SSH\n- Sécuriser une connexion non-chiffrée\n- Contourner un pare-feu (attention aux politiques !)\n\nCommande : ssh -L 3306:localhost:3306 user@serveur\n(Accède au MySQL distant comme s'il était local)\n\nRisques : Un utilisateur malveillant pourrait l'utiliser pour exfiltrer des données ou accéder à des services internes."
     },
     {
       "key": "AllowTcpForwarding",
@@ -136,7 +152,8 @@
       "severity": "GoodPractice",
       "humanDescription": "TCP forwarding is disabled. This prevents SSH from being used for tunneling.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Le TCP Forwarding est désactivé, ce qui empêche la création de tunnels SSH.\n\nC'est une bonne pratique si :\n- Vos utilisateurs n'ont pas besoin de tunnels\n- Vous voulez empêcher l'exfiltration de données\n- Vous avez d'autres moyens d'accès aux services internes (VPN)\n\nNote : Cela peut bloquer certains workflows légitimes comme l'accès aux bases de données via SSH."
     },
     {
       "key": "Protocol",
@@ -144,7 +161,8 @@
       "severity": "CriticalSecurity",
       "humanDescription": "SSH Protocol 1 is enabled. This protocol has known vulnerabilities and should not be used.",
       "suggestedFix": "Protocol 2",
-      "fixReason": "SSH Protocol 1 has cryptographic weaknesses. Always use Protocol 2."
+      "fixReason": "SSH Protocol 1 has cryptographic weaknesses. Always use Protocol 2.",
+      "educationalContent": "DANGER ! Le protocole SSH version 1 est obsolète et vulnérable.\n\nProblèmes du protocole 1 :\n- Failles cryptographiques connues\n- Attaques man-in-the-middle possibles\n- N'est plus maintenu depuis des années\n\nLe protocole 2 est le standard depuis 2006. Sur les systèmes modernes, SSH utilise automatiquement le protocole 2.\n\nSi vous voyez 'Protocol 1', c'est probablement un très vieux système qui nécessite une mise à jour urgente !"
     },
     {
       "key": "Protocol",
@@ -152,7 +170,8 @@
       "severity": "GoodPractice",
       "humanDescription": "SSH Protocol 2 is enabled. This is the secure and recommended protocol version.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "Le protocole SSH version 2 est utilisé - c'est le standard actuel.\n\nAméliorations par rapport à la version 1 :\n- Cryptographie plus robuste\n- Protection contre les attaques man-in-the-middle\n- Support des clés Ed25519 et ECDSA\n- Meilleure négociation des algorithmes\n\nNote : Sur les systèmes récents, cette ligne n'est plus nécessaire car le protocole 2 est le seul supporté."
     },
     {
       "key": "UsePAM",
@@ -160,7 +179,8 @@
       "severity": "Info",
       "humanDescription": "PAM (Pluggable Authentication Modules) is enabled for authentication.",
       "suggestedFix": "",
-      "fixReason": ""
+      "fixReason": "",
+      "educationalContent": "PAM (Pluggable Authentication Modules) est un système modulaire d'authentification Linux.\n\nAvec PAM activé, SSH peut utiliser :\n- Les règles de mots de passe système (complexité, expiration)\n- L'authentification à deux facteurs (Google Authenticator, etc.)\n- Les restrictions horaires de connexion\n- LDAP/Active Directory\n\nC'est généralement recommandé de le garder activé pour bénéficier des fonctionnalités avancées d'authentification du système."
     },
     {
       "key": "LoginGraceTime",
@@ -168,7 +188,8 @@
       "severity": "Warning",
       "humanDescription": "Login grace time is set high. This gives attackers more time to attempt authentication.",
       "suggestedFix": "LoginGraceTime 60",
-      "fixReason": "A shorter login grace time limits the window for brute-force attacks."
+      "fixReason": "A shorter login grace time limits the window for brute-force attacks.",
+      "educationalContent": "LoginGraceTime définit combien de temps (en secondes) un utilisateur a pour s'authentifier après connexion.\n\nUne valeur élevée (120s+) permet aux attaquants de :\n- Garder des connexions ouvertes longtemps\n- Potentiellement épuiser les ressources du serveur\n- Avoir plus de temps pour des attaques complexes\n\nRecommandation : 30 à 60 secondes\n- Assez pour taper un mot de passe ou présenter une clé\n- Pas assez pour des attaques élaborées\n\nLes utilisateurs légitimes s'authentifient en quelques secondes."
     }
   ]
 }
